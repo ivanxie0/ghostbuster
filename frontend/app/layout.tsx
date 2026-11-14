@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -14,10 +15,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}>
-        <div className="bg-red-900/60 text-center text-sm py-2">
-          In crisis? Call or text <a href="tel:988" className="font-bold underline">988</a>
+        {/* Honesty rule: crisis line on every screen, including the first. Hidden when printing. */}
+        <div className="sticky top-0 z-50 bg-red-700 text-white text-center text-base font-semibold py-2 print:hidden">
+          In crisis? Call or text{" "}
+          <a href="tel:988" className="underline decoration-2 underline-offset-2">
+            988
+          </a>{" "}
+          — the Suicide &amp; Crisis Lifeline, 24/7
         </div>
-        <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
+        <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 print:hidden">
+          <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+            <span aria-hidden className="text-2xl">👻</span> GhostBuster
+          </Link>
+          <span className="text-sm text-zinc-400">Evidence log + templates · not legal advice</span>
+        </header>
+        {children}
       </body>
     </html>
   );
