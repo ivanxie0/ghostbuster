@@ -1,0 +1,5 @@
+[PLACEHOLDER — Jai to write the member-services phone script.]
+
+"Hi, I'm a {insurer} member. I need a {appointment_type} {specialty} appointment and I can't get one within {deadline_days} business days. I contacted {n_called} in-network providers on {today} and none could see me in time. I'm asking the plan to arrange timely care for me, including out-of-network if needed. Can you open a timely access request and give me a reference number?"
+
+Write down: date/time, rep name, reference number, what they promised.

@@ -1,0 +1,31 @@
+// Typed client for every endpoint in docs/API.md.
+import type { SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
+
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: { "content-type": "application/json", ...(init?.headers || {}) },
+    cache: "no-store",
+  });
+  const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+  if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`);
+  return body as T;
+}
+
+export const api = {
+  health: () => req<{ ok: boolean; fake_mode: boolean }>("/api/health"),
+  createSearch: (body: SearchCreate) =>
+    req<SearchCreated>("/api/search", { method: "POST", body: JSON.stringify(body) }),
+  getSearch: (id: string) => req<SearchDetail>(`/api/search/${id}`),
+  verify: (id: string, provider_ids: string[]) =>
+    req<VerifyResponse>(`/api/search/${id}/verify`, {
+      method: "POST",
+      body: JSON.stringify({ provider_ids }),
+    }),
+  /** HTML page — open in a new tab / iframe, don't fetch as JSON. */
+  packetUrl: (id: string) => `${API_URL}/api/search/${id}/packet`,
+};
+
+export const POLL_MS = 2000;

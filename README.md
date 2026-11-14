@@ -1,2 +1,81 @@
-# ghostbuster
-SanD Hacks Fall 2026 - finds ghost therapist listings and builds SB 221 out-of-network requests
+# GhostBuster
+
+Insurance directories are full of "ghost" providers who aren't really taking patients. GhostBuster
+checks the listings, has an AI assistant call the rest, compares the earliest opening to California's
+timely-access deadlines, and builds an evidence packet when the plan falls short. SanD Hacks Fall 2026.
+
+**Team: read [CLAUDE.md](CLAUDE.md) first** (ownership, git rules, contracts).
+Docs: [ARCHITECTURE](docs/ARCHITECTURE.md) · [DATA_CONTRACT](docs/DATA_CONTRACT.md) · [API](docs/API.md) ·
+[RULES](docs/RULES.md) · [TASKS](docs/TASKS.md) · [DEMO](docs/DEMO.md) · [PITCH](docs/PITCH.md)
+
+## Prerequisites
+- Python 3.12+ (tested on 3.14), Node 20+ (tested on 24), npm, make
+- For real mode: a Neon Postgres URL; API keys as listed in `.env.example`
+- For webhooks: [ngrok](https://ngrok.com/download) (or any tunnel)
+
+## Setup (once)
+```bash
+git clone https://github.com/ivanxie0/ghostbuster.git && cd ghostbuster
+```
+```bash
+make setup
+```
+`make setup` copies `.env.example` → `.env`, creates `backend/.venv`, installs Python deps and `frontend/node_modules`.
+Manual equivalent:
+```bash
+cp .env.example .env
+python3 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt
+cd frontend && npm install
+```
+
+## Run in FAKE_MODE (no keys, no DB) — default
+Two terminals:
+```bash
+make dev-backend
+```
+```bash
+make dev-frontend
+```
+Open http://localhost:3000 → Start → Search. The backend simulates the whole run in ~20s:
+providers appear → ghosts flagged → calls resolve one by one → `done` (Ending B by default).
+- `FAKE_ENDING=A` in `.env` → one provider is available in time (Ending A).
+- `FAKE_AUTO_VERIFY=false` → simulated calls only start when you press the verify button.
+
+Quick API check:
+```bash
+curl -s localhost:8000/api/health
+```
+```bash
+curl -s -XPOST localhost:8000/api/search -H 'content-type: application/json' -d '{"insurer":"Blue Shield of California","plan_type":"hmo","zip":"92103","specialty":"therapist","appointment_type":"new"}'
+```
+
+## Run with real keys + Neon
+1. Fill `.env`: `DATABASE_URL`, `FAKE_MODE=false`, plus any keys you have (missing ones fall back to stubs).
+2. Create tables + seed data (idempotent, safe to re-run):
+   ```bash
+   make seed
+   ```
+3. `make dev-backend` and `make dev-frontend` as above. `/api/health` should show `"fake_mode": false`.
+
+## Exposing the backend for ElevenLabs webhooks
+```bash
+ngrok http 8000
+```
+Put the `https://….ngrok-free.app` URL in `.env` as `PUBLIC_BASE_URL`, restart the backend, and set the
+ElevenLabs agent's post-call webhook to `<PUBLIC_BASE_URL>/api/webhooks/call-complete`.
+
+## Tests
+```bash
+make test
+```
+
+## Troubleshooting
+- **`/api/health` says `fake_mode: true` but I set false** — `DATABASE_URL` is empty; config forces fake mode.
+- **Frontend shows "Failed to fetch"** — backend not running on :8000, or set `NEXT_PUBLIC_API_URL` in `frontend/.env.local` and restart `npm run dev`.
+- **`ModuleNotFoundError: app`** — run uvicorn from `/backend` (`make dev-backend` does this).
+- **psycopg connection errors** — Neon URL needs `?sslmode=require`; check the project isn't suspended.
+- **Seeded demo providers have no phone** — set `TEAMMATE_PHONE_1/2/3` in `.env` and re-run `make seed`.
+- **Webhook never arrives** — ngrok URL changed (it does on restart); update ElevenLabs + `PUBLIC_BASE_URL`.
+- **Port in use** — `lsof -ti:8000 | xargs kill` (or :3000).
+
+Output is an evidence log + templates, **not legal advice**. In crisis? Call or text **988**.

@@ -1,0 +1,17 @@
+[PLACEHOLDER — Jai to write. Placeholders: {insurer} {plan_type} {specialty} {appointment_type} {zip} {deadline_days} {today} {n_called} {n_violations} {n_ghosts}]
+
+{today}
+
+To: {insurer} Member Services
+
+Re: Request for timely access to {specialty} care (California timely access standards)
+
+I am a member of {insurer} ({plan_type}). On {today} I attempted to obtain a {appointment_type} {specialty} appointment near ZIP {zip}. Of the providers in your directory, {n_ghosts} appear not to be accepting patients, and {n_violations} of {n_called} contacted could not offer an appointment within {deadline_days} business days.
+
+I request that you arrange a timely appointment, including with an out-of-network provider if necessary, as required for state-regulated plans.
+
+Attached: call log.
+
+Sincerely,
+____________________
+Member ID: ____________
