@@ -6,7 +6,7 @@ from psycopg.rows import dict_row
 from app.config import DATABASE_URL
 from app.models import Provider, Search, SearchCreate
 
-SEARCH_COLS = "id::text, insurer, plan_type, zip, specialty, appointment_type, created_at, status"
+SEARCH_COLS = "id::text, insurer, plan_type, zip, specialty, appointment_type, prior_appointment_date, created_at, status"
 PROVIDER_COLS = (
     "id::text, search_id::text, name, specialty, phone, address, source_url, ghost_status, ghost_reason, "
     "earliest_date, business_days_wait, deadline_days, violation, call_transcript, checked_at"
@@ -20,9 +20,9 @@ def connect():
 def insert_search(req: SearchCreate) -> str:
     with connect() as c:
         row = c.execute(
-            "INSERT INTO searches (insurer, plan_type, zip, specialty, appointment_type) "
-            "VALUES (%s, %s, %s, %s, %s) RETURNING id::text",
-            (req.insurer, req.plan_type, req.zip, req.specialty, req.appointment_type),
+            "INSERT INTO searches (insurer, plan_type, zip, specialty, appointment_type, prior_appointment_date) "
+            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id::text",
+            (req.insurer, req.plan_type, req.zip, req.specialty, req.appointment_type, req.prior_appointment_date),
         ).fetchone()
         return row["id"]
 

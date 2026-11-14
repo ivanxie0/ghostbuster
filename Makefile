@@ -1,10 +1,13 @@
 PY := backend/.venv/bin/python
+# Prefer Python 3.12 (see .python-version); fall back to 3.13 / 3.11 / python3.
+PYTHON ?= $(shell command -v python3.12 || command -v python3.13 || command -v python3.11 || command -v python3)
 
 .PHONY: setup dev-backend dev-frontend seed test
 
 setup:
 	@test -f .env || cp .env.example .env
-	python3 -m venv backend/.venv
+	@echo "Using $(PYTHON) ($$($(PYTHON) --version))"
+	$(PYTHON) -m venv backend/.venv
 	$(PY) -m pip install -q -r backend/requirements.txt
 	cd frontend && npm install
 

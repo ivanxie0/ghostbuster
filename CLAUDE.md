@@ -37,7 +37,7 @@ The engine supports ALL specialties via the rules table; **the demo shows the th
 - The agent **discloses it is an AI assistant calling on behalf of a patient**, in its first sentence.
 
 ## Stack (fixed — do not change)
-- Backend: Python FastAPI (`/backend`), Python 3.12+ (works on 3.14)
+- Backend: Python FastAPI (`/backend`), target **Python 3.12** (3.11–3.13 supported; `.python-version`)
 - DB: Neon Postgres, `DATABASE_URL` in `.env` (never committed)
 - Frontend: Next.js (App Router) + Tailwind + TypeScript (`/frontend`)
 - Scraping: Bright Data (Web Unlocker / Scraping Browser / MCP); free NPI Registry API as backup
@@ -92,6 +92,7 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 
 ## Current status (update this list as you land things — one line each)
 - [x] Base scaffold: contracts, docs, FAKE_MODE backend, stub modules, frontend shells (Aryan)
+- [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
 - [ ] Neon schema applied + seeded (Ivan)
 - [ ] Real scraper / ghost check (Ivan)
 - [ ] Rules verified against DMHC (Jai) + business-day tests (Hardik)

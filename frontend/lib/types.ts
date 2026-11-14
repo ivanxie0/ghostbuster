@@ -4,7 +4,7 @@ export type PlanType = "hmo" | "ppo" | "medi_cal" | "unknown";
 export type Specialty = "primary_care" | "specialist" | "psychiatrist" | "therapist";
 export type AppointmentType = "new" | "follow_up" | "urgent";
 export type SearchStatus = "scraping" | "verifying" | "done";
-export type GhostStatus = "ghost" | "unverified" | "available" | "violation" | "no_answer";
+export type GhostStatus = "ghost" | "unverified" | "calling" | "available" | "violation" | "no_answer";
 
 export interface SearchCreate {
   insurer: string;
@@ -12,6 +12,8 @@ export interface SearchCreate {
   zip: string; // 5 digits
   specialty: Specialty;
   appointment_type: AppointmentType;
+  /** YYYY-MM-DD. Therapist follow-up: deadline counts from here when present, else from request date. */
+  prior_appointment_date?: string | null;
 }
 
 export interface Search extends SearchCreate {
@@ -59,6 +61,3 @@ export interface VerifyResponse {
 export interface ApiError {
   error: string;
 }
-
-/** ghost_reason value while a call is pending (row stays "unverified"). */
-export const CALL_IN_PROGRESS = "AI call in progress";

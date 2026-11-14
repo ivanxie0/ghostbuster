@@ -3,10 +3,9 @@ with a seed fallback so the demo never hangs. Owner: Aryan."""
 import threading
 import traceback
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
 
 from app import db
-from app.models import CALL_IN_PROGRESS, SearchCreate, SearchDetail
+from app.models import SearchCreate, SearchDetail
 from calls import agent, webhook
 from rules.deadlines import check_violation
 from scraper.ghosts import run_ghost_check
@@ -62,7 +61,7 @@ def verify(search_id: str, provider_ids: list[str]) -> list[str]:
     if bad:
         raise ValueError(f"provider_ids not in this search: {bad}")
     for pid in provider_ids:
-        db.update_provider(providers[pid].model_copy(update={"ghost_reason": CALL_IN_PROGRESS}))
+        db.update_provider(providers[pid].model_copy(update={"ghost_status": "calling", "ghost_reason": None}))
     with_timeout(agent.start_verification, CALL_START_TIMEOUT_S, None, search_id, provider_ids)
     return provider_ids
 
@@ -77,7 +76,7 @@ def call_complete(payload: dict) -> dict:
         return {"ok": False, "error": "unknown provider"}
     upd = check_violation(
         p.model_copy(update={"earliest_date": result.earliest_date, "call_transcript": result.transcript}),
-        search, asked_on=date.today(),
+        search,
     )
     db.update_provider(upd)
     _maybe_finish(result.search_id)
@@ -85,5 +84,5 @@ def call_complete(payload: dict) -> dict:
 
 
 def _maybe_finish(search_id: str) -> None:
-    if not any(p.ghost_reason == CALL_IN_PROGRESS for p in db.get_providers(search_id)):
+    if not any(p.ghost_status == "calling" for p in db.get_providers(search_id)):
         db.set_status(search_id, "done")

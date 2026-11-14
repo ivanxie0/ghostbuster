@@ -14,10 +14,13 @@ plans (often PPO) are federally regulated (ERISA) and may **not** be covered —
 | `specialist` / `new` | 15 business days | physician specialists |
 | `psychiatrist` / `new` | 15 business days | |
 | `therapist` / `new` | 10 business days | non-physician mental health |
-| `therapist` / `follow_up` | 10 business days **from prior appointment** | SB 221. App currently measures from request date — TODO |
-| any / `urgent` | 48 hours | urgent, no prior authorization required |
-| (any / urgent with prior auth) | 96 hours | not exposed in UI yet |
+| `therapist` / `follow_up` | 10 business days **from prior appointment** | SB 221. Uses `searches.prior_appointment_date`; if missing, counts from request date |
+| any / `urgent` | **48 calendar hours** | urgent, no prior authorization required. Hours from request time to the appointment, NOT business days |
+| any / `urgent` with prior auth | **96 calendar hours** | `check_violation(..., prior_auth=True)`; not exposed in UI yet |
 | `primary_care`/`specialist`/`psychiatrist` / `follow_up` | same as `new` (ASSUMPTION) | Jai: confirm |
+
+**Request time** = when the search was created (`searches.created_at`, Pacific time). Urgent appointments are
+compared at the start of the appointment day (conservative: only flag when clearly late) until we capture exact times.
 
 **Business days** exclude Saturdays, Sundays, and federal + California state holidays
 (list hardcoded for 2026–2027 in `deadlines.py` — Jai: confirm CA list).

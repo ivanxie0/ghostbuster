@@ -29,9 +29,13 @@ Request:
   "plan_type": "hmo",
   "zip": "92103",
   "specialty": "therapist",
-  "appointment_type": "new"
+  "appointment_type": "new",
+  "prior_appointment_date": null
 }
 ```
+`prior_appointment_date` (optional, `YYYY-MM-DD` or null): send only for `follow_up`. For therapist follow-ups
+the 10-business-day deadline counts from this date; if omitted it counts from the request date.
+
 Response `200`:
 ```json
 { "search_id": "0d5e9b8a-0000-4000-8000-00000000aaaa" }
@@ -45,7 +49,7 @@ Response `200`:
   "search": {
     "id": "0d5e9b8a-...", "insurer": "Blue Shield of California", "plan_type": "hmo",
     "zip": "92103", "specialty": "therapist", "appointment_type": "new",
-    "created_at": "2026-11-14T22:04:50Z", "status": "verifying"
+    "prior_appointment_date": null, "created_at": "2026-11-14T22:04:50Z", "status": "verifying"
   },
   "providers": [
     { "id": "6f1c...", "search_id": "0d5e...", "name": "Dr. Juniper Fakewell, LMFT", "specialty": "therapist",
@@ -68,7 +72,7 @@ Response `200`:
 { "started": 2, "provider_ids": ["6f1c...0002", "6f1c...0004"] }
 ```
 Errors: `404` unknown search, `400 {"error": "provider_ids not in this search: [...]"}`.
-While a call is in progress the row stays `unverified` with `ghost_reason: "AI call in progress"`.
+Each called row moves `unverified → calling → available | violation | no_answer`.
 
 FAKE_MODE note: if `FAKE_AUTO_VERIFY=true` (default) the simulation auto-starts calls on all
 `unverified` providers ~10s after the search is created (so a curl-only run finishes). Set

@@ -12,11 +12,12 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 | `specialty` | `primary_care`, `specialist`, `psychiatrist`, `therapist` |
 | `appointment_type` | `new`, `follow_up`, `urgent` |
 | `search.status` | `scraping`, `verifying`, `done` |
-| `provider.ghost_status` | `ghost`, `unverified`, `available`, `violation`, `no_answer` |
+| `provider.ghost_status` | `ghost`, `unverified`, `calling`, `available`, `violation`, `no_answer` |
 
 `ghost_status` meanings:
 - `ghost` — listed by insurer, but public profile/registry shows not accepting / moved / disconnected. Not called.
-- `unverified` — looks real, not called yet (or call in progress — `ghost_reason` says "AI call in progress").
+- `unverified` — looks real, not called yet.
+- `calling` — AI call in progress (set by `/verify`). Lifecycle: `unverified → calling → available | violation | no_answer`.
 - `available` — called; earliest opening is **within** the legal deadline.
 - `violation` — called; earliest opening is **past** the legal deadline.
 - `no_answer` — called; no answer / voicemail / no usable date.
@@ -30,6 +31,7 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 | `zip` | text | no | 5-digit |
 | `specialty` | text enum | no | |
 | `appointment_type` | text enum | no | |
+| `prior_appointment_date` | date | yes | therapist `follow_up`: deadline counts from this date when present, else from the request date |
 | `created_at` | timestamptz | no | default `now()` |
 | `status` | text enum | no | default `scraping` |
 
@@ -46,8 +48,8 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 | `ghost_status` | text enum | no | default `unverified` |
 | `ghost_reason` | text | yes | human-readable why |
 | `earliest_date` | date | yes | from call transcript |
-| `business_days_wait` | int | yes | business days from `checked_at` date to `earliest_date` |
-| `deadline_days` | int | yes | legal deadline in business days (urgent: hours → stored as days 2/4, see RULES.md) |
+| `business_days_wait` | int | yes | business days from clock start (request date in Pacific time, or `prior_appointment_date` for therapist follow-up) to `earliest_date` |
+| `deadline_days` | int | yes | legal deadline in business days. **Urgent**: the rule is calendar hours (48 / 96); stored here as hours÷24 (2 / 4) for display, violation is decided on hours — see `ghost_reason` |
 | `violation` | bool | no | default false |
 | `call_transcript` | text | yes | |
 | `checked_at` | timestamptz | yes | default `now()`; updated when the call result lands |
@@ -96,6 +98,26 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 
 ```json
 {
+  "id": "6f1c2a1e-0000-4000-8000-000000000006",
+  "search_id": "0d5e9b8a-0000-4000-8000-00000000aaaa",
+  "name": "Dr. Fable Nonesuch, PhD",
+  "specialty": "therapist",
+  "phone": "+16195550110",
+  "address": "8810 Fictional Pkwy, San Diego, CA 92122",
+  "source_url": "https://example.com/directory/fable-nonesuch",
+  "ghost_status": "calling",
+  "ghost_reason": null,
+  "earliest_date": null,
+  "business_days_wait": null,
+  "deadline_days": null,
+  "violation": false,
+  "call_transcript": null,
+  "checked_at": "2026-11-14T22:05:00Z"
+}
+```
+
+```json
+{
   "id": "6f1c2a1e-0000-4000-8000-000000000003",
   "search_id": "0d5e9b8a-0000-4000-8000-00000000aaaa",
   "name": "Dr. Sage Imaginary, PsyD",
@@ -104,7 +126,7 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
   "address": "1200 Placeholder Ave, San Diego, CA 92101",
   "source_url": "https://example.com/directory/sage-imaginary",
   "ghost_status": "available",
-  "ghost_reason": "Earliest new-patient opening is within the deadline",
+  "ghost_reason": "Earliest opening is 3 business days after request — within the 10-day deadline",
   "earliest_date": "2026-11-19",
   "business_days_wait": 3,
   "deadline_days": 10,
@@ -124,7 +146,7 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
   "address": "2250 Mock Rd, San Diego, CA 92108",
   "source_url": "https://example.com/directory/rowan-madeup",
   "ghost_status": "violation",
-  "ghost_reason": "Earliest new-patient opening is 27 business days out (deadline 10)",
+  "ghost_reason": "Earliest opening is 27 business days after request (deadline 10)",
   "earliest_date": "2026-12-23",
   "business_days_wait": 27,
   "deadline_days": 10,
@@ -163,6 +185,7 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
   "zip": "92103",
   "specialty": "therapist",
   "appointment_type": "new",
+  "prior_appointment_date": null,
   "created_at": "2026-11-14T22:04:50Z",
   "status": "done"
 }

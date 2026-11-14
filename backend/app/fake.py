@@ -5,15 +5,15 @@ Timeline (seconds since POST /api/search):
   0-3   status=scraping, providers=[]
   3-6   status=scraping, providers listed (all unverified)
   6-8   status=scraping, ghost flags applied
-  8+    status=verifying; calls start at /verify time (or t=10 if FAKE_AUTO_VERIFY), one resolves every 2s
+  8+    status=verifying; targets go unverified -> calling -> result; calls start at /verify time (or t=10 if FAKE_AUTO_VERIFY), one resolves every 2s
   done  when every called provider has a result (~20s for the therapist demo)
 """
 import time
 import uuid
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 from app.config import FAKE_AUTO_VERIFY
-from app.models import CALL_IN_PROGRESS, Provider, Search, SearchCreate, SearchDetail
+from app.models import Provider, Search, SearchCreate, SearchDetail
 from calls import agent, webhook
 from rules.deadlines import check_violation
 from scraper.ghosts import run_ghost_check
@@ -62,7 +62,7 @@ def _resolve(s: dict, p: Provider, index: int) -> Provider:
             "call_transcript": result.transcript if result else None,
             "checked_at": datetime.now(timezone.utc),
         })
-        s["results"][p.id] = check_violation(upd, s["search"], asked_on=date.today())
+        s["results"][p.id] = check_violation(upd, s["search"])
     return s["results"][p.id]
 
 
@@ -92,7 +92,7 @@ def get(search_id: str) -> SearchDetail | None:
                 p = _resolve(s, p, i)
             else:
                 pending += 1
-                p = p.model_copy(update={"ghost_reason": CALL_IN_PROGRESS})
+                p = p.model_copy(update={"ghost_status": "calling", "ghost_reason": None})
         out.append(p)
     done = s["verify_at"] is not None and pending == 0
     return SearchDetail(search=search.model_copy(update={"status": "done" if done else "verifying"}), providers=out)
@@ -108,5 +108,5 @@ def call_complete(payload: dict) -> dict:
     if not p:
         return {"ok": False, "error": "unknown provider"}
     upd = p.model_copy(update={"earliest_date": result.earliest_date, "call_transcript": result.transcript})
-    s["results"][p.id] = check_violation(upd, s["search"], asked_on=date.today())
+    s["results"][p.id] = check_violation(upd, s["search"])
     return {"ok": True, "provider_id": p.id, "ghost_status": s["results"][p.id].ghost_status}

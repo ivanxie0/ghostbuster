@@ -9,7 +9,9 @@ Docs: [ARCHITECTURE](docs/ARCHITECTURE.md) · [DATA_CONTRACT](docs/DATA_CONTRACT
 [RULES](docs/RULES.md) · [TASKS](docs/TASKS.md) · [DEMO](docs/DEMO.md) · [PITCH](docs/PITCH.md)
 
 ## Prerequisites
-- Python 3.12+ (tested on 3.14), Node 20+ (tested on 24), npm, make
+- **Python 3.12** (`.python-version`; 3.11–3.13 supported — pins verified on 3.11 and 3.14), Node 20+ (tested on 24), npm, make
+  - macOS: `brew install python@3.12` · pyenv: `pyenv install 3.12` (picks up `.python-version`)
+  - `make setup` auto-picks python3.12 → 3.13 → 3.11 → python3
 - For real mode: a Neon Postgres URL; API keys as listed in `.env.example`
 - For webhooks: [ngrok](https://ngrok.com/download) (or any tunnel)
 
@@ -24,7 +26,7 @@ make setup
 Manual equivalent:
 ```bash
 cp .env.example .env
-python3 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt
+python3.12 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt
 cd frontend && npm install
 ```
 
@@ -72,6 +74,7 @@ make test
 ## Troubleshooting
 - **`/api/health` says `fake_mode: true` but I set false** — `DATABASE_URL` is empty; config forces fake mode.
 - **Frontend shows "Failed to fetch"** — backend not running on :8000, or set `NEXT_PUBLIC_API_URL` in `frontend/.env.local` and restart `npm run dev`.
+- **pip can't find a wheel / build fails** — you're probably on Python 3.10 or older: install 3.12, delete the `backend/.venv` folder, re-run `make setup`.
 - **`ModuleNotFoundError: app`** — run uvicorn from `/backend` (`make dev-backend` does this).
 - **psycopg connection errors** — Neon URL needs `?sslmode=require`; check the project isn't suspended.
 - **Seeded demo providers have no phone** — set `TEAMMATE_PHONE_1/2/3` in `.env` and re-run `make seed`.

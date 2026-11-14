@@ -3,11 +3,12 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, POLL_MS } from "@/lib/api";
-import { CALL_IN_PROGRESS, type GhostStatus, type SearchDetail } from "@/lib/types";
+import type { GhostStatus, SearchDetail } from "@/lib/types";
 
 const BADGE: Record<GhostStatus, string> = {
   ghost: "bg-zinc-700",
   unverified: "bg-sky-800",
+  calling: "bg-indigo-600 animate-pulse",
   available: "bg-emerald-700",
   violation: "bg-red-700",
   no_answer: "bg-amber-700",
@@ -65,7 +66,8 @@ export default function ResultsPage() {
       <p className="text-sm text-zinc-400">Status: {search.status}</p>
       {error && <p className="text-red-400">{error}</p>}
 
-      {search.status === "verifying" && !verifying && called.length === 0 && (
+      {search.status === "verifying" && !verifying && called.length === 0 &&
+        !providers.some((p) => p.ghost_status === "calling") && (
         <button onClick={verify} className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold">
           Let the AI assistant call the remaining offices
         </button>
@@ -77,7 +79,7 @@ export default function ResultsPage() {
             <div className="flex items-center justify-between">
               <span className="font-medium">{p.name}</span>
               <span className={`rounded px-2 py-0.5 text-xs ${BADGE[p.ghost_status]}`}>
-                {p.ghost_reason === CALL_IN_PROGRESS ? "calling…" : p.ghost_status}
+                {p.ghost_status === "calling" ? "Calling…" : p.ghost_status}
               </span>
             </div>
             {p.ghost_reason && <p className="text-sm text-zinc-400">{p.ghost_reason}</p>}

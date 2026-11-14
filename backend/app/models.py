@@ -9,7 +9,7 @@ PlanType = Literal["hmo", "ppo", "medi_cal", "unknown"]
 Specialty = Literal["primary_care", "specialist", "psychiatrist", "therapist"]
 AppointmentType = Literal["new", "follow_up", "urgent"]
 SearchStatus = Literal["scraping", "verifying", "done"]
-GhostStatus = Literal["ghost", "unverified", "available", "violation", "no_answer"]
+GhostStatus = Literal["ghost", "unverified", "calling", "available", "violation", "no_answer"]
 
 
 class SearchCreate(BaseModel):
@@ -18,6 +18,8 @@ class SearchCreate(BaseModel):
     zip: str = Field(pattern=r"^\d{5}$")
     specialty: Specialty
     appointment_type: AppointmentType
+    # Therapist follow-up: deadline counts from this date when present, else from request date.
+    prior_appointment_date: Optional[date] = None
 
 
 class Search(SearchCreate):
@@ -62,5 +64,3 @@ class VerifyResponse(BaseModel):
     started: int
     provider_ids: list[str]
 
-
-CALL_IN_PROGRESS = "AI call in progress"  # ghost_reason while a call is pending

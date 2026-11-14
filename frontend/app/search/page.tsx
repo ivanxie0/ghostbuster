@@ -24,7 +24,12 @@ export default function SearchPage() {
     setBusy(true);
     setError(null);
     try {
-      const { search_id } = await api.createSearch(form);
+      const body: SearchCreate = {
+        ...form,
+        prior_appointment_date:
+          form.appointment_type === "follow_up" && form.prior_appointment_date ? form.prior_appointment_date : null,
+      };
+      const { search_id } = await api.createSearch(body);
       router.push(`/results/${search_id}`);
     } catch (err) {
       setError((err as Error).message);
@@ -61,6 +66,17 @@ export default function SearchPage() {
         <option value="follow_up">Follow-up</option>
         <option value="urgent">Urgent</option>
       </select>
+      {form.appointment_type === "follow_up" && (
+        <label className="block space-y-1 text-sm">
+          <span className="text-zinc-300">Date of your last appointment (optional)</span>
+          <input
+            type="date"
+            className={field}
+            value={form.prior_appointment_date ?? ""}
+            onChange={set("prior_appointment_date")}
+          />
+        </label>
+      )}
       {error && <p className="text-red-400">{error}</p>}
       <button disabled={busy} className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold disabled:opacity-50">
         {busy ? "Starting…" : "Search"}
