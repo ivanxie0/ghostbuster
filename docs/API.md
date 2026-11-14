@@ -74,9 +74,9 @@ Response `200`:
 Errors: `404` unknown search, `400 {"error": "provider_ids not in this search: [...]"}`.
 Each called row moves `unverified → calling → available | violation | no_answer`.
 
-FAKE_MODE note: if `FAKE_AUTO_VERIFY=true` (default) the simulation auto-starts calls on all
-`unverified` providers ~10s after the search is created (so a curl-only run finishes). Set
-`FAKE_AUTO_VERIFY=false` to make the simulation wait for this endpoint.
+FAKE_MODE note: by default (`FAKE_AUTO_VERIFY=false`) the simulation waits for this endpoint — the user's
+consent click. Set `FAKE_AUTO_VERIFY=true` to auto-start calls on all `unverified` providers ~10s after the
+search is created (handy for curl-only runs).
 
 ### `POST /api/webhooks/call-complete`
 Called by ElevenLabs post-call webhook (not by the frontend). We pass `search_id` and `provider_id` as

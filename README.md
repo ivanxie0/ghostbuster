@@ -39,9 +39,9 @@ make dev-backend
 make dev-frontend
 ```
 Open http://localhost:3000 → Start → Search. The backend simulates the whole run in ~20s:
-providers appear → ghosts flagged → calls resolve one by one → `done` (Ending B by default).
+providers appear → ghosts flagged → you approve calls → calls resolve one by one → `done` (Ending B by default).
 - `FAKE_ENDING=A` in `.env` → one provider is available in time (Ending A).
-- `FAKE_AUTO_VERIFY=false` → simulated calls only start when you press the verify button.
+- Calls start when you press **Check these for me** (consent). `FAKE_AUTO_VERIFY=true` auto-starts them ~10s in, for curl-only testing.
 
 Quick API check:
 ```bash

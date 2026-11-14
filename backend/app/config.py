@@ -20,7 +20,8 @@ if not FAKE_MODE and not DATABASE_URL:
     print("[config] FAKE_MODE=false but DATABASE_URL is empty -> forcing FAKE_MODE=true")
     FAKE_MODE = True
 
-FAKE_AUTO_VERIFY = env_bool("FAKE_AUTO_VERIFY", True)
+# Default false: calls wait for the user's consent click (POST /verify). true = auto-start for curl-only runs.
+FAKE_AUTO_VERIFY = env_bool("FAKE_AUTO_VERIFY", False)
 FAKE_ENDING = (os.getenv("FAKE_ENDING") or "B").strip().upper()
 
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "")

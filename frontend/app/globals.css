@@ -77,8 +77,16 @@ body {
 .eq > span:nth-child(4) { animation-delay: 360ms; }
 .eq > span:nth-child(5) { animation-delay: 480ms; }
 
+@keyframes scan {
+  0% { left: -33%; }
+  100% { left: 100%; }
+}
+.scan-bar {
+  animation: scan 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .flip-in, .flash, .slide-in, .rise, .eq > span, .animate-pulse { animation: none !important; }
+  .flip-in, .flash, .slide-in, .rise, .eq > span, .animate-pulse, .scan-bar { animation: none !important; }
 }
 
 /* Thin dark scrollbars for the log/transcript panes */
