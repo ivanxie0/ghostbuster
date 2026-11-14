@@ -26,6 +26,15 @@ export const api = {
     }),
   /** HTML page — open in a new tab / iframe, don't fetch as JSON. */
   packetUrl: (id: string) => `${API_URL}/api/search/${id}/packet`,
+  /** Packet HTML as text (for same-origin iframe srcDoc → printable + downloadable). */
+  getPacketHtml: async (id: string) => {
+    const res = await fetch(`${API_URL}/api/search/${id}/packet`, { cache: "no-store" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(body?.error || `HTTP ${res.status}`);
+    }
+    return res.text();
+  },
 };
 
 export const POLL_MS = 2000;

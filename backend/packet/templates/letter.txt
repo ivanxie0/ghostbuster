@@ -1,12 +1,12 @@
-[PLACEHOLDER — Jai to write. Placeholders: {insurer} {plan_type} {specialty} {appointment_type} {zip} {deadline_days} {today} {n_called} {n_violations} {n_ghosts}]
+[PLACEHOLDER — Jai to write. Placeholders: see packet/render.py docstring, e.g. {insurer} {plan_label} {specialty_label} {deadline_text} {today} {n_called} {n_violations} {n_ghosts}]
 
 {today}
 
 To: {insurer} Member Services
 
-Re: Request for timely access to {specialty} care (California timely access standards)
+Re: Request for timely access to {specialty_label} care (California timely access standards)
 
-I am a member of {insurer} ({plan_type}). On {today} I attempted to obtain a {appointment_type} {specialty} appointment near ZIP {zip}. Of the providers in your directory, {n_ghosts} appear not to be accepting patients, and {n_violations} of {n_called} contacted could not offer an appointment within {deadline_days} business days.
+I am a member of {insurer} ({plan_label}). On {today} I attempted to obtain a {appointment_type} {specialty_label} appointment near ZIP {zip}. Of the providers in your directory, {n_ghosts} appear not to be accepting patients, and {n_violations} of {n_called} contacted could not offer an appointment within {deadline_text}.
 
 I request that you arrange a timely appointment, including with an out-of-network provider if necessary, as required for state-regulated plans.
 
