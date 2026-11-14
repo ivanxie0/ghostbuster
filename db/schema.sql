@@ -34,6 +34,15 @@ CREATE TABLE IF NOT EXISTS providers (
 
 CREATE INDEX IF NOT EXISTS providers_search_id_idx ON providers (search_id);
 
+-- Scraper cache (Ivan). Internal to backend/scraper — not part of the API/data contract.
+-- key examples: 'providers:blue shield of california|92122|therapist', 'profile:https://...'
+CREATE TABLE IF NOT EXISTS scrape_cache (
+    key        text PRIMARY KEY,
+    source     text NOT NULL,          -- brightdata | npi | brightdata+gemini | keyword | ...
+    payload    jsonb NOT NULL,
+    fetched_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- Migrations for DBs created from an older version of this file (safe to re-run).
 ALTER TABLE searches ADD COLUMN IF NOT EXISTS prior_appointment_date date;
 ALTER TABLE providers DROP CONSTRAINT IF EXISTS providers_ghost_status_check;
