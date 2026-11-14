@@ -28,7 +28,7 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 - [ ] Timeouts + fallbacks on every external call
 
 ## Jai — rules, content, demo
-- [ ] Verify `docs/RULES.md` against DMHC; send Hardik any changes
+- [x] Verify `docs/RULES.md` against DMHC; send Hardik any changes
 - [ ] Coverage warning text (PPO / unknown / self-funded)
 - [ ] Letter-to-insurer template + member-services script + DMHC complaint info (`backend/packet/templates/`)
 - [ ] `docs/DEMO.md` 3-min script + Q&A answers
