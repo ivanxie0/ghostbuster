@@ -17,9 +17,9 @@ Presento esta queja porque no puedo conseguir una cita a tiempo dentro de su red
 Soy miembro de {insurer} ({plan_label}). Necesito {a_appointment_label} con {specialty_label} cerca del código postal {zip}. Pedí esta cita por primera vez el ____________ (si queda en blanco, use {today}).
 
 2. LO QUE PASÓ
-El {today}, con mi permiso, un asistente de IA que actuó como mi representante autorizado revisó los proveedores que aparecen en su directorio para este servicio cerca de mí y llamó a sus consultorios para pedir la cita más próxima, en persona o por telesalud. El asistente se identificó como una IA que llamaba en nombre de un paciente. Adjunto el registro completo de llamadas.
-- Proveedores en su directorio cerca de mí: {n_listed}
-- Listados que no parecen estar disponibles para mí: {n_ghosts}
+El {today}, con mi permiso, un asistente de IA que actuó como mi representante autorizado buscó proveedores con licencia para este servicio cerca de mí en el registro nacional de proveedores, revisó sus perfiles públicos y llamó a sus consultorios para preguntar si aceptan mi plan y cuál es la cita más próxima, en persona o por telesalud. El asistente se identificó como una IA que llamaba en nombre de un paciente. Adjunto el registro completo de llamadas.
+- Proveedores con licencia encontrados cerca de mí: {n_listed}
+- Proveedores cuyo perfil público indica que no están disponibles para mí: {n_ghosts}
 - Consultorios a los que se llamó: {n_called}
 - Consultorios cuya cita más próxima estaba fuera del plazo legal: {n_violations}
 - Consultorios que no contestaron o no pudieron dar una fecha: {n_no_answer}
@@ -32,7 +32,7 @@ La Sección 1367.03(a)(5) del Código de Salud y Seguridad de California y la Se
 a) Que me consigan una cita dentro del plazo legal y me informen el nombre del proveedor, la fecha y la hora.
 b) Si ningún proveedor de la red puede atenderme a tiempo, que coordinen y cubran la cita con un proveedor fuera de la red. Según la Sección 1367.03(a)(7)(C), mi costo no puede ser mayor que mi copago, coaseguro y deducible dentro de la red.
 c) Que confirmen por escrito que recibieron esta queja y me envíen su decisión por escrito.
-d) Que corrijan los listados del directorio señalados en el registro adjunto.
+d) Que me indiquen cuáles proveedores del registro adjunto están en su red y corrijan su directorio si alguno aparece pero no está disponible.
 
 5. PLAZOS
 Consideren esta carta como mi queja formal y como mi solicitud de cita a partir de hoy. Entiendo que tienen hasta 30 días para resolver una queja estándar. Si no se resuelve o no recibo respuesta en 30 días, presentaré una queja ante el Centro de Ayuda del Departamento de Atención Médica Administrada de California (DMHC), 1-888-466-2219.

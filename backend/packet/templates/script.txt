@@ -7,7 +7,7 @@ OPENING
 "Hi, my name is ____________ and I'm a {insurer} member. My member ID is ____________. I'm calling to file a timely access grievance and to get an appointment arranged."
 
 THE FACTS
-"I need {a_appointment_label} with a {specialty_label} near ZIP code {zip}. California law says your network has to offer that within {deadline_text}. On {today}, {n_called} offices from your directory were called on my behalf, and no provider we reached could offer a timely appointment. {n_ghosts} more of your listings appear not to be available to me at all. I have a written log of every call."
+"I need {a_appointment_label} with a {specialty_label} near ZIP code {zip}. California law says your network has to offer that within {deadline_text}. On {today}, the offices of {n_called} licensed providers near me were called on my behalf and asked if they take my plan. No provider we reached could offer a timely appointment. {n_ghosts} more appear from their public profiles not to be available at all. I have a written log of every call."
 
 THE ASK
 "I'm asking for two things. First, please find me an appointment within the legal timeframe, in network or out of network. If it has to be out of network, I understand my cost can't be more than my in-network cost sharing. Second, please open this as a formal grievance today and give me the reference number."
