@@ -22,7 +22,11 @@ Do not take these from the reports:
 
 Blueprint features that are out of scope (do not build): Mastra/TypeScript stack, multi-source entity
 resolution, DCA license checks, out-of-network therapist matching, Single Case Agreement demand, State
-Fair Hearing request, live transcript websocket, call audio recording.
+Fair Hearing request, live transcript websocket, call audio recording (as a product feature).
+
+Decision (2026-11-14): we keep "recorded and transcribed" in the agent's opening line and system prompt
+(Hardik, 5dd1d17) and in the consent card (Aryan). ElevenLabs keeps call audio, so we disclose recording,
+not just transcription. Penal Code §632 is still unverified (below); full disclosure is the conservative choice.
 
 Still unverified, so stay conservative:
 - Whether scraping Psychology Today / Headway / Alma is allowed by their terms. Prefer NPI Registry,

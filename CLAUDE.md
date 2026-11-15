@@ -114,4 +114,4 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - [ ] ElevenLabs/Twilio agent calling teammate phones (Hardik)
 - [ ] Webhook + Gemini extraction (Hardik)
 - [ ] Frontend screens wired to API (Aryan)
-- [ ] Packet letter/script templates (Jai) + render (Aryan)
+- [x] Packet letter/script templates (Jai) + render (Aryan)
