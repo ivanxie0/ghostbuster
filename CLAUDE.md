@@ -107,7 +107,7 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - [x] Neon schema applied + seeded (Ivan)
 - [x] Real scraper / ghost check (Ivan) — providers from NPI (`DIRECTORY_URLS` still empty, no insurer
       directory); ghost check = Bright Data SERP + Web Unlocker + Gemini on public profiles (page must mention the
-      provider's city/ZIP). Pre-warmed Blue Shield / 92103 / therapist: 90 checked, 5 real ghosts, 19 with a
+      provider's city/ZIP; psychologytoday / headway / alma are never read). Pre-warmed Blue Shield / 92103 / therapist: 90 checked, 4 real ghosts, ~19 with a
       "Profile checked: page says accepting new clients (url)" note in `ghost_reason` on `unverified` rows.
       Needs `BRIGHTDATA_*` (incl. `BRIGHTDATA_SERP_ZONE`) + `GEMINI_API_KEY`; other searches: `python -m scraper.prewarm`
 - [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)

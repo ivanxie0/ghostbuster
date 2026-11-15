@@ -74,6 +74,14 @@ def _is_profile_url(url: str | None) -> bool:
     return bool(url) and not any(d in url for d in ("npiregistry.cms.hhs.gov", "example.com"))
 
 
+# Sites we do not read: their terms on automated access are unverified (docs/RESEARCH_NOTES.md).
+EXCLUDED_DOMAINS = ("psychologytoday.com", "headway.co", "helloalma.com")
+
+
+def _excluded(url: str | None) -> bool:
+    return any(d in (url or "").lower() for d in EXCLUDED_DOMAINS)
+
+
 def _search_profile_url(p: Provider) -> str | None:
     """Google via Bright Data SERP API (brd_json=1 returns parsed JSON). Needs BRIGHTDATA_SERP_ZONE."""
     zone, token = os.getenv("BRIGHTDATA_SERP_ZONE"), os.getenv("BRIGHTDATA_API_TOKEN")
@@ -102,7 +110,7 @@ def _search_profile_url(p: Provider) -> str | None:
     for item in organic[:5]:
         link = item.get("link") or ""
         hay = re.sub(r"[^a-z]+", " ", (item.get("title", "") + " " + link).lower()).split()
-        if first in hay and last in hay:
+        if first in hay and last in hay and not _excluded(link):
             return link
     return None
 
@@ -122,7 +130,7 @@ def _same_place(p: Provider, page: str) -> bool:
 def check_one(p: Provider) -> tuple[str, str | None, str]:
     """Returns (verdict, reason, source). verdict: "ghost" | "ok" | "unknown"."""
     url = p.source_url if _is_profile_url(p.source_url) else _search_profile_url(p)
-    if not url:
+    if not url or _excluded(url):
         return "unknown", None, "no-profile"
     status, page = web.unlock(url, timeout=STEP_TIMEOUT_S)
     if status in (404, 410):

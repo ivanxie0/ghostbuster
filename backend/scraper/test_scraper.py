@@ -98,3 +98,14 @@ def test_profile_checked_note_on_available(live, monkeypatch):
     out = ghosts.run_ghost_check([p])[0]
     assert out.ghost_status == "unverified"
     assert out.ghost_reason.startswith("Profile checked:") and "annopen.example.org" in out.ghost_reason
+
+
+def test_excluded_domains_are_never_fetched(live, monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("must not fetch an excluded site")
+    monkeypatch.setattr(web, "unlock", boom)
+    monkeypatch.setattr(web, "brightdata_configured", lambda: True)
+    p = providers.Provider(name="Pat Listed, LCSW", specialty="therapist",
+                           source_url="https://www.psychologytoday.com/us/therapists/pat-listed-san-diego-ca/1")
+    out = ghosts.run_ghost_check([p])[0]
+    assert out.ghost_status == "unverified" and out.ghost_reason is None
