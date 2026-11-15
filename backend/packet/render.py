@@ -160,7 +160,7 @@ generated {ctx['today']} · ref {s.id[:8]}</div>
 <p class="finding">{finding}</p>
 <p><b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {A_APPT_LABEL[s.appointment_type]} with a {ctx['specialty_label']}
 within <b>{deadline_text}</b>{_e(since)}. Business days exclude weekends and federal/California holidays.
-A provider may lawfully offer a later date if they document that it won&#39;t harm the enrollee&#39;s health.
+A provider can lawfully set a longer wait if they note in the enrollee&#39;s record that it won&#39;t harm the enrollee&#39;s health.
 Telehealth appointments count.</p>
 
 <h2>Part 1 — Evidence log</h2>

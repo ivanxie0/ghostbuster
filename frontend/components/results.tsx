@@ -118,10 +118,13 @@ export function ConsentCard({ search, count, onApprove, busy }: { search: Search
         below. It will:
       </p>
       <ul className="mt-3 space-y-1.5 text-lg text-zinc-200">
-        <li>✓ say up front that it&apos;s an <b>AI assistant calling on behalf of a patient</b></li>
+        <li>✓ say at the start of the call that it&apos;s an <b>AI assistant calling on behalf of a patient</b> and that the call is being transcribed</li>
         <li>✓ ask only for the <b>earliest opening, in person or by telehealth</b>, with {search.insurer} {PLAN_LABEL[search.plan_type]}</li>
         <li>✓ <b>not</b> share your name, contact info, or health details</li>
       </ul>
+      <p className="mt-3 text-lg text-zinc-200">
+        Calls are <b>recorded and transcribed</b> so the transcript can go in your evidence log.
+      </p>
       <p className="mt-3 text-base text-indigo-200/80">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
       <button
         onClick={onApprove}
@@ -239,8 +242,8 @@ export function DemoDataTag({ providers }: { providers: Provider[] }) {
 export function LegalNote() {
   return (
     <p className="rounded-xl border border-zinc-700 bg-zinc-900/60 px-4 py-2.5 text-base text-zinc-300">
-      <span className="font-semibold text-zinc-100">Note:</span> A provider may lawfully offer a later date if they
-      document it won&apos;t harm your health. Telehealth appointments count.
+      <span className="font-semibold text-zinc-100">Note:</span> A provider can lawfully set a longer wait if they note
+      in your record that it won&apos;t harm your health. Telehealth appointments count.
     </p>
   );
 }

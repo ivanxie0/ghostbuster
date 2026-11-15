@@ -52,6 +52,42 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+/** Coverage text verbatim from Jai (docs/RULES.md): first sentence always, the rest behind the expander.
+ *  Shown to everyone; `strong` (PPO / Not sure) gets the amber warning style. */
+function CoverageNote({ strong }: { strong: boolean }) {
+  return (
+    <div
+      key={strong ? "strong" : "plain"}
+      role="note"
+      className={`slide-in mt-3 rounded-xl p-4 leading-snug ${
+        strong
+          ? "border-2 border-amber-500 bg-amber-950/60 text-lg text-amber-100"
+          : "border border-zinc-700 bg-zinc-900/60 text-base text-zinc-300"
+      }`}
+    >
+      <p>
+        California&apos;s appointment deadlines apply to state-regulated coverage: plans licensed by the Department of
+        Managed Health Care (most HMOs, many PPOs, most Covered California plans, Medi-Cal managed care) and health
+        insurance policies regulated by the California Department of Insurance.
+      </p>
+      <details className="group mt-2">
+        <summary
+          className={`cursor-pointer list-none font-semibold ${
+            strong ? "text-amber-300 hover:text-amber-200" : "text-indigo-300 hover:text-indigo-200"
+          }`}
+        >
+          <span className="inline-block transition-transform group-open:rotate-90">▸</span> Who does this apply to?
+        </summary>
+        <p className="mt-2">
+          They do not apply to self-funded employer or union plans, which are under federal law even if an
+          insurer&apos;s name is on your card, or to Medicare. Not sure which you have? Ask HR or member services
+          &quot;Is my plan self-funded?&quot; before relying on these deadlines.
+        </p>
+      </details>
+    </div>
+  );
+}
+
 export default function SearchPage() {
   const router = useRouter();
   const [form, setForm] = useState<SearchCreate>({
@@ -118,26 +154,7 @@ export default function SearchPage() {
             labels={PLAN_LABEL}
             onChange={(plan_type) => patch({ plan_type })}
           />
-          {warnCoverage && (
-            // Coverage text verbatim from Jai (docs/RULES.md). First sentence always; the rest behind the expander.
-            <div role="note" className="slide-in mt-3 rounded-xl border-2 border-amber-500 bg-amber-950/60 p-4 text-lg leading-snug text-amber-100">
-              <p>
-                California&apos;s appointment deadlines apply to state-regulated coverage: plans licensed by the
-                Department of Managed Health Care (most HMOs, many PPOs, most Covered California plans, Medi-Cal managed
-                care) and health insurance policies regulated by the California Department of Insurance.
-              </p>
-              <details className="group mt-2">
-                <summary className="cursor-pointer list-none font-semibold text-amber-300 hover:text-amber-200">
-                  <span className="inline-block transition-transform group-open:rotate-90">▸</span> Who does this apply to?
-                </summary>
-                <p className="mt-2">
-                  They do not apply to self-funded employer or union plans, which are under federal law even if an
-                  insurer&apos;s name is on your card, or to Medicare. Not sure which you have? Ask HR or member services
-                  &quot;Is my plan self-funded?&quot; before relying on these deadlines.
-                </p>
-              </details>
-            </div>
-          )}
+          <CoverageNote strong={warnCoverage} />
         </Field>
 
         <Field label="ZIP code">
