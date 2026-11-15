@@ -217,9 +217,9 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
 function Stamp({ tone, top, bottom }: { tone: "signal" | "moss"; top: string; bottom: string }) {
   const c = tone === "signal" ? "border-signal text-signal" : "border-moss text-moss";
   return (
-    <div aria-hidden className={`stamp inline-block rounded-md border-[3px] border-double px-5 py-3 text-center font-mono uppercase ${c}`}>
-      <div className="text-2xl font-bold tracking-[0.18em]">{top}</div>
-      <div className="mt-1 border-t border-current pt-1 text-[11px] tracking-[0.25em] opacity-80">{bottom}</div>
+    <div aria-hidden className={`stamp inline-block max-w-full rounded-md border-[3px] border-double px-3 py-2 text-center font-mono uppercase sm:px-5 sm:py-3 ${c}`}>
+      <div className="text-lg font-bold tracking-[0.1em] sm:text-2xl sm:tracking-[0.18em]">{top}</div>
+      <div className="mt-1 border-t border-current pt-1 text-[10px] tracking-[0.12em] opacity-80 sm:text-[11px] sm:tracking-[0.25em]">{bottom}</div>
     </div>
   );
 }

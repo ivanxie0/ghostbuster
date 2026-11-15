@@ -217,7 +217,7 @@ export default function ResultsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="lg:col-span-7">
+        <section className="min-w-0 lg:col-span-7">
           <h2 className="label mb-3 text-ink/60">
             {providers.length && providers.every(isDemoProvider) ? "Demo providers (fictional)" : "Licensed providers near you (national registry)"}
           </h2>
@@ -232,7 +232,7 @@ export default function ResultsPage() {
               reviewIds={data.under_review ?? []} onReport={reportError} />
           )}
         </section>
-        <aside className="space-y-4 lg:sticky lg:top-14 lg:col-span-5 lg:self-start">
+        <aside className="min-w-0 space-y-4 lg:sticky lg:top-14 lg:col-span-5 lg:self-start">
           <TranscriptPanel search={search} provider={selected} confirmed={!!selected && (data.patient_confirmed ?? []).includes(selected.id)}
             onCorrect={selected ? (date) => correctDate(selected.id, date) : undefined} />
           <ActivityLog events={events} onPick={setPinned} />

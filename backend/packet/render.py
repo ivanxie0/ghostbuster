@@ -152,6 +152,7 @@ pre { white-space: pre-wrap; font-family: Georgia, "Times New Roman", serif; fon
 .funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 14px; }
 .funnel div { border: 1px solid #ccc; border-radius: 6px; padding: 8px 10px; } .funnel b { display: block; font-size: 22px; }
 .steps { border: 2px solid #111; border-radius: 6px; padding: 4px 14px; } .steps li { margin: 6px 0; }
+@media screen and (max-width: 600px) { body { padding: 12px; } .funnel { grid-template-columns: repeat(2, 1fr); } table { display: block; overflow-x: auto; } }
 """
 
 

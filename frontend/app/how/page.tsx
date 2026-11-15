@@ -85,7 +85,8 @@ export default function HowPage() {
         rest with your permission, and measure the answers against California&apos;s timely-access law.
       </p>
 
-      <figure className="mt-10 overflow-x-auto border border-ink bg-paper p-3">
+      <p className="mt-8 text-sm text-ink/55 sm:hidden">Swipe to see the whole diagram →</p>
+      <figure className="mt-2 overflow-x-auto border border-ink bg-paper p-3 sm:mt-10">
         <svg viewBox="0 0 1000 630" className="min-w-[760px] w-full" role="img"
           aria-label="Architecture: Member, Next.js, FastAPI; NPI Registry, Bright Data, Gemini profile classifier, Neon; ElevenLabs agent over Twilio, post-call webhook, Gemini date extraction, California rules engine; grievance packet.">
           <defs>
