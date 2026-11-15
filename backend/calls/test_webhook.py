@@ -156,3 +156,22 @@ def test_opening_says_recorded_and_transcribed():
     from calls.agent import FIRST_MESSAGE
     from calls.setup_agent import SYSTEM_PROMPT
     assert "recorded and transcribed" in FIRST_MESSAGE and "recorded and transcribed" in SYSTEM_PROMPT
+
+
+@pytest.mark.parametrize("said, expected", [
+    ("Earliest would be the middle of January.", date(2027, 1, 15)),
+    ("We could see them mid-January.", date(2027, 1, 15)),
+    ("Maybe early February.", date(2027, 2, 5)),
+    ("Not until the end of March, sorry.", date(2027, 3, 25)),
+    ("Probably late December.", date(2026, 12, 25)),
+    ("Sometime in March.", date(2027, 3, 1)),
+])
+def test_month_only_answers(said, expected):
+    assert ex(said)["earliest_date"] == expected
+
+
+@pytest.mark.parametrize("said", ["Sorry, we don’t take that plan.", "We can’t accept Blue Shield.",
+                                  "We’re not accepting new patients."])
+def test_curly_apostrophes_not_accepting(said):
+    r = ex(said)
+    assert r["accepting"] is False and r["earliest_date"] is None

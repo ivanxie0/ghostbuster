@@ -197,9 +197,13 @@ def office_text(transcript: str) -> str:
 
 
 def month_only(month: int, qualifier: str | None, today: date) -> date:
-    """Day for a month-only answer. Unqualified -> the 1st (earliest it could mean, so we never overstate the wait)."""
+    """Day for a month-only answer: early/beginning/start -> 5th, mid/middle -> 15th, end/late -> 25th.
+    Unqualified ("in March") -> the 1st (earliest it could mean, so we never overstate the wait).
+    Next occurrence after the call date; the current month already past that day -> the call date itself."""
     q = (qualifier or "").lower()
-    d = date(today.year, month, 15 if q.startswith("mid") else 21 if q.startswith(("late", "end")) else 1)
+    day = (5 if q.startswith(("early", "beginning", "start")) else 15 if q.startswith("mid")
+           else 25 if q.startswith(("late", "end")) else 1)
+    d = date(today.year, month, day)
     if d < today:
         d = today if month == today.month else d.replace(year=today.year + 1)
     return d
