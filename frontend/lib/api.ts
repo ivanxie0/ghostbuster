@@ -27,6 +27,12 @@ export const api = {
   /** Human check: patient corrects an extracted date (YYYY-MM-DD); the rules engine re-runs. */
   correctDate: (id: string, providerId: string, date: string) =>
     req<Provider>(`/api/search/${id}/providers/${providerId}/date`, { method: "POST", body: JSON.stringify({ date }) }),
+  /** "Report an error" on a provider row (stored; the row then shows "under review"). */
+  reportError: (id: string, providerId: string, what: string, contact?: string) =>
+    req<{ ok: boolean }>(`/api/search/${id}/providers/${providerId}/report`, {
+      method: "POST",
+      body: JSON.stringify({ what, contact: contact || null }),
+    }),
   /** Ghost Map stats (real registry vs demo providers). */
   ghostStats: () => req<GhostStats>("/api/stats/ghosts"),
   /** Demo control panel (Shift+D). */

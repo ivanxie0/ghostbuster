@@ -138,6 +138,11 @@ export default function HowPage() {
         ))}
       </section>
 
+      <p className="mt-10 text-lg text-ink/80">
+        Providers can correct their status: every real provider on the results page has a &ldquo;Report an error&rdquo; link,
+        and a reported provider is marked &ldquo;under review&rdquo;.
+      </p>
+
       <p className="rule-dotted label mt-16 pt-4 text-ink/60">
         Evidence log + templates · not legal advice ·{" "}
         <Link href="/map" className="underline underline-offset-4">San Diego Ghost Map →</Link>

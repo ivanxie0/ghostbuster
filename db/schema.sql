@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS date_corrections (
     corrected_at   timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS error_reports (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    provider_id uuid NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+    search_id   uuid NOT NULL REFERENCES searches(id) ON DELETE CASCADE,
+    what        text NOT NULL,          -- what's wrong, in the reporter's words
+    contact     text,                   -- optional
+    created_at  timestamptz NOT NULL DEFAULT now()
+);
+
 -- Migrations for DBs created from an older version of this file (safe to re-run).
 ALTER TABLE searches ADD COLUMN IF NOT EXISTS prior_appointment_date date;
 ALTER TABLE providers DROP CONSTRAINT IF EXISTS providers_ghost_status_check;

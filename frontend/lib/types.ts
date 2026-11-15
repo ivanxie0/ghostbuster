@@ -56,6 +56,7 @@ export interface SearchDetail {
   fallbacks?: FallbackEvent[]; // real mode only; empty/absent in FAKE_MODE
   authorized_at?: string | null; // ISO; the patient's consent click, if any
   patient_confirmed?: string[]; // provider ids whose date the patient corrected/confirmed
+  under_review?: string[]; // provider ids with an error report
 }
 
 /** One group in the Ghost Map: real registry providers or demo (seed) providers. */

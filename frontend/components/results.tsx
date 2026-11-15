@@ -400,7 +400,56 @@ export function LegalNote() {
   );
 }
 
-export function ProviderList({ search, providers, selected, onSelect, confirmedIds = [] }: { search: Search; providers: Provider[]; selected: string | null; onSelect: (id: string) => void; confirmedIds?: string[] }) {
+/** Inline "Report an error" form for a real provider row (e.g. the provider correcting their status). */
+function ReportError({ onReport }: { onReport: (what: string, contact: string) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [what, setWhat] = useState("");
+  const [contact, setContact] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  if (!open)
+    return (
+      <button onClick={() => setOpen(true)} className="mt-1 ml-5 font-mono text-xs text-ink/55 underline underline-offset-2 hover:text-ink">
+        Report an error
+      </button>
+    );
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (what.trim().length < 3) return setError("Say briefly what's wrong.");
+    setBusy(true);
+    setError(null);
+    try {
+      await onReport(what.trim(), contact.trim());
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+    }
+  }
+  return (
+    <form onSubmit={submit} className="mt-2 ml-5 space-y-2 rounded-lg border border-line p-3 text-sm">
+      <label className="block">
+        <span className="label text-ink/60">What&apos;s wrong?</span>
+        <textarea value={what} onChange={(e) => setWhat(e.target.value)} rows={2} maxLength={1000}
+          className="mt-1 w-full rounded border border-line bg-paper px-2 py-1 text-ink" placeholder="e.g. I'm accepting new patients with this plan" />
+      </label>
+      <label className="block">
+        <span className="label text-ink/60">Contact (optional)</span>
+        <input value={contact} onChange={(e) => setContact(e.target.value)} maxLength={200}
+          className="mt-1 w-full rounded border border-line bg-paper px-2 py-1 text-ink" placeholder="email or phone" />
+      </label>
+      <div className="flex items-center gap-3">
+        <button disabled={busy} className="btn btn-solid px-3 py-1 text-sm">{busy ? "Sending…" : "Send report"}</button>
+        <button type="button" onClick={() => setOpen(false)} className="text-ink/60 underline underline-offset-2">Cancel</button>
+        {error && <span className="text-signal">{error}</span>}
+      </div>
+    </form>
+  );
+}
+
+export function ProviderList({ search, providers, selected, onSelect, confirmedIds = [], reviewIds = [], onReport }: {
+  search: Search; providers: Provider[]; selected: string | null; onSelect: (id: string) => void;
+  confirmedIds?: string[]; reviewIds?: string[]; onReport?: (providerId: string, what: string, contact: string) => Promise<void>;
+}) {
   const mixed = providers.some(isDemoProvider) && !providers.every(isDemoProvider);
   return (
     <ul className="space-y-3">
@@ -450,6 +499,12 @@ export function ProviderList({ search, providers, selected, onSelect, confirmedI
                 </span>
               );
             })()}
+            {/* Real (registry) providers only: anyone, incl. the provider, can report an error. */}
+            {!isDemoProvider(p) && (reviewIds.includes(p.id) ? (
+              <span className="mt-1 ml-5 inline-block rounded border border-line px-2 py-0.5 font-mono text-xs text-ink/70">Under review</span>
+            ) : onReport ? (
+              <div><ReportError onReport={(what, contact) => onReport(p.id, what, contact)} /></div>
+            ) : null)}
           </li>
         );
       })}

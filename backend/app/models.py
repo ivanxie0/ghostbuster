@@ -64,10 +64,16 @@ class SearchDetail(BaseModel):
     fallbacks: list[FallbackEvent] = []  # additive, optional: empty in FAKE_MODE
     authorized_at: Optional[datetime] = None  # patient's consent click (POST /verify), if any
     patient_confirmed: list[str] = []  # provider ids whose date the patient corrected/confirmed
+    under_review: list[str] = []  # provider ids with an error report
 
 
 class DateCorrection(BaseModel):
     date: date
+
+
+class ErrorReport(BaseModel):
+    what: str = Field(min_length=3, max_length=1000)
+    contact: Optional[str] = Field(default=None, max_length=200)
 
 
 class DemoSettings(BaseModel):

@@ -7,6 +7,7 @@ from app.models import Provider, SearchDetail
 
 _auth: dict[str, datetime] = {}
 _corrections: dict[str, set[str]] = {}  # fake mode: search_id -> provider ids with a patient-confirmed date
+_reports: dict[str, list[dict]] = {}   # fake mode: search_id -> error reports
 
 
 def record_authorization(search_id: str, provider_count: int) -> None:
@@ -69,7 +70,34 @@ def patient_confirmed(search_id: str) -> list[str]:
         return []
 
 
+def report_error(search_id: str, provider_id: str, what: str, contact: str | None) -> None:
+    """Anyone (e.g. the provider) reports that a row is wrong. The row then shows 'under review'."""
+    from app import store
+    detail = store.get(search_id)
+    if not detail:
+        raise LookupError("search not found")
+    if not any(p.id == provider_id for p in detail.providers):
+        raise LookupError("provider not in this search")
+    if FAKE_MODE:
+        _reports.setdefault(search_id, []).append({"provider_id": provider_id, "what": what, "contact": contact})
+    else:
+        from app import db
+        db.insert_error_report(provider_id, search_id, what, contact)
+
+
+def under_review(search_id: str) -> list[str]:
+    try:
+        if FAKE_MODE:
+            return sorted({r["provider_id"] for r in _reports.get(search_id, [])})
+        from app import db
+        return db.get_reported_providers(search_id)
+    except Exception as e:
+        print(f"[records] reports lookup failed: {e!r}")
+        return []
+
+
 def annotate(detail: SearchDetail) -> SearchDetail:
     """Add the app records to a search response (optional fields)."""
     sid = detail.search.id
-    return detail.model_copy(update={"authorized_at": authorized_at(sid), "patient_confirmed": patient_confirmed(sid)})
+    return detail.model_copy(update={"authorized_at": authorized_at(sid), "patient_confirmed": patient_confirmed(sid),
+                                     "under_review": under_review(sid)})

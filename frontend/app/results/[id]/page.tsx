@@ -129,6 +129,14 @@ export default function ResultsPage() {
     setData(d);
   }
 
+  // "Report an error" on a real provider row; refresh so the row shows "Under review".
+  async function reportError(providerId: string, what: string, contact: string) {
+    await api.reportError(id, providerId, what, contact);
+    const d = await api.getSearch(id);
+    prev.current = d;
+    setData(d);
+  }
+
   async function approve() {
     setApproving(true);
     log([{ tone: "user", text: `You approved AI calls to ${willCall.length} offices.` }]);
@@ -196,7 +204,8 @@ export default function ResultsPage() {
               ))}
             </div>
           ) : (
-            <ProviderList search={search} providers={providers} selected={selectedId} onSelect={setPinned} confirmedIds={data.patient_confirmed ?? []} />
+            <ProviderList search={search} providers={providers} selected={selectedId} onSelect={setPinned} confirmedIds={data.patient_confirmed ?? []}
+              reviewIds={data.under_review ?? []} onReport={reportError} />
           )}
         </section>
         <aside className="space-y-4 lg:sticky lg:top-14 lg:col-span-5 lg:self-start">

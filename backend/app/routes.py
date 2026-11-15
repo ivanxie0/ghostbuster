@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from app import store
 from app.config import FAKE_MODE
 from app import demo, records
-from app.models import (DateCorrection, DemoSettings, DemoSettingsUpdate, Provider, SearchCreate, SearchCreated, SearchDetail,
+from app.models import (DateCorrection, DemoSettings, ErrorReport, DemoSettingsUpdate, Provider, SearchCreate, SearchCreated, SearchDetail,
                         VerifyRequest, VerifyResponse)
 from packet.render import render_packet
 
@@ -79,6 +79,16 @@ def correct_date(search_id: str, provider_id: str, body: DateCorrection):
         raise HTTPException(404, str(e))
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+@router.post("/search/{search_id}/providers/{provider_id}/report")
+def report_error(search_id: str, provider_id: str, body: ErrorReport):
+    """'Report an error' on a provider row (e.g. the provider correcting their status). Stored; row shows 'under review'."""
+    try:
+        records.report_error(search_id, provider_id, body.what.strip(), (body.contact or "").strip() or None)
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+    return {"ok": True}
 
 
 @router.post("/webhooks/call-complete")

@@ -96,3 +96,15 @@ def get_date_corrections(search_id: str) -> list[str]:
     with connect() as c:
         rows = c.execute("SELECT provider_id::text FROM date_corrections WHERE search_id = %s", (search_id,)).fetchall()
         return [r["provider_id"] for r in rows]
+
+
+def insert_error_report(provider_id: str, search_id: str, what: str, contact: str | None) -> None:
+    with connect() as c:
+        c.execute("INSERT INTO error_reports (provider_id, search_id, what, contact) VALUES (%s, %s, %s, %s)",
+                  (provider_id, search_id, what, contact))
+
+
+def get_reported_providers(search_id: str) -> list[str]:
+    with connect() as c:
+        rows = c.execute("SELECT DISTINCT provider_id::text FROM error_reports WHERE search_id = %s", (search_id,)).fetchall()
+        return [r["provider_id"] for r in rows]
