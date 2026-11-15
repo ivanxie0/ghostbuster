@@ -171,7 +171,7 @@ html { transition: background-color var(--dur-2), color var(--dur-2); }
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--page); color: var(--ink); scroll-padding-top: 120px; }
-body { margin: 0; font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body { margin: 0; overflow-x: clip; font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
 :focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
 .console :focus-visible { outline-color: var(--console-text); }
 ::selection { background: var(--terra-tint); color: var(--ink); }
@@ -361,9 +361,12 @@ select.field { appearance: none; padding-right: 40px; background-image: linear-g
 .faq details p { margin: 10px 0 0; color: var(--ink-2); max-width: 70ch; }
 
 /* ---------- revealed footer (kept; mobile-safe) ---------- */
-.footer-reveal { background: var(--terra-footer); color: #141413; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
+.footer-reveal { --fade: 1;
+  --panel-bg: color-mix(in oklab, var(--terra-footer) calc(var(--fade) * 100%), var(--page));
+  --panel-ink: color-mix(in oklab, #141413 calc(var(--fade) * 100%), var(--ink));
+  background: var(--panel-bg); color: var(--panel-ink); min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
 .footer-reveal .t-hero { font-size: clamp(2.25rem, 8.5vw, 4.75rem); }
-.box-rule { border: 1px dashed #141413; padding: 18px; }
+.box-rule { border: 1px dashed var(--panel-ink, #141413); padding: 18px; }
 .box-rule > legend { font: 700 var(--fs-label) var(--font-data); text-transform: uppercase; letter-spacing: .06em; padding: 0 6px; }
 .box-rule > legend::before { content: "+-- "; } .box-rule > legend::after { content: " --"; }
 @media (max-width: 640px) { .footer-reveal { position: static !important; min-height: auto; padding: 64px 0; } .footer-ghost { display: none; } }
@@ -502,6 +505,9 @@ fieldset.q { border: 0; padding: 0; margin: 0; min-width: 0; }
 /* v6: healthcare ghost (cross badge + stethoscope) */
 #heroGhost .gx-cross, #asciiGhost .gx-cross { color: var(--primary); }
 #heroGhost .gx-steth { color: var(--ink); }
+/* materialize: pale see-through ghost first, then the doctor (teal scrub cap) */
+#heroGhost .gx-pale { color: var(--ink-3); opacity: .4; }
+#heroGhost .gx-cap { color: var(--primary); }
 #asciiGhost .gx-steth { color: #141413; }
 #asciiGhost .gx-cross { color: #0d5c58; }
 
@@ -546,4 +552,56 @@ html { font-size: 16px; }
 /* question headings get programmatic focus on each step; no ring (GOV.UK pattern) */
 .q-title:focus { outline: none; }
 .badge.flip { display: inline-flex; }
+
+/* Bottom panel: ASCII ghost -> ASCII Gerardo -> real photo (components/GerardoReveal.tsx). Vars set on scroll. */
+.gerardo { width: min(100%, 420px, 46svh); }
+.gerardo-stage { --real: 0; --scan: 0; position: relative; aspect-ratio: 760 / 950; }
+.gerardo-real { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; clip-path: inset(0 0 calc((1 - var(--real)) * 100%) 0); }
+/* the character grid is stretched (JS) to cover the photo box exactly; the part above the scan line is gone */
+.gerardo-ascii { position: absolute; left: 0; top: 0; margin: 0; font: 700 10px/1 var(--font-data); white-space: pre; color: var(--panel-ink);
+  transform-origin: 0 0; clip-path: inset(calc(var(--real) * 100%) 0 0 0); user-select: none; }
+.gerardo-ascii .gx-cross { color: #0b4a46; } .gerardo-ascii .gx-steth { color: var(--panel-ink); }
+.gerardo-scan { position: absolute; left: -4%; right: -4%; top: calc(var(--real) * 100%); height: 2px; background: var(--panel-ink); opacity: var(--scan);
+  box-shadow: 0 0 0 3px rgba(20,20,19,.12); }
+.gerardo-scan span { position: absolute; right: 0; top: -16px; font: 700 10px/1 var(--font-data); letter-spacing: .1em; color: var(--panel-ink); }
+.gerardo-caption { margin-top: 12px; text-align: center; font: 700 var(--fs-small)/1.3 var(--font-data); color: var(--panel-ink); }
+@media (max-width: 900px) { .gerardo { width: min(100%, 340px); } }
+/* Desktop: the panel is tall and its content stays pinned under the header while you scroll through it. */
+@media (min-width: 901px) {
+  .gerardo-pin { height: 260svh; min-height: 0; display: block; }
+  .gerardo-pin-inner { position: sticky; top: 106px; height: calc(100svh - 106px); padding-top: 24px; padding-bottom: 24px; }
+  .gerardo { width: min(100%, 420px, calc((100svh - 106px - 110px) * 0.8)); }
+}
+
+/* Results verdict: terracotta sheet (same panel as the landing's "Find out who's really there"), ink on orange. */
+.paper.verdict { --ink: #141413; --ink-2: rgba(20,20,19,.84); --ink-3: rgba(20,20,19,.74); --paper-rule: rgba(20,20,19,.3);
+  --stamp: #141413; --st-available: #141413; --primary: #141413; --primary-hover: #2e2d2b; --on-primary: #faf9f5;
+  background: var(--terra-footer); color: var(--ink); border: 0; border-radius: var(--r-md); box-shadow: var(--shadow-2); overflow-x: clip; }
+.paper.verdict .ledger-row .val.hot { color: #5a1607; }
+.paper.verdict .stamp { background: rgba(250,249,245,.08); }
+.paper.verdict .btn-outline { background: transparent; color: #141413; border-color: rgba(20,20,19,.55); }
+.paper.verdict .btn-outline:hover { background: rgba(20,20,19,.08); }
+.paper.verdict :focus-visible { outline-color: #141413; }
+.paper.verdict .notice { background: rgba(250,249,245,.35); border-color: rgba(20,20,19,.25); color: #141413; }
+
+/* Wordmark: the ghost "o" bobs when you hover the logo */
+.wordmark-ghost { transition: transform var(--dur-3) var(--ease-snap); transform-box: fill-box; transform-origin: center; }
+.brand:hover .wordmark-ghost, .brand:focus-visible .wordmark-ghost { transform: translateY(-6px) rotate(-6deg); }
+
+/* Results: case header + stat tiles in one bordered panel */
+.case-panel { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 18px; }
+.case-head { padding: 18px 22px; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border-top: 1px solid var(--line-strong); background: var(--page); }
+.stat-tile { padding: 16px 22px 18px; min-width: 0; }
+.stat-tile + .stat-tile { border-left: 1px solid var(--line-strong); }
+.stat-label { font: 700 var(--fs-label)/1.2 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); min-height: 1.2em; }
+.stat-of { font-size: .55em; color: var(--ink-3); margin-left: 2px; letter-spacing: 0; }
+.stat-bar { height: 4px; border-radius: 2px; background: var(--sunk); overflow: hidden; }
+.stat-bar > span { display: block; height: 100%; border-radius: 2px; transition: width var(--dur-3) var(--ease-out); }
+@media (max-width: 760px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .stat-tile:nth-child(3) { border-left: 0; }
+  .stat-tile:nth-child(n+3) { border-top: 1px solid var(--line-strong); }
+  .stat-tile, .case-head { padding-left: 16px; padding-right: 16px; }
+}
 }

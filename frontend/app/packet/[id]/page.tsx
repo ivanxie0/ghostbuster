@@ -40,12 +40,13 @@ export default function PacketPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 pb-20 pt-2">
-      <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-page/95 px-6 py-4 backdrop-blur print:hidden">
-        <div>
-          <Link href={`/results/${id}`} className="text-sm font-medium text-ink/60 hover:text-ink">← Back to results</Link>
-          <h1 className="display mt-1 text-4xl">Your timely access grievance</h1>
-          <p className="mt-1 text-sm text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
-        </div>
+      <div className="pt-4 print:hidden">
+        <Link href={`/results/${id}`} className="text-sm font-medium text-ink/60 hover:text-ink">← Back to results</Link>
+        <h1 className="display mt-1 text-4xl">Your timely access grievance</h1>
+        <p className="mt-1 text-sm text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
+      </div>
+      {/* Toolbar pins just under the site header (sticky at 38px, ~69px tall) and slides under it; on phones it scrolls normally. */}
+      <div className="relative z-30 -mx-6 mb-6 flex flex-wrap items-center gap-3 border-b border-line bg-page/95 px-6 py-3 backdrop-blur min-[641px]:sticky min-[641px]:top-[107px] print:hidden">
         <div className="flex flex-wrap items-center gap-3">
           <div role="radiogroup" aria-label="Packet language" className="flex border border-ink font-mono text-sm">
             {(["en", "es"] as const).map((l) => (

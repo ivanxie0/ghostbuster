@@ -174,7 +174,8 @@ export default function ResultsPage() {
 
   return (
     <main className="wrap pb-[120px] pt-8">
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-4" style={{ borderColor: "var(--line-strong)" }}>
+      <section className="case-panel">
+      <div className="case-head flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="t-data" style={{ color: "var(--ink-3)" }}>
             Case GB-{id.slice(0, 6).toUpperCase()} · {search.insurer} · {PLAN_LABEL[search.plan_type]} · {search.zip}
@@ -191,6 +192,7 @@ export default function ResultsPage() {
       </div>
 
       <Counters providers={providers} scanning={search.status === "scraping"} />
+      </section>
 
       {error && <div className="notice mb-4" data-tone="error" role="alert"><b>Connection issue:</b> {error}. Retrying…</div>}
 

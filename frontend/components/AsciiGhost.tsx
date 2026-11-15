@@ -4,7 +4,14 @@ import { useEffect, useRef } from "react";
 /** One frame of the healthcare ghost: shaded silhouette with a rippling hem, a medical cross on the chest
  *  (cleared ring so it reads as a badge) and a two-tube stethoscope. Returns HTML with
  *  <span class="gx-cross"> / <span class="gx-steth">. Generated locally from numbers only, no user input. */
-export function ghostFrame(W: number, H: number, t: number, blink: boolean): string {
+export type GhostCell = { ch: string[]; cl: number[] };
+
+/** Character classes: 0 body, 1 cross (teal), 2 stethoscope (ink), 3 pale ghost, 4 scrub cap (teal). */
+export type GhostOpts = { doctor?: boolean; cap?: boolean };
+
+/** The ghost as a character grid. `doctor` adds the chest cross + stethoscope (default on); `cap` adds a scrub cap. */
+export function ghostGrid(W: number, H: number, t: number, blink: boolean, opts: GhostOpts = {}): GhostCell[] {
+  const { doctor = true, cap = false } = opts;
   const ramp = " .:-=+*#%@";
   const head = H * 0.42;
   const cx = W / 2 - 0.5;
@@ -39,6 +46,19 @@ export function ghostFrame(W: number, H: number, t: number, blink: boolean): str
     x = Math.round(x);
     if (y >= 0 && y < H && x >= 0 && x < W && rows[y].ch[x] !== " ") { rows[y].ch[x] = " "; rows[y].cl[x] = 0; }
   };
+  if (cap) {
+    // scrub cap over the top of the head: textured crown, a band row at the brim, a tie knot on the right
+    const brim = Math.round(head * 0.48);
+    for (let y = 0; y <= brim; y++)
+      for (let x = 0; x < W; x++)
+        if (rows[y].m[x]) put(x, y, y === brim ? "=" : (x + y) % 3 === 0 ? "#" : "%", 4);
+    const kx = Math.round(W * 0.86);
+    for (const [dx, dy, c] of [[0, 0, "o"], [1, 1, "\\"], [-1, 1, "/"]] as [number, number, string][]) {
+      const x = kx + dx, y = brim + dy;
+      if (y < H && x < W && rows[y].ch[x] !== undefined) { rows[y].ch[x] = c; rows[y].cl[x] = 4; }
+    }
+  }
+  if (!doctor) return rows;
   // medical cross on the chest, with a clear ring
   const cy = Math.round(head + H * 0.33), vh = Math.max(1, Math.round(H * 0.065)), hw = Math.round(W * 0.11), vw = Math.max(1, Math.round(W * 0.04));
   const inCross = (dx: number, dy: number) => (Math.abs(dx) <= vw && dy >= -vh && dy <= vh + 1) || (dy >= 0 && dy <= 1 && Math.abs(dx) <= hw);
@@ -62,7 +82,12 @@ export function ghostFrame(W: number, H: number, t: number, blink: boolean): str
   put(px - 2, py, "/", 2); put(px - 1, py, "@", 2); put(px, py, "@", 2); put(px + 1, py, "@", 2); put(px + 2, py, "\\", 2);
   put(px - 2, py + 1, "|", 2); put(px - 1, py + 1, "(", 1); put(px, py + 1, "+", 1); put(px + 1, py + 1, ")", 1); put(px + 2, py + 1, "|", 2);
   put(px - 2, py + 2, "\\", 2); put(px - 1, py + 2, "@", 2); put(px, py + 2, "@", 2); put(px + 1, py + 2, "@", 2); put(px + 2, py + 2, "/", 2);
-  const cls = ["", "gx-cross", "gx-steth"];
+  return rows;
+}
+
+/** Grid rows -> HTML with <span class="gx-cross|gx-steth"> runs. Characters are generated locally (no user input). */
+export function gridHtml(rows: GhostCell[]): string {
+  const cls = ["", "gx-cross", "gx-steth", "gx-pale", "gx-cap"];
   return rows
     .map((r) => {
       let o = "", cur = 0, buf = "";
@@ -74,25 +99,70 @@ export function ghostFrame(W: number, H: number, t: number, blink: boolean): str
     .join("\n");
 }
 
+export function ghostFrame(W: number, H: number, t: number, blink: boolean): string {
+  return gridHtml(ghostGrid(W, H, t, blink));
+}
+
+const RAMP = " .:-=+*#%@";
+const hash = (x: number, y: number, z = 0) => {
+  const v = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453;
+  return v - Math.floor(v);
+};
+
+/** Pale see-through ghost (m=0) decoding top-down into the full-color doctor ghost with a scrub cap (m=1). */
+export function materializeFrame(W: number, H: number, t: number, blink: boolean, m: number): string {
+  if (m >= 1) return gridHtml(ghostGrid(W, H, t, blink, { cap: true }));
+  const pale = ghostGrid(W, H, t, blink, { doctor: false });
+  const doc = ghostGrid(W, H, t, blink, { cap: true });
+  const out: GhostCell[] = pale.map((row, y) => {
+    const ch: string[] = [], cl: number[] = [];
+    row.ch.forEach((pc, x) => {
+      const dc = doc[y].ch[x];
+      const tau = 0.06 + 0.86 * (0.6 * (y / H) + 0.4 * hash(x, y, 2));
+      if (Math.abs(m - tau) < 0.07 && (pc !== " " || dc !== " ")) { ch.push(RAMP[1 + Math.floor(hash(x, y, Math.floor(t * 3)) * 9)]); cl.push(0); }
+      else if (m > tau) { ch.push(dc); cl.push(doc[y].cl[x]); }
+      else { ch.push(pc); cl.push(pc === " " ? 0 : 3); }
+    });
+    return { ch, cl };
+  });
+  return gridHtml(out);
+}
+
 /** The mascot. `animated`: rippling hem + random blink every 3–6.5s (one still frame under reduced motion). */
-export default function AsciiGhost({ id, width = 42, height = 30, animated = false, className = "", style }: {
-  id?: string; width?: number; height?: number; animated?: boolean; className?: string; style?: React.CSSProperties;
+/** The mascot. `animated`: rippling hem + random blink every 3–6.5s. `materialize`: starts as a pale ghost and
+ *  decodes into the doctor ghost (scrub cap, cross, stethoscope) over ~2.4s; hover replays it.
+ *  Reduced motion: one still frame of the finished doctor ghost. */
+export default function AsciiGhost({ id, width = 42, height = 30, animated = false, materialize = false, className = "", style }: {
+  id?: string; width?: number; height?: number; animated?: boolean; materialize?: boolean; className?: string; style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLPreElement>(null);
+  const start = useRef(0);
+  const render = (t: number, blink: boolean, m: number) =>
+    materialize ? materializeFrame(width, height, t, blink, m) : ghostFrame(width, height, t, blink);
   useEffect(() => {
     const el = ref.current;
-    if (!el || !animated || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.innerHTML = render(0, false, 1); return; }
+    if (!animated) return;
+    start.current = performance.now() + 700;
     let t = 0, next = performance.now() + 3200, blinkUntil = 0;
     const iv = setInterval(() => {
       const now = performance.now();
       if (now > next) { blinkUntil = now + 140; next = now + 3000 + Math.random() * 3500; }
       t += 0.35;
-      el.innerHTML = ghostFrame(width, height, t, now < blinkUntil);
+      const m = Math.min(1, Math.max(0, (now - start.current) / 2400));
+      el.innerHTML = render(t, now < blinkUntil, m);
+      el.style.setProperty("--m", String(m));
     }, 120);
     return () => clearInterval(iv);
-  }, [animated, width, height]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animated, materialize, width, height]);
+  const replay = () => {
+    if (materialize && performance.now() - start.current > 2600) start.current = performance.now();
+  };
   return (
-    <pre ref={ref} id={id} aria-hidden="true" className={className} style={style}
-      dangerouslySetInnerHTML={{ __html: ghostFrame(width, height, 0, false) }} />
+    <pre ref={ref} id={id} aria-hidden="true" className={className} style={{ ...style, ...(materialize ? { ["--m" as string]: 0 } : {}) }}
+      onMouseEnter={replay} data-materialize={materialize || undefined}
+      dangerouslySetInnerHTML={{ __html: render(0, false, materialize ? 0 : 1) }} />
   );
 }

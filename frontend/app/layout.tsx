@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next, Schibsted_Grotesk } from "next/font/google";
 import Link from "next/link";
 import DemoPanel from "@/components/DemoPanel";
-import GhostMark from "@/components/GhostMark";
+import Wordmark from "@/components/Wordmark";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -34,8 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <header className="site-header print:hidden">
           <div className="wrap">
             <Link className="brand" href="/" aria-label="GhostBuster home">
-              <GhostMark />
-              GhostBuster
+              <Wordmark height={38} className="h-[30px] w-auto sm:h-[38px]" />
             </Link>
             <nav className="nav" aria-label="Main">
               <Link className="hide-sm" href="/#how">How it works</Link>

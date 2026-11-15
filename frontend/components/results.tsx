@@ -112,29 +112,36 @@ export function GhostRate({ providers }: { providers: Provider[] }) {
   return <p className="t-h2">{unavailable} of {providers.length} appear unavailable.</p>;
 }
 
-function Num({ v, color, of }: { v: number; color?: string; of?: number }) {
+/** One boxed stat tile: label, big number (flips on change), optional "/ total", and a thin bar. */
+function Tile({ label, v, of, color, bar }: { label: string; v: number; of?: number; color?: string; bar: number }) {
   return (
-    <div className="t-display" style={{ color, fontVariantNumeric: "tabular-nums" }}>
-      <span key={v} className="flip">{v}</span>
-      {of !== undefined && <span style={{ fontSize: ".5em", color: "var(--ink-3)" }}> of {of}</span>}
+    <div className="stat-tile">
+      <div className="stat-label">{label}</div>
+      <div className="t-display mt-1.5" style={{ color, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+        <span key={v} className="flip">{v}</span>
+        {of !== undefined && <span className="stat-of">/{of}</span>}
+      </div>
+      <div className="stat-bar mt-3" aria-hidden="true">
+        <span style={{ width: `${Math.round(Math.min(1, Math.max(0, bar)) * 100)}%`, background: color ?? "var(--ink-2)" }} />
+      </div>
     </div>
   );
 }
-const Lbl = ({ children }: { children: React.ReactNode }) => <div className="t-small" style={{ color: "var(--ink-3)" }}>{children}</div>;
 
-/** Big numbers: found / ghosts / called (x of y) / past deadline. Each number flips when it changes.
+/** Four boxed tiles: found / appear unavailable / called (x/y) / past deadline.
  *  `scanning`: the ghost check is still running, so the number of offices to call isn't known yet. */
 export function Counters({ providers, scanning = false }: { providers: Provider[]; scanning?: boolean }) {
+  const found = providers.length;
   const ghosts = providers.filter((p) => p.ghost_status === "ghost").length;
   const called = providers.filter(wasCalled).length;
   const total = callTotal(providers);
   const past = providers.filter((p) => p.ghost_status === "violation").length;
   return (
-    <section aria-label="Tally" aria-live="polite" className="my-[18px] flex flex-wrap gap-10">
-      <div><Num v={providers.length} /><Lbl>found</Lbl></div>
-      <div><Num v={ghosts} color="var(--st-ghost)" /><Lbl>appear unavailable</Lbl></div>
-      <div><Num v={called} color="var(--st-calling)" of={scanning ? undefined : total} /><Lbl>called</Lbl></div>
-      <div><Num v={past} color="var(--st-past)" /><Lbl>past deadline</Lbl></div>
+    <section aria-label="Tally" aria-live="polite" className="stat-grid">
+      <Tile label="Found" v={found} bar={found ? 1 : 0} />
+      <Tile label="Appear unavailable" v={ghosts} color="var(--st-ghost)" bar={found ? ghosts / found : 0} />
+      <Tile label="Offices called" v={called} of={scanning ? undefined : total} color="var(--st-calling)" bar={total ? called / total : 0} />
+      <Tile label="Past deadline" v={past} color="var(--st-past)" bar={called ? past / called : 0} />
     </section>
   );
 }
@@ -227,7 +234,7 @@ function Verdict({ kicker, title, sub, stamp, ok = false, children }: {
   kicker: string; title: React.ReactNode; sub: React.ReactNode; stamp: [string, string]; ok?: boolean; children: React.ReactNode;
 }) {
   return (
-    <article className="paper print-in">
+    <article className="paper verdict print-in">
       <div className="flex flex-wrap-reverse items-start justify-between gap-6">
         <div className="min-w-0 flex-[1_1_420px]">
           <div className="t-small font-bold" style={{ color: "var(--ink-3)" }}>{kicker}</div>

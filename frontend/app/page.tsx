@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AsciiGhost from "@/components/AsciiGhost";
+import GerardoReveal from "@/components/GerardoReveal";
 import HeroSearch from "@/components/HeroSearch";
 import Reveal from "@/components/Reveal";
 
@@ -67,7 +68,7 @@ export default function Landing() {
             </p>
           </div>
           <figure className="m-0 flex flex-col items-center">
-            <AsciiGhost id="heroGhost" width={42} height={30} animated className="floaty" />
+            <AsciiGhost id="heroGhost" width={42} height={30} animated materialize className="floaty" />
             <figcaption className="mt-[18px] max-w-[24em] border-t pt-3 text-[length:var(--fs-small)]" style={{ ...MUTED, borderColor: "var(--line-strong)" }}>
               <b style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}>ghost listing</b> <span style={{ color: "var(--ink-3)" }}>(noun)</span>
               <br />
@@ -242,27 +243,26 @@ export default function Landing() {
         </section>
       </div>
 
-      {/* ---------------- revealed terracotta panel ---------------- */}
-      <section className="footer-reveal sticky bottom-0 z-0" aria-label="Get started">
-        <div className="wrap grid items-center gap-10 py-16 min-[901px]:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
+      {/* ---------------- terracotta panel: pinned while the ghost turns into a real person ---------------- */}
+      <section className="footer-reveal gerardo-pin" aria-label="Get started">
+        <div className="gerardo-pin-inner wrap grid items-center gap-10 py-16 min-[901px]:py-6 min-[901px]:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
           <div>
-            <h2 className="t-hero" style={{ color: "#141413" }}>Find out who&apos;s really there.</h2>
+            <h2 className="t-hero" style={{ color: "var(--panel-ink)" }}>Find out who&apos;s really there.</h2>
             <div className="mt-8 grid gap-[18px] min-[901px]:grid-cols-2">
               <fieldset className="box-rule">
                 <legend>Start here</legend>
-                <Link className="btn btn-lg" href="/search" style={{ background: "#141413", color: "#fff", border: 0 }}>
+                <Link className="btn btn-lg" href="/search" style={{ background: "var(--panel-ink)", color: "var(--panel-bg)", border: 0 }}>
                   Find care <span className="arrow" aria-hidden="true">→</span>
                 </Link>
                 <p className="t-small mb-0 mt-2.5">about a minute · no account · free</p>
               </fieldset>
               <fieldset className="box-rule">
                 <legend>In crisis?</legend>
-                <p className="m-0">Call or text <a href="tel:988" style={{ color: "#141413", fontWeight: 700 }}>988</a> to reach the Suicide &amp; Crisis Lifeline, any time.</p>
+                <p className="m-0">Call or text <a href="tel:988" style={{ color: "var(--panel-ink)", fontWeight: 700 }}>988</a> to reach the Suicide &amp; Crisis Lifeline, any time.</p>
               </fieldset>
             </div>
           </div>
-          <AsciiGhost id="asciiGhost" width={34} height={22} className="footer-ghost m-0 justify-self-center"
-            style={{ font: "12px/1.05 var(--font-data)", color: "#141413" }} />
+          <GerardoReveal />
         </div>
       </section>
     </main>
