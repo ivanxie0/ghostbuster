@@ -28,15 +28,13 @@ is in the middle of January."
 ## Script
 
 ### 0:00–0:30 — Problem + law (Jai)
-> "Try to find a therapist who takes your insurance. You get a list from your insurer and start
-> calling. A study published last month did exactly that, almost six thousand calls. About one in
-> eight ended with an appointment option. The rest were wrong numbers, full practices, or voicemail.
-> Those are ghost listings.
+75 words. Do not add to it.
+> "Try finding a therapist who takes your insurance. A study last month made almost six thousand
+> calls to listed clinicians. About one in eight led to an appointment. The rest are ghost listings.
 >
-> California law says your health plan has ten business days to get you a therapy appointment. If its
-> network can't, the plan has to arrange one out of network at your in-network price. The state fined
-> Kaiser fifty million dollars over this in 2023. But the patient has to prove the network failed, one
-> phone call at a time. GhostBuster makes the calls."
+> California law gives your plan ten business days to get you in, or it must arrange care out of
+> network at your in-network price. But you have to prove the network failed, one call at a time.
+> GhostBuster makes the calls."
 
 ### 0:30–2:15 — Live demo
 **0:30–0:50 — Search (Aryan drives, Jai talks)**
@@ -48,35 +46,38 @@ Aryan submits the form. Results load.
 
 **0:50–1:40 — The call (Hardik)**
 Hardik hands the phone and the card to a judge.
-> Hardik: "The rest need a phone call. With the patient's permission, our AI agent makes it. Today it
-> only dials our own phones, so you're the receptionist. Tell it whatever you want."
+> Hardik: "With the patient's permission, our AI makes the calls. Today it only dials our own
+> phones, so you're the receptionist."
 
 Aryan clicks **Verify**. Phone rings. Judge answers; agent discloses it is an AI and asks for the
-earliest opening, in person or by telehealth. Let the call breathe; do not talk over it.
-> Hardik (while it wraps up): "It said it's an AI in the first sentence. Now the transcript comes back,
-> a model pulls out the date, and our rules engine counts business days, skipping weekends and California holidays."
+earliest opening, in person or by telehealth. **Nobody talks until the row flips.** The call is the demo.
+> Hardik (only if there is dead air after the call): "The transcript comes back, a model pulls out the
+> date, and the rules engine counts business days."
 
 **1:40–2:15 — Result + packet (Jai, Aryan drives)**
 Row flips to **Past legal deadline**.
 > Jai: "Mid-January is about forty business days. The limit is ten. One slow office isn't illegal; the
 > duty is on the plan. What matters is this line: no provider we reached could offer a timely
-> appointment. So we build the packet."
+> appointment."
 
 Aryan opens the packet.
-> Jai: "A timestamped call log. A grievance to the plan, citing the statute and asking it to arrange
-> care, out of network if needed. A phone script. And the steps for the state regulator if the plan
-> doesn't fix it in thirty days. It's a template, not legal advice, and it says so."
+> Jai: "So we build the packet: a timestamped call log, a grievance to the plan citing the statute,
+> a phone script, and the steps for the state regulator after thirty days. A template, not legal advice."
 
 ### 2:15–3:00 — Architecture + every specialty (Ivan, then Jai closes)
 > Ivan: "Under the hood: Bright Data reads the insurer's directory and public profiles, with the NPI
-> registry as a fallback and a Neon Postgres cache. An ElevenLabs agent calls through Twilio. Gemini
-> extracts the date from the transcript. A FastAPI rules engine does the deadline math, and Next.js
-> shows it live. Every external call has a timeout and a fallback.
+> registry as a fallback. An ElevenLabs agent calls through Twilio. Gemini extracts the date. A
+> FastAPI rules engine does the deadline math, and every external call has a timeout and a fallback.
 >
 > Therapy was the demo, but the rules table covers primary care, specialists, psychiatry and urgent
 > care. Same engine, different deadline."
 
-> Jai: "The law already exists. GhostBuster does the legwork so patients can use it."
+> Jai: "California fined Kaiser fifty million dollars over this. The law exists. GhostBuster does the
+> legwork so patients can use it."
+
+**Timing budget** (150 words a minute): opening 30s, search 20s, live call about 40s plus 10s of
+Hardik, result and packet 30s, architecture and close 35s. Total about 2:45, leaving 15s of slack.
+If the call runs past 2:00 on the clock, skip the packet walk-through.
 
 ## If something breaks
 | Problem | Do this | Say this |
@@ -94,9 +95,10 @@ Aryan opens the packet.
 2. **Why isn't this already solved?** — Existing tools are sold to insurers to clean their own
    directories. Nobody is on the patient's side producing evidence, and until voice AI the phone calls
    were too expensive to do for one person.
-3. **Which plans are covered?** — Plans licensed by California's Department of Managed Health Care:
-   most HMOs, many PPOs, most Covered California plans, and Medi-Cal managed care. Self-funded employer
-   plans and Medicare are not, and the app warns about that.
+3. **Which plans are covered?** — State-regulated coverage: plans licensed by the Department of Managed
+   Health Care (most HMOs, many PPOs, Medi-Cal managed care) plus policies regulated by the Department
+   of Insurance, which have the same deadlines. Self-funded employer plans and Medicare are not
+   covered, and the app warns about that.
 4. **How accurate is the AI?** — We keep the transcript beside every extracted date so a person can
    check it, and anything unclear is logged as "no answer" rather than guessed. The packet tells the
    member to review before sending.
