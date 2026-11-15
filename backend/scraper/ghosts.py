@@ -82,15 +82,28 @@ def _search_profile_url(p: Provider) -> str | None:
         return None
     city = (p.address or "").split(",")[-2].strip() if p.address and p.address.count(",") >= 2 else "San Diego"
     q = f'"{p.name.split(",")[0]}" {city} CA accepting new clients'
-    r = httpx.post(web.BRIGHTDATA_URL, timeout=STEP_TIMEOUT_S,
-                   headers={"Authorization": f"Bearer {token}"},
-                   json={"zone": zone, "format": "raw",
-                         "url": f"https://www.google.com/search?q={quote_plus(q)}&brd_json=1"})
-    r.raise_for_status()
-    last = p.name.split(",")[0].split()[-1].lower()
-    for item in r.json().get("organic", [])[:5]:
+    organic = []
+    for _ in range(2):  # the SERP API occasionally returns an empty / non-JSON body; one retry
+        r = httpx.post(web.BRIGHTDATA_URL, timeout=STEP_TIMEOUT_S,
+                       headers={"Authorization": f"Bearer {token}"},
+                       json={"zone": zone, "format": "raw",
+                             "url": f"https://www.google.com/search?q={quote_plus(q)}&brd_json=1"})
+        r.raise_for_status()
+        try:
+            organic = r.json().get("organic", [])
+            break
+        except ValueError:
+            continue
+    # Only trust a result that names this person: first AND last name must both appear, so we never
+    # flag a provider from someone else's page.
+    words = re.sub(r"^(dr\.?|mr\.?|ms\.?|mrs\.?)\s+", "", p.name.split(",")[0].lower()).split()
+    if len(words) < 2:
+        return None
+    first, last = words[0], words[-1]
+    for item in organic[:5]:
         link = item.get("link") or ""
-        if last in (item.get("title", "") + link).lower():
+        hay = re.sub(r"[^a-z]+", " ", (item.get("title", "") + " " + link).lower()).split()
+        if first in hay and last in hay:
             return link
     return None
 

@@ -105,8 +105,9 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - [x] Base scaffold: contracts, docs, FAKE_MODE backend, stub modules, frontend shells (Aryan)
 - [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
 - [x] Neon schema applied + seeded (Ivan)
-- [ ] Real scraper / ghost check (Ivan) — code landed (cache → Bright Data → NPI → seed), but every
-      `DIRECTORY_URLS` entry is empty, so real providers currently come from NPI only, not an insurer directory
+- [ ] Real scraper / ghost check (Ivan) — Bright Data live (Web Unlocker + SERP zones), Neon cache pre-warmed
+      for 92103 / 92122 therapists. Providers come from NPI (`DIRECTORY_URLS` still empty). Ghost check runs on
+      real providers but flags 0 so far: few profiles found, and no `GEMINI_API_KEY` on Ivan's machine yet
 - [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)
 - [ ] ElevenLabs/Twilio agent calling teammate phones (Hardik)
 - [ ] Webhook + Gemini extraction (Hardik)

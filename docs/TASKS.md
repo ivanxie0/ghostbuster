@@ -16,9 +16,9 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 - [x] Apply `db/schema.sql` to Neon (`make seed` does it)
 - [ ] Seed data reviewed (`db/seed_providers.json`)
 - [ ] `scraper/providers.py`: Bright Data scrape of an insurer directory (pick one insurer for demo)
-- [ ] NPI Registry fallback
+- [x] NPI Registry fallback
 - [ ] `scraper/ghosts.py`: cross-check profiles → ghost flags + reasons
-- [ ] Cache scraped results in Neon; timeout → cache/seed fallback
+- [x] Cache scraped results in Neon; timeout → cache/seed fallback
 
 ## Hardik — rules, calls
 - [x] `rules/deadlines.py`: DEADLINES + holidays + `business_days_between` + `check_violation` + tests
