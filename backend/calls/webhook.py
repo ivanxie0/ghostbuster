@@ -52,7 +52,9 @@ def transcript_to_text(turns: list[dict]) -> str:
     def msg(t):  # tags only ever come from the agent's TTS; never alter what the office said
         m = t.get("message") or ""
         return VOICE_TAG.sub("", m).strip() if t.get("role") == "agent" else m
-    return "\n".join(f"{who.get(t.get('role'), t.get('role'))}: {msg(t)}" for t in turns or [])
+    # Skip agent turns that are empty once tags are stripped (they render as blank bubbles).
+    return "\n".join(f"{who.get(t.get('role'), t.get('role'))}: {msg(t)}" for t in turns or []
+                     if not (t.get("role") == "agent" and not msg(t)))
 
 
 def call_day(data: dict) -> date:

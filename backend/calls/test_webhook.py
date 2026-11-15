@@ -143,3 +143,16 @@ def test_real_call_fixture_parses():
     assert r.transcript.startswith("Agent: Hi, I'm an AI assistant calling on behalf of a patient")
     assert "[happy]" not in r.transcript and "Office: I don't have any." in r.transcript
     assert r.earliest_date is None  # "I don't have any" -> no date offered
+
+
+def test_empty_agent_turns_skipped():
+    from calls.webhook import transcript_to_text
+    t = transcript_to_text([{"role": "agent", "message": "Hi."}, {"role": "agent", "message": "[slow] "},
+                            {"role": "agent", "message": None}, {"role": "user", "message": "Hello"}])
+    assert t == "Agent: Hi.\nOffice: Hello"
+
+
+def test_opening_says_recorded_and_transcribed():
+    from calls.agent import FIRST_MESSAGE
+    from calls.setup_agent import SYSTEM_PROMPT
+    assert "recorded and transcribed" in FIRST_MESSAGE and "recorded and transcribed" in SYSTEM_PROMPT

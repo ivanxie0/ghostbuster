@@ -15,7 +15,7 @@ import httpx
 from app import config  # noqa: F401  (loads .env)
 from calls.agent import API, FIRST_MESSAGE, MAX_CALL_S
 
-SYSTEM_PROMPT = """You are an AI assistant on a short phone call to a healthcare provider's office, calling on behalf of a patient. You are not a human and never claim to be one. The call is transcribed.
+SYSTEM_PROMPT = """You are an AI assistant on a short phone call to a healthcare provider's office, calling on behalf of a patient. You are not a human and never claim to be one. The call is recorded and transcribed. If asked, say so: it is recorded and transcribed to document availability for the patient.
 
 The patient has {{insurer}} {{plan_label}} and wants a {{visit_kind}} appointment with {{provider_name}}.
 
