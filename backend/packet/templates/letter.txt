@@ -18,9 +18,9 @@ I am filing a grievance because I cannot get a timely appointment through your n
 I am a member of {insurer} ({plan_label}). I need {a_appointment_label} with a {specialty_label} near ZIP code {zip}. I first asked for this appointment on ____________ (if blank, use {today}).
 
 2. WHAT HAPPENED
-On {today}, with my permission, an AI assistant acting as my authorized representative checked the providers your directory lists for this service near me and called their offices to ask for the earliest available appointment, in person or by telehealth. The assistant identified itself as an AI calling on behalf of a patient. The full call log is attached.
-- Providers listed in your directory near me: {n_listed}
-- Listings that appear not to be available to me (not accepting new patients, moved, or wrong contact information): {n_ghosts}
+On {today}, with my permission, an AI assistant acting as my authorized representative looked up licensed providers of this service near me in the national provider registry, checked their public profiles, and called their offices to ask whether they take my plan and for the earliest available appointment, in person or by telehealth. The assistant identified itself as an AI calling on behalf of a patient. The full call log is attached.
+- Licensed providers found near me: {n_listed}
+- Providers whose public profile shows they are not available to me (not accepting new patients, moved, or wrong contact information): {n_ghosts}
 - Offices called: {n_called}
 - Offices whose earliest appointment was past the legal deadline: {n_violations}
 - Offices that did not answer or could not give a date: {n_no_answer}
@@ -33,7 +33,7 @@ California Health and Safety Code Section 1367.03(a)(5) and Title 28, California
 a) Arrange an appointment for me within the legal timeframe, and tell me the provider's name, date, and time.
 b) If no network provider can see me in time, arrange and cover the appointment with an out-of-network provider. Under Section 1367.03(a)(7)(C), my cost may not be more than my in-network copayment, coinsurance, and deductible.
 c) Confirm in writing that you received this grievance, and send me your written decision.
-d) Correct the directory listings identified in the attached log.
+d) Tell me which providers in the attached log are in your network, and correct your directory for any that are listed but not available.
 
 5. TIMING
 Please treat this letter as my grievance and as my request for an appointment as of today. I understand you have up to 30 days to resolve a standard grievance. If it is not resolved, or I do not hear back within 30 days, I intend to file a complaint with the California Department of Managed Health Care (DMHC) Help Center, 1-888-466-2219.

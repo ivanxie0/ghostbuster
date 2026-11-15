@@ -4,7 +4,7 @@ Payloads are built from the real captured webhook (fixtures/real_webhook_2026-11
 shape ElevenLabs delivers. Results go through the real rules engine (rules.deadlines.check_violation) to check the final
 row status. Gemini is always mocked: an autouse guard fails any test that would make a real network call.
 
-Call date in the fixture: Sat 2026-11-14 (Pacific). Owner of the logic under test: Hardik (calls/webhook.py).
+Call date in the fixture: Sat 2026-11-14 (Pacific). Owner of the logic under test: Jai (calls/webhook.py extraction).
 """
 import copy
 import json
@@ -19,11 +19,8 @@ from calls import webhook
 from calls.webhook import PROMPT, TZ, handle_call_complete
 from rules.deadlines import check_violation
 
-# Known failures, owner @Hardik Chopra (logic in calls/webhook.py). strict=True: each turns red once it's fixed,
-# so the marker gets removed. Not fixed here on purpose (tests-only change).
-XF_MONTH_ONLY = pytest.mark.xfail(strict=True, reason="webhook.py:172 MONTH_DAY needs a day; 'middle of January' -> no date")
-XF_CURLY = pytest.mark.xfail(strict=True, reason="webhook.py:166 NOT_ACCEPTING only matches ASCII apostrophes (don't), not ’")
-XF_TYPES = pytest.mark.xfail(strict=True, reason="webhook.py:53-56 transcript_to_text assumes a list of dicts; crashes otherwise")
+# The five cases Aryan marked xfail(strict) here were fixed in calls/webhook.py on 2026-11-14 (Jai): month-only
+# answers, curly apostrophes, and non-list / null-turn transcripts. The markers are gone; the tests now pass.
 
 FIXTURES = Path(__file__).parent / "fixtures"
 REAL_WEBHOOK = json.loads((FIXTURES / "real_webhook_2026-11-14.json").read_text(encoding="utf-8"))
@@ -109,7 +106,6 @@ def test_vague_answers_stay_unknown(said):
 
 # ------------------------------------------------------------------------------ "middle of January"
 
-@XF_MONTH_ONLY
 @pytest.mark.parametrize("said", [
     "Earliest would be the middle of January.",
     "We could see them mid-January.",
@@ -136,7 +132,7 @@ def test_middle_of_january_gemini_answer_is_kept_and_judged(monkeypatch):
     "We're not accepting new patients right now.",
     "Sorry, we don't take that plan.",
     "We do not accept Blue Shield, sorry.",
-    pytest.param("Sorry, we don’t take that plan.", marks=XF_CURLY, id="curly-apostrophe"),  # as STT often writes it
+    pytest.param("Sorry, we don’t take that plan.", id="curly-apostrophe"),  # as STT often writes it
     "We’re not accepting any new clients.",
 ])
 def test_not_accepting_is_confirmed_ghost(said):
@@ -232,8 +228,8 @@ def test_empty_or_odd_turns_are_safe(turns):
 
 
 @pytest.mark.parametrize("transcript", [
-    pytest.param("garbage string", marks=XF_TYPES, id="string"),
-    pytest.param([None], marks=XF_TYPES, id="null turn"),
+    pytest.param("garbage string", id="string"),
+    pytest.param([None], id="null turn"),
     pytest.param(None, id="null"),
 ])
 def test_wrong_transcript_types_do_not_crash(transcript):

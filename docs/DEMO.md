@@ -41,8 +41,8 @@ is in the middle of January."
 > Jai: "I'm a Blue Shield HMO member in San Diego and I need a new therapist."
 
 Aryan submits the form. Results load.
-> Jai: "These are the therapists my insurer lists near me. We cross-checked each against public
-> profiles. These ones, flagged as ghosts, aren't really available: not taking new patients, moved, or a dead number."
+> Jai: "These are licensed therapists near me, from the national provider registry. Bright Data
+> checked each one's public profile. These ones, flagged as ghosts, aren't really available: not taking new patients, moved, or a dead number."
 
 **0:50–1:40 — The call (Hardik)**
 Hardik hands the phone and the card to a judge.
@@ -65,8 +65,8 @@ Aryan opens the packet.
 > a phone script, and the steps for the state regulator after thirty days. A template, not legal advice."
 
 ### 2:15–3:00 — Architecture + every specialty (Ivan, then Jai closes)
-> Ivan: "Under the hood: Bright Data reads the insurer's directory and public profiles, with the NPI
-> registry as a fallback. An ElevenLabs agent calls through Twilio. Gemini extracts the date. A
+> Ivan: "Under the hood: we pull licensed providers near you from the national provider registry, then
+> use Bright Data to check each one's public profile. An ElevenLabs agent calls through Twilio. Gemini extracts the date. A
 > FastAPI rules engine does the deadline math, and every external call has a timeout and a fallback.
 >
 > Therapy was the demo, but the rules table covers primary care, specialists, psychiatry and urgent
@@ -117,8 +117,8 @@ If the call runs past 2:00 on the clock, skip the packet walk-through.
    one call that serves many patients, during office hours. The rules are a table, so adding a specialty or a state is data, not code.
 10. **Privacy and HIPAA?** — We ask for insurer, plan type, ZIP and specialty: no name, diagnosis or
     member ID. The agent never gives the office patient details; the member writes their ID on the letter themselves.
-11. **What does Bright Data do?** — Insurer directories and provider profiles have no public API and
-    block simple scrapers. Bright Data is how we read them reliably, which is what makes ghost detection possible.
+11. **What does Bright Data do?** — Providers come from the national provider registry. Bright Data finds
+    and reads each one's public profile, pages with no API that block simple scrapers, which is what makes ghost detection possible.
 12. **What's next?** — Real calls with clinic-friendly limits, Spanish, an anonymized ghost-rate
     scoreboard by insurer, and other states' rules.
 
