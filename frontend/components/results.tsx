@@ -228,7 +228,7 @@ function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
     case "ghost": return <span className="text-ink/55">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "")}</span>;
-    case "unverified": return <span className="text-ink/60">{maskPhonesIn(p.ghost_reason ?? "Looks real — not called yet")}</span>;
+    case "unverified": return <span className="text-ink/60">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "Looks real — not called yet")}</span>;
     case "calling": return <span className="text-cobalt">AI assistant is on the line…</span>;
     case "no_answer": return <span className="text-ink/80">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
     default:
