@@ -4,7 +4,9 @@ from fastapi.responses import HTMLResponse
 
 from app import store
 from app.config import FAKE_MODE
-from app.models import SearchCreate, SearchCreated, SearchDetail, VerifyRequest, VerifyResponse
+from app import demo
+from app.models import (DemoSettings, DemoSettingsUpdate, SearchCreate, SearchCreated, SearchDetail,
+                        VerifyRequest, VerifyResponse)
 from packet.render import render_packet
 
 router = APIRouter(prefix="/api")
@@ -13,6 +15,22 @@ router = APIRouter(prefix="/api")
 @router.get("/health")
 def health():
     return {"ok": True, "fake_mode": FAKE_MODE}
+
+
+def _demo_settings() -> DemoSettings:
+    from calls.agent import real_calls_enabled
+    return DemoSettings(fake_mode=FAKE_MODE, force_fallback=demo.force_fallback(), real_calls=real_calls_enabled())
+
+
+@router.get("/demo", response_model=DemoSettings)
+def get_demo():
+    return _demo_settings()
+
+
+@router.post("/demo", response_model=DemoSettings)
+def set_demo(body: DemoSettingsUpdate):
+    demo.set_force_fallback(body.force_fallback)
+    return _demo_settings()
 
 
 @router.post("/search", response_model=SearchCreated)

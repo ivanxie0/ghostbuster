@@ -1,5 +1,5 @@
 // Typed client for every endpoint in docs/API.md.
-import type { SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
+import type { DemoSettings, SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -24,6 +24,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ provider_ids }),
     }),
+  /** Demo control panel (Shift+D). */
+  getDemo: () => req<DemoSettings>("/api/demo"),
+  setDemo: (force_fallback: boolean) =>
+    req<DemoSettings>("/api/demo", { method: "POST", body: JSON.stringify({ force_fallback }) }),
   /** HTML page — open in a new tab / iframe, don't fetch as JSON. */
   packetUrl: (id: string) => `${API_URL}/api/search/${id}/packet`,
   /** Packet HTML as text (for same-origin iframe srcDoc → printable + downloadable). */

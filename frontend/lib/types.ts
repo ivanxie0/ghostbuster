@@ -44,9 +44,22 @@ export interface SearchCreated {
   search_id: string;
 }
 
+export interface FallbackEvent {
+  stage: string; // "directory" | "ghost check" | "calls" | "extraction"
+  detail: string; // e.g. "timed out after 10s → cached demo providers"
+  at: string; // ISO timestamp
+}
+
 export interface SearchDetail {
   search: Search;
   providers: Provider[];
+  fallbacks?: FallbackEvent[]; // real mode only; empty/absent in FAKE_MODE
+}
+
+export interface DemoSettings {
+  fake_mode: boolean;
+  force_fallback: boolean;
+  real_calls: boolean;
 }
 
 export interface VerifyRequest {

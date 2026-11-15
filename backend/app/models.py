@@ -51,9 +51,27 @@ class SearchCreated(BaseModel):
     search_id: str
 
 
+class FallbackEvent(BaseModel):
+    # A pipeline stage that fell back to cached/seed data (real mode). Shown in the results activity log.
+    stage: str          # "directory" | "ghost check" | "calls" | "extraction"
+    detail: str         # e.g. "timed out after 10s → cached demo providers"
+    at: datetime
+
+
 class SearchDetail(BaseModel):
     search: Search
     providers: list[Provider]
+    fallbacks: list[FallbackEvent] = []  # additive, optional: empty in FAKE_MODE
+
+
+class DemoSettings(BaseModel):
+    fake_mode: bool
+    force_fallback: bool
+    real_calls: bool  # ElevenLabs configured: teammate phones get real calls
+
+
+class DemoSettingsUpdate(BaseModel):
+    force_fallback: bool
 
 
 class VerifyRequest(BaseModel):
