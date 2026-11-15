@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason, hadProfileCheck,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_PLURAL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason, hadProfileCheck,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -30,7 +30,7 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
   const out: Omit<LogEvent, "id" | "at">[] = [];
   const s = next.search;
   if (!prev) {
-    out.push({ tone: "info", text: `Looking up ${SPECIALTY_LABEL[s.specialty].toLowerCase()}s near ${s.zip} for your ${s.insurer} plan` });
+    out.push({ tone: "info", text: `Looking up ${SPECIALTY_PLURAL[s.specialty].toLowerCase()} near ${s.zip} for your ${s.insurer} plan` });
   }
   if ((prev?.providers.length ?? 0) === 0 && next.providers.length > 0) {
     out.push({ tone: "info", text: `Found ${next.providers.length} providers. Checking their public profiles…` });

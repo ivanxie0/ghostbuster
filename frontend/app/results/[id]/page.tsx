@@ -7,7 +7,7 @@ import {
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
-import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, isRealCallUpdate, shortDate, wasCalled } from "@/lib/format";
+import { PLAN_LABEL, SPECIALTY_PLURAL, clock, deadlineText, isDemoProvider, isRealCallUpdate, shortDate, wasCalled } from "@/lib/format";
 import type { SearchDetail } from "@/lib/types";
 
 const POLL_AFTER_DONE_MS = 45_000;
@@ -180,7 +180,7 @@ export default function ResultsPage() {
             <span className="text-accent-deep">File GB-{id.slice(0, 6).toUpperCase()}</span> · {search.insurer} · {PLAN_LABEL[search.plan_type]} · ZIP {search.zip}
           </p>
           <h1 className="display mt-2 text-4xl sm:text-5xl">
-            {SPECIALTY_LABEL[search.specialty]}s, <span className="italic text-ink/60">legal limit {deadlineText(search)}</span>
+            {SPECIALTY_PLURAL[search.specialty]}, <span className="italic text-ink/60">legal limit {deadlineText(search)}</span>
           </h1>
         </div>
         <div className="flex flex-col items-end gap-2">

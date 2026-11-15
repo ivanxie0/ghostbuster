@@ -17,7 +17,7 @@ from pathlib import Path
 from app import store
 from app.solutions import oon_candidates
 from app import records
-from rules.deadlines import DEADLINES, TZ, URGENT_HOURS
+from rules.deadlines import DEADLINES, TZ, URGENT_HOURS, hours_until
 
 TEMPLATES = Path(__file__).parent / "templates"
 PLAN = {"hmo": "HMO", "ppo": "PPO", "medi_cal": "Medi-Cal", "unknown": "plan type unknown"}
@@ -246,6 +246,8 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     def wait(p) -> str:
         if p.business_days_wait is None:
             return "—"
+        if urgent and p.earliest_date:  # urgent deadlines are calendar hours, not business days
+            return f"~{hours_until(s.created_at, p.earliest_date):.0f} hrs"
         return "<1 bus. day" if p.business_days_wait == 0 else f"{p.business_days_wait} bus. day{'' if p.business_days_wait == 1 else 's'}"
 
     log_rows = "".join(

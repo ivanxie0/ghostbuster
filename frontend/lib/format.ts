@@ -8,6 +8,13 @@ export const SPECIALTY_LABEL: Record<Specialty, string> = {
   specialist: "Specialist",
 };
 
+export const SPECIALTY_PLURAL: Record<Specialty, string> = {
+  therapist: "Therapists",
+  psychiatrist: "Psychiatrists",
+  primary_care: "Primary care providers",
+  specialist: "Specialists",
+};
+
 export const PLAN_LABEL: Record<PlanType, string> = {
   hmo: "HMO",
   ppo: "PPO",
