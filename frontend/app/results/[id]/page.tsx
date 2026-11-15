@@ -7,7 +7,7 @@ import {
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
-import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isResolved } from "@/lib/format";
+import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, wasCalled } from "@/lib/format";
 import type { SearchDetail } from "@/lib/types";
 
 export default function ResultsPage() {
@@ -44,7 +44,7 @@ export default function ResultsPage() {
         if (stop) return;
         const items = diffEvents(prev.current, d);
         log(items);
-        const last = [...items].reverse().find((e) => e.pid && e.tone !== "ghost");
+        const last = [...items].reverse().find((e) => e.pid && e.focus);
         if (last?.pid) setFocus(last.pid);
         if (d.search.status === "done") {
           const hit = d.providers.find((p) => p.ghost_status === "available");
@@ -86,7 +86,8 @@ export default function ResultsPage() {
 
   const { search, providers } = data;
   const callable = providers.filter((p) => p.ghost_status === "unverified");
-  const started = approving || providers.some((p) => p.ghost_status === "calling" || isResolved(p));
+  // "Started" = any row is being or has been called. Directory ghosts don't count (they exist before consent).
+  const started = approving || providers.some((p) => p.ghost_status === "calling" || wasCalled(p));
   const showConsent = search.status === "verifying" && !started && callable.length > 0;
   const done = search.status === "done";
   const available = providers

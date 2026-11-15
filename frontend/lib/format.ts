@@ -34,6 +34,7 @@ export const STATUS_LABEL: Record<GhostStatus, string> = {
 export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; text: string; flash: string }> = {
   ghost: {
     badge: "bg-zinc-700 text-zinc-200",
+    // (confirmed-on-call ghosts add CONFIRMED_GHOST_STYLE on top of this)
     row: "border-zinc-800 bg-zinc-900/40 opacity-70",
     text: "text-zinc-400",
     flash: "rgba(161,161,170,.5)",
@@ -70,11 +71,28 @@ export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; tex
   },
 };
 
+/** Confirmed ghost: ghost grey with a red outline. */
+export const CONFIRMED_GHOST_STYLE = {
+  badge: "bg-zinc-700 text-zinc-100 ring-2 ring-red-500",
+  row: "border-red-500/70 bg-zinc-900/60",
+};
+
 /** Seed/fake providers all have example.com source URLs (db/seed_providers.json); real scraped ones never do. */
 export const isDemoProvider = (p: Provider) => !!p.source_url?.startsWith("https://example.com/");
 
-export const RESOLVED: GhostStatus[] = ["available", "violation", "no_answer"];
+/** Terminal statuses: nothing more will happen to the row. "ghost" is terminal whether it came from the
+ *  directory check or from a call (Hardik: called rows saying "not accepting" end as ghost). */
+export const RESOLVED: GhostStatus[] = ["available", "violation", "no_answer", "ghost"];
 export const isResolved = (p: Provider) => RESOLVED.includes(p.ghost_status);
+
+/** Ghost confirmed by the office on the call (vs. flagged from the directory/profile check). */
+export const isConfirmedGhost = (p: Provider) =>
+  p.ghost_status === "ghost" && !!p.ghost_reason?.startsWith("Confirmed on call:");
+
+/** Row was actually phoned and has a result. Directory ghosts (never called) are resolved but NOT called. */
+export const wasCalled = (p: Provider) =>
+  ["available", "violation", "no_answer"].includes(p.ghost_status) ||
+  (p.ghost_status === "ghost" && (isConfirmedGhost(p) || !!p.call_transcript));
 
 /** "Dec 23" from "2026-12-23" without timezone drift. */
 export function shortDate(iso: string | null): string {

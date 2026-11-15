@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isDemoProvider, isResolved, longDate, shortDate, waitVsDeadline,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate,
+  shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
 
 // ---------------------------------------------------------------- activity log model
-export type LogEvent = { id: number; at: string; text: string; tone: GhostStatus | "info" | "user"; pid?: string };
+// focus: the results page auto-selects this provider (call results; not directory ghosts)
+export type LogEvent = { id: number; at: string; text: string; tone: GhostStatus | "info" | "user"; pid?: string; focus?: boolean };
 
 const TONE_DOT: Record<LogEvent["tone"], string> = {
   info: "bg-zinc-400",
@@ -38,13 +40,26 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
     if (was === p.ghost_status || (!was && p.ghost_status === "unverified")) continue;
     const w = waitVsDeadline(s, p);
     const name = p.name;
-    if (p.ghost_status === "ghost") out.push({ tone: "ghost", pid: p.id, text: `Ghost listing: ${name} — ${p.ghost_reason ?? "not accepting"}` });
-    if (p.ghost_status === "calling") out.push({ tone: "calling", pid: p.id, text: `Calling ${name}…` });
-    if (p.ghost_status === "available")
-      out.push({ tone: "available", pid: p.id, text: `${name}: earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit}). Within the deadline ✓` });
-    if (p.ghost_status === "violation")
-      out.push({ tone: "violation", pid: p.id, text: `${name}: earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit}). Past legal deadline` });
-    if (p.ghost_status === "no_answer") out.push({ tone: "no_answer", pid: p.id, text: `${name}: no answer` });
+    const reason = p.ghost_reason?.trim();
+    switch (p.ghost_status) {
+      case "calling":
+        out.push({ tone: "calling", pid: p.id, focus: true, text: `Calling ${name}…` });
+        break;
+      case "ghost":
+        out.push(isConfirmedGhost(p) || wasCalled(p)
+          ? { tone: "ghost", pid: p.id, focus: true, text: `${name}: ${reason ?? "listed, but not accepting this plan/new patients"}` }
+          : { tone: "ghost", pid: p.id, text: `Ghost listing: ${name} — ${reason ?? "not accepting"}` });
+        break;
+      case "available":
+        out.push({ tone: "available", pid: p.id, focus: true, text: `${name}: ${reason ?? `earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit})`}. Within the deadline ✓` });
+        break;
+      case "violation":
+        out.push({ tone: "violation", pid: p.id, focus: true, text: `${name}: ${reason ?? `earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit})`}. Past legal deadline` });
+        break;
+      case "no_answer":
+        out.push({ tone: "no_answer", pid: p.id, focus: true, text: `${name}: ${reason ?? "no answer"}` });
+        break;
+    }
   }
   const callable = next.providers.filter((p) => p.ghost_status === "unverified").length;
   if (prev?.search.status === "scraping" && s.status === "verifying" && !next.providers.some((p) => p.ghost_status === "calling")) {
@@ -87,7 +102,7 @@ export function Counters({ providers }: { providers: Provider[] }) {
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       <Counter label="Listed" value={providers.length} tone="text-white" />
       <Counter label="Ghosts" value={n("ghost")} tone="text-zinc-300" />
-      <Counter label="Checked" value={providers.filter(isResolved).length} tone="text-sky-300" />
+      <Counter label="Checked" value={providers.filter(wasCalled).length} tone="text-sky-300" />
       <Counter label="Past deadline" value={n("violation")} tone="text-red-400" />
     </div>
   );
@@ -157,7 +172,9 @@ export function EndingA({ search, provider, id, violations }: { search: Search; 
 export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
   const { search, providers } = detail;
   const n = (s: GhostStatus) => providers.filter((p) => p.ghost_status === s).length;
-  const checked = providers.filter(isResolved).length;
+  const checked = providers.filter(wasCalled).length;
+  const confirmed = providers.filter(isConfirmedGhost).length;
+  const listedGhosts = n("ghost") - confirmed;
   const selfFunded = search.plan_type === "ppo" || search.plan_type === "unknown";
   return (
     <section className="rise rounded-3xl border-2 border-red-500 bg-red-950/60 p-6 sm:p-8">
@@ -169,8 +186,9 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
         Under California law, your plan must now arrange timely care, including out-of-network at in-network cost.
       </p>
       <p className="mt-4 text-xl leading-snug text-red-100">
-        Legal limit: {deadlineText(search)}. <b>{n("violation")}</b> of {checked} offices we reached were past the legal
-        deadline, <b>{n("ghost")}</b> listings appear unavailable, and <b>{n("no_answer")}</b> didn&apos;t answer.
+        Legal limit: {deadlineText(search)}. Of {checked} offices we reached, <b>{n("violation")}</b> were past the legal
+        deadline{confirmed > 0 && <>, <b>{confirmed}</b> said they aren&apos;t taking this plan or new patients</>}, and{" "}
+        <b>{n("no_answer")}</b> didn&apos;t answer. <b>{listedGhosts}</b> more listings appear unavailable.
       </p>
       <p className="mt-2 text-lg text-red-100/80">
         Your packet has the evidence log, a grievance letter to {search.insurer}, a phone script, and next steps with the DMHC.
@@ -233,12 +251,13 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
     <ul className="space-y-3">
       {providers.map((p) => {
         const st = STATUS_STYLE[p.ghost_status];
+        const confirmed = isConfirmedGhost(p);
         return (
           <li key={p.id} className="slide-in">
             <button
               onClick={() => onSelect(p.id)}
               aria-pressed={selected === p.id}
-              className={`relative w-full rounded-2xl border-2 px-5 py-4 text-left transition-all duration-500 ${st.row} ${
+              className={`relative w-full rounded-2xl border-2 px-5 py-4 text-left transition-all duration-500 ${confirmed ? CONFIRMED_GHOST_STYLE.row : st.row} ${
                 selected === p.id ? "outline outline-3 outline-offset-2 outline-white/80" : "hover:brightness-125"
               }`}
             >
@@ -255,7 +274,7 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
                   </div>
                   <div className="mt-1 text-lg leading-snug">{rowDetail(search, p)}</div>
                 </div>
-                <StatusBadge status={p.ghost_status} />
+                <StatusBadge status={p.ghost_status} confirmed={confirmed} />
               </div>
             </button>
           </li>
@@ -284,7 +303,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
             {[provider.phone, provider.address].filter(Boolean).join(" · ")}
           </p>
         </div>
-        <StatusBadge status={provider.ghost_status} big />
+        <StatusBadge status={provider.ghost_status} big confirmed={isConfirmedGhost(provider)} />
       </div>
 
       {w && provider.earliest_date && (
@@ -307,7 +326,12 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
             <span className="text-lg font-semibold">Live call in progress — transcript arrives when the call ends.</span>
           </div>
         )}
-        {provider.ghost_status === "ghost" && (
+        {provider.ghost_status === "ghost" && wasCalled(provider) && (
+          <p className="rounded-xl border border-red-500/60 bg-zinc-900 p-3 text-lg text-zinc-200">
+            Confirmed on the call: <b>listed, but not accepting this plan/new patients.</b>
+          </p>
+        )}
+        {provider.ghost_status === "ghost" && !wasCalled(provider) && (
           <p className="text-lg text-zinc-300">
             Not called — this listing is a ghost: <b>{provider.ghost_reason}</b>.{" "}
             {provider.source_url && (

@@ -33,6 +33,7 @@ def short_date(d) -> str:
 
 def short_datetime(dt) -> str:
     return f"{short_date(dt)} {dt.hour % 12 or 12}:{dt:%M} {dt:%p} {dt:%Z}".rstrip()
+CALLED_GHOST_LABEL = "Listed, but not accepting this plan/new patients"
 LABEL = {"available": "Available in time", "violation": "Past legal deadline", "no_answer": "No answer",
          "ghost": "Appears unavailable", "unverified": "Not called", "calling": "Call in progress"}
 
@@ -81,7 +82,10 @@ def render_packet(search_id: str) -> str:
     if not detail:
         return "<h1>Search not found</h1>"
     s, providers = detail.search, detail.providers
-    called = [p for p in providers if p.ghost_status in ("available", "violation", "no_answer")]
+    # A called row can end as ghost ("not accepting new patients / this plan", Hardik). Keep it in the call
+    # log so its transcript stays in the evidence; it counts as an office that could not offer a timely appt.
+    called = [p for p in providers
+              if p.ghost_status in ("available", "violation", "no_answer") or (p.ghost_status == "ghost" and p.call_transcript)]
     ghosts = [p for p in providers if p.ghost_status == "ghost"]
     urgent = s.appointment_type == "urgent"
     deadline_days = URGENT_HOURS["no_prior_auth"] // 24 if urgent else DEADLINES[s.specialty][s.appointment_type]
@@ -106,7 +110,7 @@ def render_packet(search_id: str) -> str:
     log_rows = "".join(
         f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(p.phone)}</td>"
         f"<td>{short_datetime(p.checked_at.astimezone(TZ)) if p.checked_at else ''}</td>"
-        f"<td><span class='pill {p.ghost_status}'>{LABEL[p.ghost_status]}</span></td>"
+        f"<td><span class='pill {p.ghost_status}'>{CALLED_GHOST_LABEL if p.ghost_status == 'ghost' else LABEL[p.ghost_status]}</span></td>"
         f"<td>{short_date(p.earliest_date) if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
         f"<td>{_e(p.ghost_reason)}</td></tr>"
         for p in called
