@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -311,16 +311,17 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
             {(() => {
               // Real ghost from the public-profile check: show where it came from (link sits outside the button).
               const pc = profileCheck(p);
-              return pc?.url ? (
-                <a
-                  href={pc.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 ml-5 inline-flex items-center gap-1.5 font-mono text-xs text-cobalt underline underline-offset-2"
-                >
-                  ✓ Profile checked · {pc.host ?? "source"} ↗
-                </a>
-              ) : null;
+              const url = pc?.url ?? (p.ghost_status === "ghost" ? p.source_url : null);
+              if (!url) return null;
+              const when = checkedDate(p.checked_at);
+              return (
+                <span className="mt-1 ml-5 inline-flex flex-wrap items-center gap-1.5 font-mono text-xs">
+                  <a href={url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">
+                    {pc ? `✓ Profile checked · ${pc.host ?? "source"} ↗` : "Source ↗"}
+                  </a>
+                  {when && <span className="text-ink/55">· checked {when}</span>}
+                </span>
+              );
             })()}
           </li>
         );
@@ -392,6 +393,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
                 <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">Source</a>
               )
             )}
+            {checkedDate(provider.checked_at) && <span className="text-ink/55"> · checked {checkedDate(provider.checked_at)}</span>}
           </p>
         )}
         {provider.ghost_status === "unverified" && <p className="font-mono text-sm text-ink/55">Not called yet.</p>}

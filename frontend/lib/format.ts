@@ -97,6 +97,13 @@ export function profileCheck(p: Provider): { text: string; url: string | null; h
   return { text: text || "public profile says unavailable", url, host };
 }
 
+/** "Nov 14, 2026" in Pacific time, from a provider's checked_at. */
+export function checkedDate(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" });
+}
+
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
 export function maskPhone(phone: string | null | undefined): string {
   if (!phone) return "";

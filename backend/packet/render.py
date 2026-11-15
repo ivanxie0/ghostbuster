@@ -90,6 +90,12 @@ def mask_phones_in(text: str | None) -> str:
     return _PHONE_IN_TEXT.sub(lambda m: mask_phone(m.group(0)), text or "")
 
 
+def _flag_source(p) -> str:
+    """Where a ghost flag came from: the profile URL at the end of the reason ("... (https://...)"), else source_url."""
+    m = re.search(r"\((https?://[^\s)]+)\)\s*$", p.ghost_reason or "")
+    return m.group(1) if m else (p.source_url or "")
+
+
 def _e(v) -> str:
     return html.escape("" if v is None else str(v))
 
@@ -134,7 +140,8 @@ def render_packet(search_id: str) -> str:
     ) or "<tr><td colspan='7' class='muted'>No offices were called.</td></tr>"
     ghost_rows = "".join(
         f"<tr><td><b>{_e(p.name)}</b></td><td>{_e(mask_phone(p.phone))}</td><td>{_e(mask_phones_in(p.ghost_reason))}</td>"
-        f"<td class='small'>{_e(p.source_url)}</td></tr>"
+        f"<td class='small'>{_e(_flag_source(p))}"
+        f"{'<br><span class=muted>checked ' + short_date(p.checked_at.astimezone(TZ)) + '</span>' if p.checked_at and p.source_url else ''}</td></tr>"
         for p in ghosts
     ) or "<tr><td colspan='4' class='muted'>None.</td></tr>"
     transcripts = "".join(
