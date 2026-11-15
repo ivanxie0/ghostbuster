@@ -123,7 +123,7 @@ export function GhostFunnel({ providers }: { providers: Provider[] }) {
     { label: "providers found", value: providers.length, tone: "bg-ink/70" },
     { label: "profiles found online", value: providers.filter(hadProfileCheck).length, tone: "bg-cobalt/80" },
     { label: "appear unavailable", value: providers.filter((p) => p.ghost_status === "ghost").length, tone: "bg-ink/40" },
-    { label: "offices reached", value: providers.filter(wasCalled).length, tone: "bg-cobalt" },
+    { label: "offices called", value: providers.filter(wasCalled).length, tone: "bg-cobalt" },
     { label: "timely appointment", value: providers.filter((p) => p.ghost_status === "available").length, tone: "bg-moss" },
   ];
   const max = Math.max(1, steps[0].value);
@@ -321,7 +321,7 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
           <Stamp tone="signal" top="Past deadline" bottom={`limit ${deadlineText(search)}`} />
           <Ledger
             rows={[
-              { k: "offices reached", v: checked },
+              { k: "offices called", v: checked },
               { k: "past legal deadline", v: n("violation"), tone: "text-signal" },
               ...(confirmed > 0 ? [{ k: "not taking plan / new patients", v: confirmed, tone: "text-signal" }] : []),
               { k: "no answer", v: n("no_answer") },
