@@ -12,3 +12,11 @@ Hardik played the receptionist ("I have that plan … I don't have any [appointm
 
 Replay against a running backend:
 `curl -s -X POST localhost:8000/api/webhooks/call-complete -H 'Content-Type: application/json' -d @backend/calls/fixtures/real_call_2026-11-14.json`
+
+`real_webhook_2026-11-14.json` is the first **captured webhook delivery** (the real post-call payload ElevenLabs POSTed
+through ngrok to `/api/webhooks/call-complete`, Sat 2026-11-14 19:11 PT, 35 s call to Aryan's phone). Captured by Aryan
+from the ngrok inspector.
+- Office said "I have the earliest for tomorrow at 8:00 p.m."; Gemini (and the regex fallback) → 2026-11-15, app result `available`.
+- **Redacted:** the one real phone number → `+15550000001`; call/stream SIDs, user ids, caller/called numbers → `REDACTED`.
+  Scanned for API keys / tokens: none present.
+- `search_id` / `provider_id` are real ids from that run (Neon), so a replay updates that row again.

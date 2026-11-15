@@ -1,0 +1,795 @@
+{
+  "type": "post_call_transcription",
+  "event_timestamp": 1794712274,
+  "data": {
+    "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+    "agent_name": "GhostBuster caller",
+    "conversation_product": "agent",
+    "status": "done",
+    "user_id": "REDACTED",
+    "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+    "version_id": "agtvrsn_6101m7ej6eceenf98n6wz9z31cz5",
+    "metadata": {
+      "start_time_unix_secs": 1794712234,
+      "accepted_time_unix_secs": 1794712234,
+      "call_duration_secs": 35,
+      "queue_wait_secs": null,
+      "cost": 279,
+      "deletion_settings": {
+        "deletion_time_unix_secs": null,
+        "deleted_logs_at_time_unix_secs": null,
+        "deleted_audio_at_time_unix_secs": null,
+        "deleted_transcript_at_time_unix_secs": null,
+        "delete_transcript_and_pii": false,
+        "delete_audio": false
+      },
+      "feedback": {
+        "type": null,
+        "overall_score": null,
+        "likes": 0,
+        "dislikes": 0,
+        "rating": null,
+        "comment": null
+      },
+      "authorization_method": "signed_url",
+      "charging": {
+        "dev_discount": false,
+        "is_burst": false,
+        "tier": "creator",
+        "llm_usage": {
+          "irreversible_generation": {
+            "model_usage": {
+              "deepseek-v41-flash": {
+                "input": {
+                  "tokens": 117,
+                  "price": 6.435e-05
+                },
+                "input_cache_read": {
+                  "tokens": 128,
+                  "price": 3.52e-05
+                },
+                "input_cache_write": {
+                  "tokens": 1952,
+                  "price": 0.0010736
+                },
+                "output_total": {
+                  "tokens": 129,
+                  "price": 0.001935
+                }
+              }
+            },
+            "detailed_model_usage": [
+              {
+                "config": {
+                  "model": "deepseek-v41-flash",
+                  "service_tier": "standard"
+                },
+                "usage": {
+                  "input": {
+                    "tokens": 117,
+                    "price": 6.435e-05
+                  },
+                  "input_cache_read": {
+                    "tokens": 128,
+                    "price": 3.52e-05
+                  },
+                  "input_cache_write": {
+                    "tokens": 1952,
+                    "price": 0.0010736
+                  },
+                  "output_total": {
+                    "tokens": 129,
+                    "price": 0.001935
+                  }
+                }
+              }
+            ]
+          },
+          "initiated_generation": {
+            "model_usage": {
+              "deepseek-v41-flash": {
+                "input": {
+                  "tokens": 117,
+                  "price": 6.435e-05
+                },
+                "input_cache_read": {
+                  "tokens": 128,
+                  "price": 3.52e-05
+                },
+                "input_cache_write": {
+                  "tokens": 1952,
+                  "price": 0.0010736
+                },
+                "output_total": {
+                  "tokens": 129,
+                  "price": 0.001935
+                }
+              }
+            },
+            "detailed_model_usage": [
+              {
+                "config": {
+                  "model": "deepseek-v41-flash",
+                  "service_tier": "standard"
+                },
+                "usage": {
+                  "input": {
+                    "tokens": 117,
+                    "price": 6.435e-05
+                  },
+                  "input_cache_read": {
+                    "tokens": 128,
+                    "price": 3.52e-05
+                  },
+                  "input_cache_write": {
+                    "tokens": 1952,
+                    "price": 0.0010736
+                  },
+                  "output_total": {
+                    "tokens": 129,
+                    "price": 0.001935
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "llm_price": 0.00310815,
+        "llm_charge": 17,
+        "call_charge": 262,
+        "platform_charge": 262,
+        "platform_usage": {
+          "category_usage": {
+            "voice": {
+              "credits": 262,
+              "price": 0.047663508300048604,
+              "quantity": 0.5957938537506076
+            }
+          }
+        },
+        "platform_price": 0.047663508300048604,
+        "free_minutes_consumed": 0.0,
+        "free_llm_dollars_consumed": 0.0,
+        "tts_usage": {
+          "primary_tts_model": "eleven_v4_turbo",
+          "total_audio_output_seconds": 26.56,
+          "total_characters": 426,
+          "per_voice_usage": [
+            {
+              "voice_id": "cjVigY5qzO86Huf0OWal",
+              "audio_output_seconds": 26.56
+            }
+          ]
+        },
+        "asr_usage": {
+          "asr_model": "scribe_realtime",
+          "total_transcription_calls": 47,
+          "total_audio_input_seconds": 8.040000000000003
+        },
+        "analysis": null,
+        "subagent_charge": 0,
+        "voice_surcharge_charge": null,
+        "user_memory": null
+      },
+      "phone_call": {
+        "direction": "outbound",
+        "phone_number_id": "phnum_5201m7ehfb36f8btnftdrvhs6agf",
+        "agent_number": "+15550000001",
+        "external_number": "REDACTED",
+        "call_result": "answered",
+        "type": "twilio",
+        "stream_sid": "REDACTED",
+        "call_sid": "REDACTED"
+      },
+      "batch_call": null,
+      "termination_reason": "end_call tool was called.",
+      "error": null,
+      "warnings": [],
+      "main_language": "en",
+      "rag_usage": null,
+      "text_only": false,
+      "features_usage": {
+        "language_detection": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_agent": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_number": {
+          "enabled": false,
+          "used": false
+        },
+        "multivoice": {
+          "enabled": false,
+          "used": false
+        },
+        "dtmf_tones": {
+          "enabled": false,
+          "used": false
+        },
+        "external_mcp_servers": {
+          "enabled": false,
+          "used": false
+        },
+        "pii_zrm_workspace": false,
+        "pii_zrm_agent": false,
+        "tool_dynamic_variable_updates": {
+          "enabled": false,
+          "used": false
+        },
+        "is_livekit": false,
+        "voicemail_detection": {
+          "enabled": true,
+          "used": false
+        },
+        "dtmf_input": {
+          "enabled": false,
+          "used": false
+        },
+        "workflow": {
+          "enabled": false,
+          "version": 1,
+          "tool_node": {
+            "enabled": false,
+            "used": false
+          },
+          "standalone_agent_node": {
+            "enabled": false,
+            "used": false
+          },
+          "phone_number_node": {
+            "enabled": false,
+            "used": false
+          },
+          "end_node": {
+            "enabled": false,
+            "used": false
+          },
+          "override_agent_node": {
+            "enabled": false,
+            "used": false
+          },
+          "say_node": {
+            "enabled": false,
+            "used": false
+          },
+          "update_state_node": {
+            "enabled": false,
+            "used": false
+          },
+          "subgraph_node": {
+            "enabled": false,
+            "used": false
+          },
+          "transfer_to_genesys_node": {
+            "enabled": false,
+            "used": false
+          },
+          "start_procedure_node": {
+            "enabled": false,
+            "used": false
+          }
+        },
+        "agent_testing": {
+          "enabled": false,
+          "tests_ran_after_last_modification": false,
+          "tests_ran_in_last_7_days": false
+        },
+        "versioning": {
+          "enabled": true,
+          "used": false
+        },
+        "file_input": {
+          "enabled": true,
+          "used": false
+        },
+        "freeform_procedure": {
+          "enabled": false,
+          "used": false
+        },
+        "structured_procedure": {
+          "enabled": false,
+          "used": false
+        }
+      },
+      "eleven_assistant": {
+        "is_eleven_assistant": false
+      },
+      "initiator_id": null,
+      "conversation_initiation_source": "twilio",
+      "conversation_initiation_source_version": null,
+      "timezone": null,
+      "async_metadata": null,
+      "whatsapp": null,
+      "sms": null,
+      "agent_created_from": "api",
+      "agent_last_updated_from": "api",
+      "stream_state": null,
+      "voice_rewards": [],
+      "avatar_sessions": [],
+      "cost_fiat": 0.0507716583000486
+    },
+    "analysis": {
+      "evaluation_criteria_results": {},
+      "data_collection_results": {},
+      "evaluation_criteria_results_list": [],
+      "data_collection_results_list": [],
+      "call_successful": "success",
+      "call_success_score": null,
+      "transcript_summary": "The AI agent, on behalf of a patient, inquired about Dr. Daniel Reyes, PsyD's availability for a patient with Blue Shield of California HMO. The user confirmed acceptance of the plan and offered the earliest new-patient appointment for tomorrow at 8 PM, in person. The agent acknowledged the information and concluded the call.",
+      "call_summary_title": "New Patient Appointment",
+      "scoped": [],
+      "sentiment_analysis": {
+        "overall_label": "neutral",
+        "overall_sentiment_score": 0.0,
+        "overall_frustration_score": 0.0,
+        "min_user_sentiment_score": 0.0,
+        "max_user_frustration_score": 0.0,
+        "num_scored_user_turns": 1
+      },
+      "not_applicable": []
+    },
+    "user_message_count": 1,
+    "agent_message_count": 2,
+    "visited_agents": [
+      {
+        "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g"
+      }
+    ],
+    "conversation_initiation_client_data": {
+      "conversation_config_override": {
+        "asr": null,
+        "turn": null,
+        "tts": null,
+        "conversation": null,
+        "agent": null
+      },
+      "custom_llm_extra_body": {},
+      "user_id": null,
+      "source_info": {
+        "source": null,
+        "version": null
+      },
+      "branch_id": null,
+      "environment": null,
+      "starting_workflow_node_id": null,
+      "experiments": [],
+      "procedure_ids": null,
+      "start_procedure_ids": null,
+      "dynamic_variables": {
+        "search_id": "0b23c57c-6237-4a56-b3c4-8d85c93ee4da",
+        "provider_id": "60753d71-0409-45e3-8667-19ace75d7aac",
+        "provider_name": "Dr. Daniel Reyes, PsyD",
+        "insurer": "Blue Shield of California",
+        "plan_label": "HMO",
+        "visit_kind": "new-patient",
+        "system__agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "system__agent_turns": 2,
+        "system__current_agent_turns": 2,
+        "system__current_subagent_turns": 2,
+        "system__current_agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "system__conversation_id": "conv_8501m7ejymr3fva8bvmc2ymsz94r",
+        "system__call_duration_secs": 35,
+        "system__time_utc": "2026-11-15T03:11:09.879281+00:00",
+        "system__timezone": null,
+        "system__time": "Sunday, 03:11 15 November 2026",
+        "system__time_date": "Sunday, 15 November 2026",
+        "system__time_hour": 3,
+        "system__time_minute": 11,
+        "system__time_second": 9,
+        "system__is_text_only": false,
+        "system__channel": "twilio",
+        "system__caller_id": "REDACTED",
+        "system__guardrail_synthetic_voice": false,
+        "system__guardrail_human_voice": false,
+        "system__called_number": "REDACTED",
+        "system__call_sid": "REDACTED",
+        "system__call_id": null,
+        "system__conversation_history": "{\"x-elevenlabs-history\": true, \"entries\": [{\"role\": \"agent\", \"message\": \"Hi, I'm an AI assistant calling on behalf of a patient, and this call is being transcribed. I'm checking availability with Dr. Daniel Reyes, PsyD for a patient with Blue Shield of California HMO. Do you take that plan, and what's the earliest new-patient appointment you have, in person or by telehealth?\"}, {\"role\": \"user\", \"message\": \"Uh, yes, I can take it. I have the earliest for tomorrow at 8:00 p.m. In person. In person.\"}, {\"role\": \"agent\", \"message\": \"[happy] Great, thank you. So that's tomorrow at eight in the evening, in person. I appreciate your help. Have a good day.\\n\"}, {\"role\": \"agent\", \"tool_requests\": [{\"tool_name\": \"end_call\", \"params_as_json\": {\"reason\": \"Confirmed the practice accepts Blue Shield of California HMO and got the earliest new-patient appointment: tomorrow at eight p.m., in person. Task complete.\", \"system__message_to_speak\": \"Thank you, that's all I needed. Have a good day.\"}}]}, {\"role\": \"agent\", \"tool_results\": [{\"tool_name\": \"end_call\", \"result_value\": \"{\\\"result_type\\\":\\\"end_call_success\\\",\\\"status\\\":\\\"success\\\",\\\"reason\\\":\\\"Confirmed the practice accepts Blue Shield of California HMO and got the earliest new-patient appointment: tomorrow at eight p.m., in person. Task complete.\\\",\\\"message\\\":null}\"}]}]}",
+        "system__user_id": "REDACTED",
+        "system__initiator_id": null,
+        "system__environment": "production",
+        "system__agents_user_id": null,
+        "system__user_verification_level": null,
+        "system__uploaded_file_ids": []
+      },
+      "tool_mock_config": {
+        "mocking_strategy": "none",
+        "fallback_strategy": "raise_error",
+        "mocked_tool_names": []
+      },
+      "tool_mock_overrides": {}
+    },
+    "environment": "production",
+    "experiment_assignments": null,
+    "hiding_reason": null,
+    "smb_metadata": null,
+    "conversation_id": "conv_8501m7ejymr3fva8bvmc2ymsz94r",
+    "has_audio": true,
+    "has_user_audio": true,
+    "has_response_audio": true,
+    "has_auxiliary_audio": false,
+    "transcript": [
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_6101m7ej6eceenf98n6wz9z31cz5"
+        },
+        "message": "Hi, I'm an AI assistant calling on behalf of a patient, and this call is being transcribed. I'm checking availability with Dr. Daniel Reyes, PsyD for a patient with Blue Shield of California HMO. Do you take that plan, and what's the earliest new-patient appointment you have, in person or by telehealth?",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 0,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.08184892998542637
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.08989193197339773
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.0
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 1,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "Uh, yes, I can take it. I have the earliest for tomorrow at 8:00 p.m. In person. In person.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 20,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.025561573973391205
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 171,
+        "used_static_kb_document_ids": [],
+        "analysis": {
+          "user_sentiment_score": 0.0,
+          "user_frustration_score": 0.0
+        },
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_6101m7ej6eceenf98n6wz9z31cz5"
+        },
+        "message": "[happy] Great, thank you. So that's tomorrow at eight in the evening, in person. I appreciate your help. Have a good day.\n",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 27,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.33612809097394347
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.2743543909746222
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.4091669589979574
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.08355943800415844
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.6245003360346891
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.16
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.025561573973391205
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.025561573973391205
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 171,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_6101m7ej6eceenf98n6wz9z31cz5"
+        },
+        "message": null,
+        "multivoice_message": null,
+        "tool_calls": [
+          {
+            "type": "system",
+            "request_id": "chatcmpl-tool-9ac0bd05a4e75e61",
+            "tool_name": "end_call",
+            "tool_id": "__system_end_call",
+            "params_as_json": "{\"reason\": \"Confirmed the practice accepts Blue Shield of California HMO and got the earliest new-patient appointment: tomorrow at eight p.m., in person. Task complete.\", \"system__message_to_speak\": \"Thank you, that's all I needed. Have a good day.\"}",
+            "tool_has_been_called": true,
+            "tool_details": null
+          }
+        ],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 28,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.33612809097394347
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.2743543909746222
+            },
+            "convai_llm_tool_request_generation_latency": {
+              "elapsed_time": 1.1179769459995441
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.4091669589979574
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.08355943800415844
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.6245003360346891
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.16
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.025561573973391205
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.025561573973391205
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 117,
+                "price": 6.435e-05
+              },
+              "input_cache_read": {
+                "tokens": 128,
+                "price": 3.52e-05
+              },
+              "input_cache_write": {
+                "tokens": 1952,
+                "price": 0.0010736
+              },
+              "output_total": {
+                "tokens": 129,
+                "price": 0.001935
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 117,
+                  "price": 6.435e-05
+                },
+                "input_cache_read": {
+                  "tokens": 128,
+                  "price": 3.52e-05
+                },
+                "input_cache_write": {
+                  "tokens": 1952,
+                  "price": 0.0010736
+                },
+                "output_total": {
+                  "tokens": 129,
+                  "price": 0.001935
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 171,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_6101m7ej6eceenf98n6wz9z31cz5"
+        },
+        "message": null,
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [
+          {
+            "request_id": "chatcmpl-tool-9ac0bd05a4e75e61",
+            "tool_name": "end_call",
+            "tool_id": "__system_end_call",
+            "result_value": "{\"result_type\":\"end_call_success\",\"status\":\"success\",\"reason\":\"Confirmed the practice accepts Blue Shield of California HMO and got the earliest new-patient appointment: tomorrow at eight p.m., in person. Task complete.\",\"message\":null}",
+            "is_error": false,
+            "is_blocked": false,
+            "tool_has_been_called": true,
+            "tool_latency_secs": 0.5014796390314586,
+            "error_type": "",
+            "raw_error_message": "",
+            "dynamic_variable_updates": [],
+            "type": "system",
+            "result": {
+              "result_type": "end_call_success",
+              "status": "success",
+              "reason": "Confirmed the practice accepts Blue Shield of California HMO and got the earliest new-patient appointment: tomorrow at eight p.m., in person. Task complete.",
+              "message": null
+            }
+          }
+        ],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 35,
+        "conversation_turn_metrics": null,
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 171,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      }
+    ],
+    "tag_ids": [],
+    "realtime_config_snapshots": null,
+    "orchestrator": "conversational",
+    "realtime_context": null,
+    "otlp_traces": null
+  }
+}
