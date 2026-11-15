@@ -2,7 +2,8 @@
 
 Contract: render_packet(search_id) -> HTML string (US Letter, print -> PDF).
 Templates are plain text with {placeholders}: insurer, plan_type, plan_label, zip, specialty, specialty_label,
-appointment_type, deadline_text ("10 business days" / "48 hours"), deadline_days, today, n_listed, n_called,
+appointment_type (readable, e.g. "follow-up"), appointment_label ("follow-up appointment"),
+a_appointment_label ("an urgent appointment"), deadline_text ("10 business days" / "48 hours"), deadline_days, today, n_listed, n_called,
 n_violations, n_ghosts, n_no_answer, search_id. Unknown placeholders render as "____".
 """
 import html
@@ -15,8 +16,23 @@ from rules.deadlines import DEADLINES, TZ, URGENT_HOURS
 
 TEMPLATES = Path(__file__).parent / "templates"
 PLAN = {"hmo": "HMO", "ppo": "PPO", "medi_cal": "Medi-Cal", "unknown": "plan type unknown"}
-SPEC = {"therapist": "therapist", "psychiatrist": "psychiatrist", "primary_care": "primary care", "specialist": "specialist"}
+SPEC = {"therapist": "therapist", "psychiatrist": "psychiatrist", "primary_care": "primary care provider", "specialist": "specialist"}
 APPT = {"new": "new-patient", "follow_up": "follow-up", "urgent": "urgent"}
+APPT_LABEL = {k: f"{v} appointment" for k, v in APPT.items()}  # "follow-up appointment"
+A_APPT_LABEL = {k: ("an " if v[0] in "aeiou" else "a ") + v for k, v in APPT_LABEL.items()}  # "an urgent appointment"
+
+
+# Windows-safe dates: no dash-flag strftime codes (glibc/BSD only). Build day and hour numbers by hand.
+def long_date(d) -> str:
+    return f"{d:%B} {d.day}, {d.year}"
+
+
+def short_date(d) -> str:
+    return f"{d:%b} {d.day}, {d.year}"
+
+
+def short_datetime(dt) -> str:
+    return f"{short_date(dt)} {dt.hour % 12 or 12}:{dt:%M} {dt:%p} {dt:%Z}".rstrip()
 LABEL = {"available": "Available in time", "violation": "Past legal deadline", "no_answer": "No answer",
          "ghost": "Appears unavailable", "unverified": "Not called", "calling": "Call in progress"}
 
@@ -74,7 +90,10 @@ def render_packet(search_id: str) -> str:
              if s.specialty == "therapist" and s.appointment_type == "follow_up" and s.prior_appointment_date else "")
     ctx = {
         **s.model_dump(), "plan_label": PLAN[s.plan_type], "specialty_label": SPEC[s.specialty],
-        "today": date.today().strftime("%B %-d, %Y"), "deadline_days": deadline_days, "deadline_text": deadline_text,
+        # Never let templates print raw enum values like "follow_up".
+        "appointment_type": APPT[s.appointment_type], "appointment_label": APPT_LABEL[s.appointment_type],
+        "a_appointment_label": A_APPT_LABEL[s.appointment_type],
+        "today": long_date(date.today()), "deadline_days": deadline_days, "deadline_text": deadline_text,
         "n_listed": len(providers), "n_called": len(called), "n_violations": sum(p.violation for p in called),
         "n_ghosts": len(ghosts), "n_no_answer": sum(p.ghost_status == "no_answer" for p in called), "search_id": s.id,
     }
@@ -86,9 +105,9 @@ def render_packet(search_id: str) -> str:
 
     log_rows = "".join(
         f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(p.phone)}</td>"
-        f"<td>{p.checked_at.astimezone(TZ).strftime('%b %-d, %Y %-I:%M %p %Z') if p.checked_at else ''}</td>"
+        f"<td>{short_datetime(p.checked_at.astimezone(TZ)) if p.checked_at else ''}</td>"
         f"<td><span class='pill {p.ghost_status}'>{LABEL[p.ghost_status]}</span></td>"
-        f"<td>{p.earliest_date.strftime('%b %-d, %Y') if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
+        f"<td>{short_date(p.earliest_date) if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
         f"<td>{_e(p.ghost_reason)}</td></tr>"
         for p in called
     ) or "<tr><td colspan='7' class='muted'>No offices were called.</td></tr>"
@@ -135,8 +154,8 @@ generated {ctx['today']} · ref {s.id[:8]}</div>
   <div class="card red"><span class="muted small">Past legal deadline</span><b>{ctx['n_violations']}</b></div>
 </div>
 <p class="finding">{finding}</p>
-<p><b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — a {ctx['specialty_label']} {APPT[s.appointment_type]}
-appointment within <b>{deadline_text}</b>{_e(since)}. Business days exclude weekends and federal/California holidays.
+<p><b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {A_APPT_LABEL[s.appointment_type]} with a {ctx['specialty_label']}
+within <b>{deadline_text}</b>{_e(since)}. Business days exclude weekends and federal/California holidays.
 A provider may lawfully offer a later date if they document that it won&#39;t harm the enrollee&#39;s health.
 Telehealth appointments count.</p>
 

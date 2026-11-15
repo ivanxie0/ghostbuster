@@ -9,13 +9,13 @@ From: ______________________________ (member name)
 Member ID: ____________________   Date of birth: ____________
 Phone / email: ______________________________
 
-RE: TIMELY ACCESS GRIEVANCE - request for a {appointment_type} {specialty_label} appointment
+RE: TIMELY ACCESS GRIEVANCE - request for {a_appointment_label} with a {specialty_label}
 Reference: GhostBuster search {search_id}
 
 I am filing a grievance because I cannot get a timely appointment through your network.
 
 1. WHAT I NEED
-I am a member of {insurer} ({plan_label}). I need a {appointment_type} appointment with a {specialty_label} near ZIP code {zip}. I first asked for this appointment on ____________ (if blank, use {today}).
+I am a member of {insurer} ({plan_label}). I need {a_appointment_label} with a {specialty_label} near ZIP code {zip}. I first asked for this appointment on ____________ (if blank, use {today}).
 
 2. WHAT HAPPENED
 On {today}, with my permission, an AI assistant acting as my authorized representative checked the providers your directory lists for this service near me and called their offices to ask for the earliest available appointment, in person or by telehealth. The assistant identified itself as an AI calling on behalf of a patient. The full call log is attached.

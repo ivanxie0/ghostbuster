@@ -119,11 +119,23 @@ export default function SearchPage() {
             onChange={(plan_type) => patch({ plan_type })}
           />
           {warnCoverage && (
-            <div role="alert" className="slide-in mt-3 rounded-xl border-2 border-amber-500 bg-amber-950/60 p-4 text-lg text-amber-100">
-              <b className="text-amber-300">Heads up:</b> many PPOs from employers are <b>self-funded</b>, which means
-              they&apos;re regulated federally and California&apos;s appointment deadlines may <b>not</b> apply. You can
-              still run the check — ask HR or member services whether your plan is &ldquo;fully insured&rdquo; or
-              &ldquo;self-funded.&rdquo;
+            // Coverage text verbatim from Jai (docs/RULES.md). First sentence always; the rest behind the expander.
+            <div role="note" className="slide-in mt-3 rounded-xl border-2 border-amber-500 bg-amber-950/60 p-4 text-lg leading-snug text-amber-100">
+              <p>
+                California&apos;s appointment deadlines apply to state-regulated coverage: plans licensed by the
+                Department of Managed Health Care (most HMOs, many PPOs, most Covered California plans, Medi-Cal managed
+                care) and health insurance policies regulated by the California Department of Insurance.
+              </p>
+              <details className="group mt-2">
+                <summary className="cursor-pointer list-none font-semibold text-amber-300 hover:text-amber-200">
+                  <span className="inline-block transition-transform group-open:rotate-90">▸</span> Who does this apply to?
+                </summary>
+                <p className="mt-2">
+                  They do not apply to self-funded employer or union plans, which are under federal law even if an
+                  insurer&apos;s name is on your card, or to Medicare. Not sure which you have? Ask HR or member services
+                  &quot;Is my plan self-funded?&quot; before relying on these deadlines.
+                </p>
+              </details>
             </div>
           )}
         </Field>
