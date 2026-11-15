@@ -66,6 +66,12 @@ def main() -> None:
                 (pid, seed_search_id(r["specialty"]), r["name"], r["specialty"], r["phone"],
                  r["address"], r["source_url"], r["ghost_status"], r["ghost_reason"]),
             )
+        # Ids come from names, so a renamed seed provider is a new row: drop seed rows no longer in the file.
+        keep = [str(uuid.uuid5(SEED_NS, f"provider:{r['name']}")) for r in rows]
+        cur.execute(
+            "DELETE FROM providers WHERE search_id = ANY(%s::uuid[]) AND NOT (id = ANY(%s::uuid[]))",
+            ([seed_search_id(s) for s in SPECIALTIES], keep),
+        )
         conn.commit()
     missing = [r["name"] for r in rows if r["phone"] is None]
     print(f"Seeded {len(rows)} providers across {len(SPECIALTIES)} seed searches.")

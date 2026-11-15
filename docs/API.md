@@ -52,7 +52,7 @@ Response `200`:
     "prior_appointment_date": null, "created_at": "2026-11-14T22:04:50Z", "status": "verifying"
   },
   "providers": [
-    { "id": "6f1c...", "search_id": "0d5e...", "name": "Dr. Juniper Fakewell, LMFT", "specialty": "therapist",
+    { "id": "6f1c...", "search_id": "0d5e...", "name": "Rachel Okafor, LMFT", "specialty": "therapist",
       "phone": "+16195550101", "address": "...", "source_url": "...", "ghost_status": "ghost",
       "ghost_reason": "...", "earliest_date": null, "business_days_wait": null, "deadline_days": null,
       "violation": false, "call_transcript": null, "checked_at": "2026-11-14T22:05:00Z" }
