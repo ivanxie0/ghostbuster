@@ -30,8 +30,22 @@ Voicemail → agent hangs up, no date → `no_answer`. Nothing back after 90 s �
    Make sure the agent uses the workspace webhook (default).
 
 ### 3. ngrok
-`ngrok http 8000` → put the https URL in `PUBLIC_BASE_URL` and in the webhook URL above.
-Free ngrok URLs change on restart, so update the webhook URL whenever ngrok restarts.
+1. Sign up at ngrok.com (free). Install it: `sudo snap install ngrok`, or download the Linux zip from the
+   dashboard and put `ngrok` on your PATH. Then run `ngrok config add-authtoken <token from dashboard>`.
+2. Start the backend (`make dev-backend`), then in another terminal run `ngrok http 8000`.
+3. Put the https URL in `PUBLIC_BASE_URL` and in the ElevenLabs webhook URL above.
+   Free URLs change on restart, so update the webhook URL whenever ngrok restarts.
+4. Check the tunnel without a real call:
+   ```
+   curl -s -X POST $PUBLIC_BASE_URL/api/webhooks/call-complete -H 'Content-Type: application/json' \
+     -d '{"type":"post_call_transcription","data":{"transcript":[{"role":"user","message":"next Tuesday"}]}}'
+   ```
+   The expected response is `{"ok":false,"error":"unknown provider"}`, which means the tunnel reached our code.
+
+### 3b. Gemini
+Get a key from aistudio.google.com → **Get API key** and set `GEMINI_API_KEY`. The default model is `gemini-3.5-flash-lite`;
+override it with `GEMINI_MODEL` if needed. Check it: `cd backend && .venv/bin/python -m calls.webhook "Office: we're about six months out"`.
+You should see `earliest_date` about six months from today. If Gemini errors, the log says `regex fallback` and calls still resolve.
 
 ### 4. `.env` (repo root, never committed)
 ```
