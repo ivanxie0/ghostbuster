@@ -101,6 +101,20 @@ function Counter({ label, value, tone }: { label: string; value: number; tone: s
   );
 }
 
+/** One quotable number: "5 of 10 listings appear unavailable". Real registry providers aren't insurer
+ *  listings, so the noun is "listings" only when every provider is demo data. */
+export function GhostRate({ providers }: { providers: Provider[] }) {
+  if (!providers.length) return null;
+  const unavailable = providers.filter((p) => p.ghost_status === "ghost").length;
+  const noun = providers.every(isDemoProvider) ? "listings" : "providers";
+  return (
+    <p className="display text-4xl leading-tight sm:text-5xl" aria-live="polite">
+      <span key={unavailable} className="flip-in inline-block bg-sun px-2 tabular-nums">{unavailable}</span>
+      <span className="tabular-nums"> of {providers.length}</span> {noun} appear unavailable
+    </p>
+  );
+}
+
 export function Counters({ providers }: { providers: Provider[] }) {
   const n = (s: GhostStatus) => providers.filter((p) => p.ghost_status === s).length;
   return (

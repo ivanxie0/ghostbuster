@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityLog, ConsentCard, Counters, DemoDataTag, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
+  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostRate, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
@@ -155,6 +155,7 @@ export default function ResultsPage() {
 
       {error && <p className="rounded-[2px] border border-signal bg-[#fdf0ee] p-3 font-mono text-sm text-signal">Connection issue: {error} — retrying…</p>}
 
+      <GhostRate providers={providers} />
       <Counters providers={providers} />
       <LegalNote />
 
