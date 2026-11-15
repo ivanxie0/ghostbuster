@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostFunnel, GhostRate, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
+  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostFunnel, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents, tallyText,
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
@@ -103,10 +103,10 @@ export default function ResultsPage() {
 
   if (deleted) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <h1 className="display text-4xl">Search deleted</h1>
-        <p className="mt-3 text-lg text-ink/70">Its providers, call transcripts and records were removed.</p>
-        <Link href="/search" className="btn btn-solid mt-6 inline-block">New search</Link>
+      <main className="wrap max-w-3xl py-16 text-center">
+        <h1 className="t-h2">Search deleted</h1>
+        <p className="t-lead mt-3">Its providers, call transcripts and records were removed.</p>
+        <Link href="/search" className="btn btn-primary mt-6">New search</Link>
       </main>
     );
   }
@@ -114,15 +114,15 @@ export default function ResultsPage() {
   if (!data) {
     const expired = error === "search not found";
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center">
+      <main className="wrap max-w-3xl py-16 text-center">
         {expired ? (
           <>
-            <h1 className="display text-4xl">This search has expired</h1>
-            <p className="mt-3 text-lg text-ink/65">The server restarted. Start a new search.</p>
-            <Link href="/search" className="btn btn-solid mt-6">New search</Link>
+            <h1 className="t-h2">This search has expired</h1>
+            <p className="t-lead mt-3">The server restarted. Start a new search.</p>
+            <Link href="/search" className="btn btn-primary mt-6">New search</Link>
           </>
         ) : (
-          <p className="animate-pulse text-lg text-ink/60">{error ? `Reconnecting… (${error})` : "Loading…"}</p>
+          <p className="t-lead animate-pulse">{error ? `Reconnecting… (${error})` : "Loading…"}</p>
         )}
       </main>
     );
@@ -173,41 +173,39 @@ export default function ResultsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl space-y-6 px-6 pb-20 pt-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className="wrap pb-[120px] pt-8">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-4" style={{ borderColor: "var(--line-strong)" }}>
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-ink/55">
-            <span className="text-accent-deep">File GB-{id.slice(0, 6).toUpperCase()}</span> · {search.insurer} · {PLAN_LABEL[search.plan_type]} · ZIP {search.zip}
-          </p>
-          <h1 className="display mt-2 text-4xl sm:text-5xl">
-            {SPECIALTY_PLURAL[search.specialty]}, <span className="italic text-ink/60">legal limit {deadlineText(search)}</span>
+          <div className="t-data" style={{ color: "var(--ink-3)" }}>
+            Case GB-{id.slice(0, 6).toUpperCase()} · {search.insurer} · {PLAN_LABEL[search.plan_type]} · {search.zip}
+          </div>
+          <h1 className="t-h2 mt-1">
+            {SPECIALTY_PLURAL[search.specialty]} <span style={{ color: "var(--ink-3)", fontWeight: 500 }}>· legal limit {deadlineText(search)}</span>
           </h1>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <PhasePill detail={data} />
+        <div className="flex flex-wrap items-center gap-2.5">
           <DemoDataTag providers={providers} />
-          <Link href="/map" className="label text-ink/60 underline underline-offset-4 hover:text-accent print:hidden">
-            San Diego Ghost Map →
-          </Link>
+          <PhasePill detail={data} />
+          <Link href="/map" className="link t-small print:hidden">San Diego Ghost Map →</Link>
         </div>
       </div>
 
-      {error && <p className="rounded-lg border border-signal/40 bg-signal/10 p-3 text-sm text-signal">Connection issue: {error} — retrying…</p>}
+      <Counters providers={providers} scanning={search.status === "scraping"} />
 
-      <GhostRate providers={providers} />
-      <Counters providers={providers} />
-      <LegalNote />
+      {error && <div className="notice mb-4" data-tone="error" role="alert"><b>Connection issue:</b> {error}. Retrying…</div>}
 
       {search.status === "scraping" && (
-        <div className="relative h-1.5 overflow-hidden rounded-full bg-ink/10">
-          <div className="scan-bar absolute inset-y-0 w-1/3 rounded-full bg-cobalt" />
+        <div className="relative mb-[18px] h-1.5 overflow-hidden rounded-full" style={{ background: "var(--sunk)" }}>
+          <div className="scan-bar absolute inset-y-0 w-1/3 rounded-full" style={{ background: "var(--primary)" }} />
         </div>
       )}
 
       {showConsent && (
-        <ConsentCard search={search} count={willCall.length} skipped={callable.length - willCall.length} onApprove={approve} busy={approving} />
+        <div className="mb-[18px]">
+          <ConsentCard search={search} count={willCall.length} skipped={callable.length - willCall.length} onApprove={approve} busy={approving} />
+        </div>
       )}
-      <div ref={endingRef} className="scroll-mt-16">
+      <div ref={endingRef} className="mb-[18px] scroll-mt-32">
         {done && (available ? (
           <EndingA search={search} provider={available} id={id} violations={providers.filter((p) => p.violation).length} />
         ) : (
@@ -216,15 +214,21 @@ export default function ResultsPage() {
         {done && <GhostFunnel providers={providers} />}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-12">
-        <section className="min-w-0 lg:col-span-7">
-          <h2 className="label mb-3 text-ink/60">
-            {providers.length && providers.every(isDemoProvider) ? "Demo providers (fictional)" : "Licensed providers near you (national registry)"}
-          </h2>
+      <div className="grid gap-6 min-[901px]:grid-cols-[minmax(0,7fr)_minmax(300px,5fr)]">
+        <section className="min-w-0">
+          <div className="flex flex-wrap justify-between gap-2">
+            <h2 className="t-h3" style={{ fontSize: "1.0625rem" }}>
+              {providers.length && providers.every(isDemoProvider) ? `Demo ${SPECIALTY_PLURAL[search.specialty].toLowerCase()} (fictional)` : `Licensed ${SPECIALTY_PLURAL[search.specialty].toLowerCase()} near ${search.zip}`}
+            </h2>
+            {!(providers.length && providers.every(isDemoProvider)) && (
+              <span className="t-small" style={{ color: "var(--ink-3)" }}>from the national provider registry</span>
+            )}
+          </div>
+          <LegalNote />
           {providers.length === 0 ? (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-2">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-20 animate-pulse rounded-xl bg-ink/5" />
+                <div key={i} className="h-20 animate-pulse rounded-lg" style={{ background: "var(--sunk)" }} />
               ))}
             </div>
           ) : (
@@ -232,16 +236,16 @@ export default function ResultsPage() {
               reviewIds={data.under_review ?? []} onReport={reportError} />
           )}
         </section>
-        <aside className="min-w-0 space-y-4 lg:sticky lg:top-14 lg:col-span-5 lg:self-start">
-          <TranscriptPanel search={search} provider={selected} confirmed={!!selected && (data.patient_confirmed ?? []).includes(selected.id)}
+        <aside className="console min-w-0 self-start p-[18px] min-[901px]:sticky min-[901px]:top-[130px]" aria-label="Call transcript">
+          <TranscriptPanel search={search} provider={selected} tally={search.status === "scraping" ? undefined : tallyText(providers)} confirmed={!!selected && (data.patient_confirmed ?? []).includes(selected.id)}
             onCorrect={selected ? (date) => correctDate(selected.id, date) : undefined} />
           <ActivityLog events={events} onPick={setPinned} />
         </aside>
       </div>
 
-      <div className="rule-dotted flex flex-wrap items-center justify-between gap-3 pt-4 print:hidden">
-        <p className="text-sm text-ink/60">We don&apos;t store your name or health details; delete your search anytime.</p>
-        <button onClick={deleteSearch} className="rounded border border-signal/60 px-3 py-1.5 text-sm text-signal hover:bg-signal/10">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-4 print:hidden" style={{ borderColor: "var(--line)" }}>
+        <p className="t-small m-0" style={{ color: "var(--ink-2)" }}>We don&apos;t store your name or health details; delete your search anytime.</p>
+        <button onClick={deleteSearch} className="btn btn-outline" style={{ minHeight: 40, padding: "8px 14px", color: "var(--st-past)", borderColor: "var(--st-past)" }}>
           Delete this search
         </button>
       </div>

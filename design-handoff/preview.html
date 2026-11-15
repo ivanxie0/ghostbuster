@@ -1,0 +1,540 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GhostBuster — design preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>/* GhostBuster — "Night Shift / Paper Trail" tokens + components
+   Drop into app/globals.css (Tailwind v4, CSS-first). See DESIGN_SPEC.md.
+   Fonts: in app/layout.tsx load via next/font/google and expose CSS variables:
+     const serif = Newsreader({ subsets:['latin'], style:['normal','italic'], weight:['400','500'], variable:'--font-newsreader' })
+     const sans  = Public_Sans({ subsets:['latin'], weight:['400','500','600'], variable:'--font-public-sans' })
+     const mono  = JetBrains_Mono({ subsets:['latin'], weight:['400','500','700'], variable:'--font-jetbrains' })
+     <html className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+*/
+
+
+:root {
+  /* night surfaces */
+  --night: #262624;
+  --night-1: #30302e;
+  --night-2: #3a3936;
+  --night-deep: #1c1c1a;
+  --line: rgba(250, 249, 245, 0.12);
+  --line-strong: rgba(250, 249, 245, 0.24);
+  --text: #faf9f5;      /* 14.4:1 on night */
+  --text-2: #d9d6cc;    /* 10.4:1 */
+  --text-3: #aeaa9f;    /* 6.5:1 — the floor, never go fainter */
+
+  /* brand */
+  --accent: #d97757;
+  --accent-hover: #e4876a;
+  --accent-text: #e08a6c; /* 5.8:1 on night */
+  --on-accent: #141413;   /* 5.9:1 on accent */
+
+  /* provider statuses (on night) */
+  --st-ghost: #a39f95;
+  --st-unverified: #c9c5ba;
+  --st-calling: #9db2ff;
+  --st-available: #7fd1a2;
+  --st-past: #ff8f7a;
+  --st-noanswer: #e8bf6a;
+  --st-ghost-bg: rgba(163, 159, 149, 0.14);
+  --st-unverified-bg: rgba(201, 197, 186, 0.10);
+  --st-calling-bg: rgba(157, 178, 255, 0.14);
+  --st-available-bg: rgba(127, 209, 162, 0.14);
+  --st-past-bg: rgba(255, 143, 122, 0.14);
+  --st-noanswer-bg: rgba(232, 191, 106, 0.12);
+
+  /* paper (evidence) */
+  --paper: #f6f1e7;
+  --paper-2: #ece5d6;
+  --paper-rule: #d6cdb9;
+  --ink: #141413;
+  --ink-2: #45423b;
+  --ink-3: #6b675d;
+  --stamp: #b3361f;
+  --ink-available: #1f7a4a;
+  --ink-noanswer: #8a5a00;
+  --ink-accent: #a8472b;
+
+  /* type */
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-ui: "Public Sans", Inter, system-ui, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --fs-hero: clamp(2.75rem, 6vw, 5rem);
+  --fs-display: clamp(2rem, 3.6vw, 3rem);
+  --fs-h2: clamp(1.5rem, 2.4vw, 2rem);
+  --fs-h3: 1.25rem;
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.8125rem;
+  --fs-data: 0.9375rem;
+  --fs-num: clamp(2rem, 3vw, 2.75rem);
+
+  /* shape */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-paper: 2px;
+  --shadow-paper: 0 1px 0 rgba(0,0,0,.25), 0 18px 40px -12px rgba(0,0,0,.55);
+  --gutter: clamp(16px, 4vw, 48px);
+
+  /* motion */
+  --dur-1: 120ms;
+  --dur-2: 240ms;
+  --dur-3: 420ms;
+  --dur-4: 700ms;
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --ease-snap: cubic-bezier(.3,1.4,.5,1);
+  --ease-io: cubic-bezier(.65,0,.35,1);
+}
+
+@theme inline {
+  --color-night: var(--night);
+  --color-night-1: var(--night-1);
+  --color-night-2: var(--night-2);
+  --color-night-deep: var(--night-deep);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
+  --color-st-ghost: var(--st-ghost);
+  --color-st-unverified: var(--st-unverified);
+  --color-st-calling: var(--st-calling);
+  --color-st-available: var(--st-available);
+  --color-st-past: var(--st-past);
+  --color-st-noanswer: var(--st-noanswer);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-rule: var(--paper-rule);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-stamp: var(--stamp);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-code);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-paper: var(--r-paper);
+  --shadow-paper: var(--shadow-paper);
+}
+
+/* ---------- base ---------- */
+html { background: var(--night); color: var(--text); }
+body { font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 2px; }
+.paper :focus-visible { outline-color: var(--ink); }
+::selection { background: var(--accent); color: var(--on-accent); }
+
+.t-hero    { font-family: var(--font-serif); font-size: var(--fs-hero); line-height: 1.02; letter-spacing: -0.02em; font-weight: 400; }
+.t-display { font-family: var(--font-serif); font-size: var(--fs-display); line-height: 1.08; font-weight: 400; letter-spacing: -0.01em; }
+.t-h2      { font-family: var(--font-serif); font-size: var(--fs-h2); line-height: 1.15; font-weight: 400; }
+.t-h3      { font-family: var(--font-ui); font-size: var(--fs-h3); line-height: 1.3; font-weight: 600; }
+.t-small   { font-size: var(--fs-small); line-height: 1.5; }
+.t-label   { font-family: var(--font-code); font-size: var(--fs-label); line-height: 1.3; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); }
+.t-data    { font-family: var(--font-code); font-size: var(--fs-data); line-height: 1.5; }
+.t-num     { font-family: var(--font-serif); font-size: var(--fs-num); line-height: 1; font-variant-numeric: tabular-nums lining-nums; }
+.em        { font-style: italic; color: var(--accent-text); }
+.paper .em { color: var(--ink-accent); }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5em; min-height: 44px;
+  padding: 14px 22px; border-radius: var(--r-sm); font: 600 var(--fs-body)/1 var(--font-ui);
+  transition: background var(--dur-1), border-color var(--dur-1), transform var(--dur-1); cursor: pointer; text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+.btn .arrow { transition: transform var(--dur-1) var(--ease-out); }
+.btn:hover .arrow { transform: translateX(3px); }
+.btn-primary { background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--line-strong); }
+.btn-outline:hover { background: var(--night-1); border-color: var(--text-3); }
+.btn-paper { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn-paper:hover { background: #2b2a27; }
+.btn:disabled, .btn[aria-disabled="true"] { background: transparent; color: var(--text-3); border: 1px dashed var(--line-strong); cursor: not-allowed; transform: none; }
+.btn[aria-busy="true"] { cursor: progress; }
+.btn-link { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.btn-link:hover { text-decoration-thickness: 2px; }
+.busy-dots::after { content: "·"; display: inline-block; width: 2ch; text-align: left; animation: dots 1.2s steps(3) infinite; }
+@keyframes dots { 0% { content: "·"; } 33% { content: "··"; } 66% { content: "···"; } }
+
+/* ---------- form ---------- */
+.field { height: 48px; width: 100%; padding: 0 14px; background: var(--night-2); color: var(--text);
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: 400 var(--fs-body) var(--font-ui); }
+.field::placeholder { color: var(--text-3); }
+.field:focus { border-color: var(--text); }
+.field[aria-invalid="true"] { border-color: var(--st-past); }
+.field-zip { font-family: var(--font-code); letter-spacing: .12em; }
+select.field { appearance: none; background-image: none; padding-right: 36px; }
+.select-wrap { position: relative; }
+.select-wrap::after { content: "▾"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-family: var(--font-code); color: var(--text-2); pointer-events: none; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--night-1); border: 1px solid var(--line-strong); border-radius: var(--r-sm); }
+.seg > button { min-height: 40px; padding: 10px 14px; border-radius: 3px; font: 400 var(--fs-data) var(--font-code); color: var(--text-2); background: transparent; border: 0; cursor: pointer; transition: background var(--dur-1), color var(--dur-1); }
+.seg > button:hover { background: var(--night-2); color: var(--text); }
+.seg > button[aria-checked="true"] { background: var(--text); color: var(--night); font-weight: 500; }
+@media (max-width: 640px) { .seg { display: flex; } .seg > button { flex: 1 1 40%; } }
+
+/* ---------- status badge ---------- */
+.badge { display: inline-flex; align-items: center; gap: .5em; padding: 4px 8px; border-radius: var(--r-sm);
+  font: 500 var(--fs-label)/1.2 var(--font-code); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+.badge-lg { font-size: var(--fs-small); padding: 6px 10px; }
+.badge[data-st="ghost"]      { color: var(--st-ghost); background: var(--st-ghost-bg); }
+.badge[data-st="unverified"] { color: var(--st-unverified); background: var(--st-unverified-bg); }
+.badge[data-st="calling"]    { color: var(--st-calling); background: var(--st-calling-bg); }
+.badge[data-st="available"]  { color: var(--st-available); background: var(--st-available-bg); }
+.badge[data-st="violation"]  { color: var(--st-past); background: var(--st-past-bg); }
+.badge[data-st="no_answer"]  { color: var(--st-noanswer); background: var(--st-noanswer-bg); }
+
+/* animated ))) glyph */
+.arcs span { opacity: .25; animation: arc 900ms infinite; }
+.arcs span:nth-child(2) { animation-delay: 150ms; }
+.arcs span:nth-child(3) { animation-delay: 300ms; }
+@keyframes arc { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+/* ---------- provider row ---------- */
+.row { --edge: transparent; --wash: transparent; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px;
+  padding: 16px 18px 16px 21px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--night);
+  text-align: left; width: 100%; color: inherit; cursor: pointer; transition: background var(--dur-1), border-color var(--dur-1); }
+.row::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--edge); }
+.row:hover { background: var(--night-1); }
+.row[aria-pressed="true"] { background: var(--night-1); border-color: var(--text-3); }
+.row-name { font: 600 var(--fs-h3)/1.3 var(--font-ui); color: var(--text); }
+.row-detail { grid-column: 1 / -1; font-size: var(--fs-small); color: var(--text-2); }
+.row-detail b { color: var(--text); font-weight: 600; }
+.row-source { grid-column: 1 / -1; font: 400 var(--fs-label) var(--font-code); color: var(--text-3); }
+.row[data-st="calling"]   { --edge: var(--st-calling); }
+.row[data-st="calling"]::before { animation: pulse 1.2s ease-in-out infinite; }
+.row[data-st="available"] { --edge: var(--st-available); background: var(--st-available-bg); }
+.row[data-st="violation"] { --edge: var(--st-past); background: var(--st-past-bg); }
+.row[data-st="no_answer"] { --edge: var(--st-noanswer); }
+.row[data-st="calling"] .row-detail { color: var(--st-calling); }
+.row[data-st="violation"] .row-detail .hot { color: var(--st-past); }
+.row[data-st="available"] .row-detail .hot { color: var(--st-available); }
+/* compact ghost row */
+.row[data-st="ghost"] { padding-top: 12px; padding-bottom: 12px; grid-template-columns: auto 1fr auto; align-items: center; }
+.row[data-st="ghost"] .row-name { color: var(--st-ghost); font-weight: 500; position: relative; }
+.row[data-st="ghost"] .row-name::after { content: ""; position: absolute; left: 0; right: 0; top: 55%; height: 2px; background: var(--st-ghost); transform-origin: left; animation: strike var(--dur-3) var(--ease-out) both; }
+.row[data-st="ghost"] .row-detail { grid-column: auto; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row[data-st="ghost"] .row-detail::before { content: "— "; }
+@media (max-width: 640px) { .row[data-st="ghost"] { grid-template-columns: 1fr auto; } .row[data-st="ghost"] .row-detail { grid-column: 1 / -1; white-space: normal; } }
+.row.just-resolved { animation: wash 1200ms ease-out; }
+
+/* ---------- deadline ruler ---------- */
+.ruler { --scale: 30; --wait: 0; --limit: 10; position: relative; padding-bottom: 20px; }
+.ruler-track { position: relative; height: 10px; border-radius: 2px; background: var(--night-2); overflow: visible; }
+.ruler-sm .ruler-track { height: 6px; }
+.ruler-lg .ruler-track { height: 14px; }
+.ruler-fill { position: absolute; left: 0; top: 0; bottom: 0; display: flex; width: calc(var(--wait) / var(--scale) * 100%); transform-origin: left; animation: grow 600ms var(--ease-out) 200ms both; border-radius: 2px; overflow: hidden; }
+.ruler-in  { width: calc(min(var(--wait), var(--limit)) / var(--wait) * 100%); background: var(--text-2); }
+.ruler-out { flex: 1; background: var(--st-past); }
+.ruler[data-ok="true"] .ruler-in { background: var(--st-available); width: 100%; }
+.ruler-tick { position: absolute; top: -4px; width: 2px; height: calc(100% + 8px); background: var(--text); left: calc(var(--limit) / var(--scale) * 100%); }
+.ruler-tick::after { content: attr(data-label); position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 400 var(--fs-label) var(--font-code); color: var(--text-3); }
+.paper .ruler-track { background: var(--paper-2); }
+.paper .ruler-in { background: var(--ink-3); }
+.paper .ruler-out { background: var(--stamp); }
+.paper .ruler-tick { background: var(--ink); }
+.paper .ruler-tick::after { color: var(--ink-3); }
+
+/* ---------- transcript ---------- */
+.well { background: var(--night-deep); border: 1px solid var(--line); border-radius: var(--r-md); }
+.bubble { max-width: 88%; padding: 10px 14px; border-radius: var(--r-md); font-size: var(--fs-small); line-height: 1.5; color: var(--text); animation: rise var(--dur-2) var(--ease-out) both; }
+.bubble-label { display: block; margin-bottom: 4px; font: 500 12px/1 var(--font-code); letter-spacing: .08em; text-transform: uppercase; }
+.bubble-agent { align-self: flex-start; background: rgba(157,178,255,.12); border: 1px solid rgba(157,178,255,.4); }
+.bubble-agent .bubble-label { color: var(--st-calling); }
+.bubble-office { align-self: flex-end; background: var(--night-1); border: 1px solid var(--line-strong); }
+.bubble-office .bubble-label { color: var(--text-3); }
+.bubble-system { align-self: center; font: 400 var(--fs-label) var(--font-code); color: var(--text-3); }
+.eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; }
+.eq i { width: 4px; height: 100%; background: var(--st-calling); border-radius: 1px; transform-origin: bottom; animation: eq .9s ease-in-out infinite; }
+.eq i:nth-child(2n) { animation-delay: -.3s; } .eq i:nth-child(3n) { animation-delay: -.6s; }
+
+/* ---------- activity log ---------- */
+.log-line { display: grid; grid-template-columns: 88px 20px 1fr; gap: 6px; padding: 4px 8px; border-radius: 3px; font: 400 var(--fs-data)/1.5 var(--font-code); color: var(--text-2); animation: rise var(--dur-2) var(--ease-out) both; cursor: pointer; }
+.log-line:hover { background: var(--night-1); }
+.log-time { color: var(--text-3); }
+.log-line[data-kind="user"] { color: var(--text); font-weight: 500; } .log-line[data-kind="user"] .log-glyph { color: var(--accent-text); }
+.log-line[data-kind="fallback"] { color: var(--st-noanswer); }
+.log-line[data-kind="violation"] .log-glyph { color: var(--st-past); }
+.log-line[data-kind="available"] .log-glyph { color: var(--st-available); }
+.log-line[data-kind="ghost"] .log-glyph { color: var(--st-ghost); }
+
+/* ---------- notices, tags, pill ---------- */
+.notice { border-left: 4px solid var(--st-noanswer); background: rgba(232,191,106,.10); padding: 14px 16px; border-radius: 0 var(--r-sm) var(--r-sm) 0; color: var(--text); font-size: var(--fs-small); }
+.notice-title { display: block; margin-bottom: 4px; font: 500 var(--fs-label) var(--font-code); text-transform: uppercase; letter-spacing: .08em; color: var(--st-noanswer); }
+.notice[data-tone="error"] { border-color: var(--st-past); background: var(--st-past-bg); }
+.notice[data-tone="error"] .notice-title { color: var(--st-past); }
+.paper .notice { border-color: var(--ink-noanswer); background: #f3e6c4; color: var(--ink); }
+.paper .notice-title { color: var(--ink-noanswer); }
+.demo-tag { display: inline-flex; align-items: center; padding: 3px 8px; border: 1px dashed var(--st-noanswer); border-radius: var(--r-sm); color: var(--st-noanswer); font: 500 var(--fs-label)/1.2 var(--font-code); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+.phase { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid currentColor; border-radius: 999px; font: 500 var(--fs-label) var(--font-code); text-transform: uppercase; letter-spacing: .08em; }
+.phase-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.phase[data-phase="scraping"] { color: var(--st-calling); } .phase[data-phase="scraping"] .phase-dot { animation: pulse 1.2s infinite; }
+.phase[data-phase="ready"] { color: var(--accent-text); }
+.phase[data-phase="calling"] { color: var(--st-calling); }
+.phase[data-phase="done"] { color: var(--text-2); }
+
+/* ---------- consent ---------- */
+.consent { background: var(--night-1); border: 1px solid var(--line-strong); border-top: 3px solid var(--accent); border-radius: var(--r-md); padding: 28px; }
+.consent li { list-style: none; padding-left: 1.6em; position: relative; }
+.consent li::before { content: "✓"; position: absolute; left: 0; color: var(--st-available); font-family: var(--font-code); }
+.consent strong { color: var(--text); font-weight: 600; }
+
+/* ---------- paper ---------- */
+.paper { background: var(--paper); color: var(--ink); border-radius: var(--r-paper); box-shadow: var(--shadow-paper); padding: 36px 40px; }
+@media (max-width: 640px) { .paper { padding: 20px; } }
+.paper .t-label { color: var(--ink-3); }
+.paper-ruled { background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(214,205,185,.35) 27px 28px); }
+.ledger { font: 400 var(--fs-data)/1.5 var(--font-code); }
+.ledger-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; animation: rise var(--dur-2) var(--ease-out) both; }
+.ledger-row .lead { flex: 1; border-bottom: 2px dotted var(--paper-rule); transform: translateY(-4px); }
+.ledger-row .val { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ledger-row .val.hot { color: var(--stamp); }
+.ledger-row.sub { padding-left: 2ch; color: var(--ink-2); }
+.stamp { display: inline-block; padding: 10px 16px; border: 3px double var(--stamp); color: var(--stamp); font: 700 1.5rem/1.1 var(--font-code); letter-spacing: .06em; text-transform: uppercase; text-align: center; transform: rotate(-6deg); position: relative; }
+.stamp small { display: block; font-size: .6rem; font-weight: 500; letter-spacing: .12em; margin-top: 4px; }
+.stamp::after { content: ""; position: absolute; inset: 0; border: 3px double var(--stamp); opacity: .25; transform: translate(1px, 1px); }
+.print-in { animation: print var(--dur-4) var(--ease-io) both; }
+.stamp-in { animation: stamp 280ms var(--ease-snap) 750ms both; }
+
+/* ---------- flip (badge / number / phase) ---------- */
+.flip { display: inline-block; animation: flip var(--dur-3) var(--ease-snap) both; transform-origin: center; backface-visibility: hidden; }
+
+/* ---------- keyframes ---------- */
+@keyframes rise   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes strike { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes flip   { 0% { transform: perspective(400px) rotateX(90deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: perspective(400px) rotateX(0); } }
+@keyframes wash   { from { box-shadow: inset 0 0 0 999px var(--wash-strong, rgba(255,143,122,.22)); } to { box-shadow: inset 0 0 0 999px transparent; } }
+@keyframes grow   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pulse  { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+@keyframes eq     { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+@keyframes print  { from { clip-path: inset(0 0 100% 0); transform: translateY(-6px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes stamp  { from { opacity: 0; transform: rotate(-6deg) scale(1.6); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
+@keyframes sheet-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes scan   { from { left: 0; } to { left: calc(100% - 6ch); } }
+@keyframes float  { 0%, 100% { transform: translateY(-6px); } 50% { transform: translateY(6px); } }
+.row[data-st="available"].just-resolved { --wash-strong: rgba(127,209,162,.22); }
+.row[data-st="no_answer"].just-resolved { --wash-strong: rgba(232,191,106,.2); }
+.sheet-up { animation: sheet-up var(--dur-3) var(--ease-out) both; }
+.ghost-float { animation: float 6s ease-in-out infinite; }
+
+/* ---------- mobile footer fix ---------- */
+.footer-reveal { min-height: 100svh; background: var(--accent); color: var(--on-accent); }
+.footer-reveal .t-hero { font-size: clamp(2.25rem, 9vw, 5rem); }
+.box-rule { border: 1px dashed var(--on-accent); padding: 16px; border-radius: 0; }
+.box-rule > legend { font: 500 var(--fs-label) var(--font-code); text-transform: uppercase; letter-spacing: .08em; padding: 0 6px; margin-left: -6px; }
+.box-rule > legend::before { content: "+-- "; }
+.box-rule > legend::after { content: " --"; }
+@media (max-width: 640px) {
+  .footer-reveal { position: static !important; }
+  .footer-ghost { display: none; }
+}
+
+/* ---------- print ---------- */
+@media print {
+  .crisis-banner, .demo-pill, .demo-panel, .site-header { display: none !important; }
+  .paper { box-shadow: none; background: #fff; }
+}
+
+/* ---------- reduced motion: neutralise everything ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .row[data-st="calling"]::before, .arcs span, .eq i, .phase-dot { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .ghost-float { animation: none !important; }
+}
+
+body{margin:0} button.row{font:inherit}</style></head><body><div class="crisis-banner" style="position:sticky;top:0;z-index:50;background:var(--night-deep);border-bottom:1px solid var(--line);text-align:center;padding:9px var(--gutter);font-size:var(--fs-small);color:var(--text-2)">
+  In crisis? Call or text <a href="tel:988" style="color:var(--text);font-weight:600;text-underline-offset:2px">988</a> — the Suicide &amp; Crisis Lifeline, 24/7
+</div>
+<header class="site-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px var(--gutter);border-bottom:1px solid var(--line)">
+  <div style="display:flex;align-items:center;gap:10px">
+    <pre aria-hidden="true" style="margin:0;font:9px/1 var(--font-code);color:var(--accent)">▄███▄
+█▀█▀█
+▀▄▀▄▀</pre>
+    <span style="font:500 22px var(--font-serif)">Ghost<span style="color:var(--accent-text)">Buster</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a class="btn-link t-small" style="color:var(--text-2)" href="#">How it works</a>
+    <span class="t-label">Evidence log + templates · not legal advice</span>
+  </div>
+</header>
+
+<div style="position:fixed;right:16px;bottom:16px;z-index:60;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+  <button class="btn btn-outline" style="background:var(--night-deep)" onclick="resolveCall()">1 · Resolve a call</button>
+  <button class="btn btn-outline" style="background:var(--night-deep)" onclick="finishRun()">2 · Finish run (Ending B)</button>
+  <button class="btn btn-outline" style="background:var(--night-deep)" onclick="location.reload()">↺ Reset</button>
+</div>
+
+<main style="max-width:1200px;margin:0 auto;padding:24px var(--gutter) 120px">
+  <p class="t-label" style="margin:0 0 16px;color:var(--accent-text)">Preview · results page at the 960px demo viewport · mid-call → verdict</p>
+
+  <!-- case strip -->
+  <section style="border-bottom:1px solid var(--line);padding-bottom:18px">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+      <div class="t-data" style="color:var(--text-3)"><span style="color:var(--text-2)">FILE GB-327D24</span> · Blue Shield of California · HMO · 92103</div>
+      <span class="phase" data-phase="calling" id="phase"><span class="arcs" aria-hidden="true"><span>)</span><span>)</span><span>)</span></span> <span id="phaseLabel">Calling offices</span></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;margin-top:8px">
+      <h1 class="t-h2" style="margin:0">Therapists, <span class="em">legal limit 10 business days</span></h1>
+      <span class="demo-tag">Demo data — fictional providers</span>
+    </div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:16px" aria-live="polite">
+      <div><div class="t-num">10</div><div class="t-label">found</div></div>
+      <div><div class="t-num" style="color:var(--st-ghost)">5</div><div class="t-label">ghosts</div></div>
+      <div><div class="t-num" style="color:var(--st-calling)"><span id="nCalled" class="flip">2</span><span style="font-size:.5em;color:var(--text-3)"> of 5</span></div><div class="t-label">called</div></div>
+      <div><div class="t-num" style="color:var(--st-past)"><span id="nPast" class="flip">1</span></div><div class="t-label">past deadline</div></div>
+    </div>
+  </section>
+
+  <!-- action slot -->
+  <section id="slot" style="margin:18px 0">
+    <div id="progress" class="t-data" style="display:flex;gap:14px;align-items:center;color:var(--st-calling)">
+      <span class="arcs" aria-hidden="true"><span>)</span><span>)</span><span>)</span></span>
+      <span>Calling 5 offices · <span id="nDone">2</span> done</span>
+      <span id="segs" style="letter-spacing:.15em"><span style="color:var(--st-past)">■</span><span style="color:var(--st-noanswer)">■</span><span>□</span><span>□</span><span>□</span></span>
+    </div>
+  </section>
+
+  <!-- columns -->
+  <section style="display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:24px" class="cols">
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+        <h2 class="t-label" style="margin:0;color:var(--text-2)">Licensed therapists near 92103</h2>
+        <span class="t-label">from the national provider registry</span>
+      </div>
+      <p class="t-small" style="margin:8px 0 14px;color:var(--text-2)"><span style="color:var(--accent-text);font-family:var(--font-code)">§</span> A provider can lawfully set a longer wait if they note in your record that it won't harm your health. Telehealth appointments count.</p>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="row" data-st="violation" aria-pressed="true">
+          <span class="row-name">Elena Marsh, LCSW</span>
+          <span class="badge" data-st="violation">! Past legal deadline</span>
+          <span class="row-detail">Earliest <b class="hot">Dec 15</b> · <b class="hot">20 business days</b> vs 10 business days limit</span>
+          <div class="ruler ruler-sm" style="grid-column:1/-1;--wait:20;--limit:10"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div>
+        </button>
+        <button class="row" data-st="no_answer">
+          <span class="row-name">Priya Natarajan, LPCC</span>
+          <span class="badge" data-st="no_answer">– No answer</span>
+          <span class="row-detail">No answer / no usable appointment date</span>
+        </button>
+        <div id="reyesSlot">
+          <button class="row" data-st="calling" id="reyes">
+            <span class="row-name">Dr. Daniel Reyes, PsyD</span>
+            <span class="badge" data-st="calling"><span class="arcs"><span>)</span><span>)</span><span>)</span></span> Calling…</span>
+            <span class="row-detail">AI assistant is on the line…</span>
+          </button>
+        </div>
+        <button class="row" data-st="unverified">
+          <span class="row-name">Dr. Michael Brennan, PhD</span>
+          <span class="badge" data-st="unverified">· Not checked</span>
+          <span class="row-detail">Looks real — not called yet</span>
+        </button>
+        <button class="row" data-st="unverified">
+          <span class="row-name">Dr. Nora Whitfield, PhD <span class="demo-tag" style="margin-left:6px;vertical-align:2px">Demo</span></span>
+          <span class="badge" data-st="unverified">· Not checked</span>
+          <span class="row-detail">Looks real — not called yet</span>
+        </button>
+        <button class="row" data-st="ghost"><span class="row-name">Rachel Okafor, LMFT</span><span class="row-detail">Public profile says 'not accepting new clients'</span><span class="badge" data-st="ghost">◌ Ghost</span></button>
+        <button class="row" data-st="ghost"><span class="row-name">Sarah Lindqvist, LMFT</span><span class="row-detail">NPI Registry shows practice moved to Sacramento, CA</span><span class="badge" data-st="ghost">◌ Ghost</span></button>
+        <button class="row" data-st="ghost"><span class="row-name">Marcus Hale, LCSW</span><span class="row-detail">Profile says waitlist closed until next year</span><span class="badge" data-st="ghost">◌ Ghost</span></button>
+      </div>
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:12px;position:sticky;top:56px;align-self:start">
+      <div class="well" style="padding:18px">
+        <div class="t-label" style="margin-bottom:10px">Call transcript</div>
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+          <div><div class="t-h3">Elena Marsh, LCSW</div><div class="t-small" style="color:var(--text-2)">(•••) •••-4529 · 3500 30th St Ste 4, San Diego, CA 92104</div></div>
+          <span class="badge badge-lg" data-st="violation">! Past deadline</span>
+        </div>
+        <div style="display:flex;gap:28px;margin:16px 0 6px">
+          <div><div class="t-label">Wait</div><div class="t-num" style="font-size:1.75rem;color:var(--st-past)">20 <span style="font-size:.55em">business days</span></div></div>
+          <div><div class="t-label">Legal limit</div><div class="t-num" style="font-size:1.75rem">10 <span style="font-size:.55em">business days</span></div></div>
+        </div>
+        <div class="ruler ruler-lg" style="--wait:20;--limit:10"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+          <div class="bubble bubble-agent"><span class="bubble-label">AI assistant</span>Hi, I'm an AI assistant calling on behalf of a patient, and this call is being recorded and transcribed. Do you take Blue Shield of California, and what's the earliest new-patient appointment?</div>
+          <div class="bubble bubble-office" style="animation-delay:80ms"><span class="bubble-label">Office</span>Let me check… our earliest new-patient opening is Tuesday, December 15.</div>
+        </div>
+      </div>
+      <div class="well" style="padding:12px 8px">
+        <div class="t-label" style="margin:0 8px 8px">Live activity</div>
+        <div id="log">
+          <div class="log-line" data-kind="ghost"><span class="log-time">12:59:20</span><span class="log-glyph">◌</span><span>Ghost listing: Marcus Hale, LCSW — waitlist closed</span></div>
+          <div class="log-line" data-kind="user"><span class="log-time">12:59:31</span><span class="log-glyph">★</span><span>You approved AI calls to 5 offices.</span></div>
+          <div class="log-line" data-kind="violation"><span class="log-time">12:59:52</span><span class="log-glyph">!</span><span>Elena Marsh, LCSW: earliest opening 20 business days (deadline 10). Past legal deadline</span></div>
+          <div class="log-line" data-kind="noanswer"><span class="log-time">13:00:04</span><span class="log-glyph">–</span><span>Priya Natarajan, LPCC: No answer / no usable appointment date</span></div>
+          <div class="log-line"><span class="log-time">13:00:05</span><span class="log-glyph">)))</span><span>Calling Dr. Daniel Reyes, PsyD…</span></div>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- token strip -->
+  <section style="margin-top:64px;border-top:1px solid var(--line);padding-top:24px">
+    <p class="t-label">Tokens</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="swatches"></div>
+  </section>
+</main>
+
+<template id="verdictTpl">
+  <article class="paper print-in" style="position:relative">
+    <div style="display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap-reverse;align-items:flex-start">
+      <div style="flex:1 1 420px">
+        <div class="t-label">Finding · Timely access grievance ready</div>
+        <h2 class="t-display" style="margin:10px 0 10px">No provider we reached could offer a <span class="em">timely</span> appointment.</h2>
+        <p style="margin:0;color:var(--ink-2)">You can now ask your plan to arrange timely care, including out-of-network at in-network cost.</p>
+      </div>
+      <div class="stamp stamp-in" style="margin:8px 12px 0 0">Past deadline<small>×4 offices · limit 10 business days</small></div>
+    </div>
+    <div class="ledger paper-ruled" style="margin:24px 0;padding:6px 0;border-top:1px solid var(--paper-rule);border-bottom:1px solid var(--paper-rule)">
+      <div class="ledger-row" style="animation-delay:1100ms"><span>Offices reached</span><span class="lead"></span><span class="val">5</span></div>
+      <div class="ledger-row sub" style="animation-delay:1180ms"><span>Past legal deadline</span><span class="lead"></span><span class="val hot">4</span></div>
+      <div class="ledger-row sub" style="animation-delay:1260ms"><span>Didn't answer</span><span class="lead"></span><span class="val">1</span></div>
+      <div class="ledger-row" style="animation-delay:1340ms"><span>Other listings that appear unavailable</span><span class="lead"></span><span class="val">5</span></div>
+      <div class="ledger-row" style="animation-delay:1420ms"><span>Legal limit</span><span class="lead"></span><span class="val">10 business days</span></div>
+    </div>
+    <div class="t-label" style="margin-bottom:6px">Your packet</div>
+    <p class="t-data" style="margin:0 0 18px;color:var(--ink-2)">[x] Evidence log of every call &nbsp; [x] Grievance letter to Blue Shield of California &nbsp; [x] Member-services phone script &nbsp; [x] Next steps with the DMHC</p>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <a class="btn btn-paper" href="#" style="animation:rise 240ms 1500ms both">Open grievance packet <span class="arrow">→</span></a>
+      <span class="t-small" style="color:var(--ink-3)">Evidence log + template, not legal advice.</span>
+    </div>
+  </article>
+</template>
+
+<script>
+const sw=[['night','#262624'],['night-1','#30302e'],['night-deep','#1c1c1a'],['text','#faf9f5'],['text-2','#d9d6cc'],['text-3','#aeaa9f'],['accent','#d97757'],['st-ghost','#a39f95'],['st-calling','#9db2ff'],['st-available','#7fd1a2'],['st-past','#ff8f7a'],['st-noanswer','#e8bf6a'],['paper','#f6f1e7'],['ink','#141413'],['stamp','#b3361f']];
+document.getElementById('swatches').innerHTML=sw.map(([n,h])=>`<div style="width:120px"><div style="height:44px;border-radius:4px;border:1px solid var(--line);background:${h}"></div><div class="t-data" style="font-size:12px;color:var(--text-2);margin-top:4px">--${n}<br><span style="color:var(--text-3)">${h}</span></div></div>`).join('');
+function bump(id,v){const el=document.getElementById(id);const n=el.cloneNode();n.textContent=v;el.replaceWith(n);}
+let resolved=false;
+function resolveCall(){
+  if(resolved) return; resolved=true;
+  document.getElementById('reyesSlot').innerHTML=`<button class="row just-resolved" data-st="violation">
+    <span class="row-name">Dr. Daniel Reyes, PsyD</span>
+    <span class="badge flip" data-st="violation">! Past legal deadline</span>
+    <span class="row-detail">Earliest <b class="hot">Dec 29</b> · <b class="hot">29 business days</b> vs 10 business days limit</span>
+    <div class="ruler ruler-sm" style="grid-column:1/-1;--wait:29;--limit:10;--scale:31"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div></button>`;
+  bump('nCalled','3'); bump('nPast','2'); document.getElementById('nDone').textContent='3';
+  document.getElementById('segs').children[2].outerHTML='<span style="color:var(--st-past)">■</span>';
+  document.getElementById('log').insertAdjacentHTML('beforeend','<div class="log-line" data-kind="violation"><span class="log-time">13:00:41</span><span class="log-glyph">!</span><span>Dr. Daniel Reyes, PsyD: earliest opening 29 business days (deadline 10). Past legal deadline</span></div>');
+}
+function finishRun(){
+  resolveCall();
+  bump('nCalled','5'); bump('nPast','4');
+  const p=document.getElementById('phase'); p.dataset.phase='done'; p.innerHTML='✓ <span class="flip">Complete</span>';
+  const slot=document.getElementById('slot'); slot.innerHTML='';
+  slot.appendChild(document.getElementById('verdictTpl').content.cloneNode(true));
+  setTimeout(()=>window.scrollTo({top:slot.getBoundingClientRect().top+scrollY-56,behavior:'smooth'}),50);
+}
+</script>
+<style>@media (max-width:820px){.cols{grid-template-columns:1fr !important}}</style>
+</body></html>

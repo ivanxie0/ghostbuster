@@ -1,6 +1,17 @@
 // Display helpers. Pure functions over contract types — no data access here (that's lib/api.ts).
 import type { AppointmentType, GhostStatus, PlanType, Provider, Search, Specialty } from "./types";
 
+/** Insurers offered in the search bar and the Find care flow. */
+export const INSURERS = [
+  "Blue Shield of California",
+  "Anthem Blue Cross",
+  "Health Net",
+  "Kaiser Permanente",
+  "Molina Healthcare",
+  "L.A. Care",
+  "Medi-Cal plan",
+];
+
 export const SPECIALTY_LABEL: Record<Specialty, string> = {
   therapist: "Therapist",
   psychiatrist: "Psychiatrist",

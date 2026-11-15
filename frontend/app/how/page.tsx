@@ -106,8 +106,8 @@ export default function HowPage() {
           ))}
 
           {NODES.map((n) => {
-            const fill = n.tone === "packet" ? "var(--sun)" : "var(--paper)";
-            const stroke = n.tone === "gemini" ? "var(--cobalt)" : n.tone === "rules" ? "var(--moss)" : "var(--ink)";
+            const fill = n.tone === "packet" ? "var(--st-noanswer-bg)" : "var(--surface)";
+            const stroke = n.tone === "gemini" ? "var(--color-cobalt)" : n.tone === "rules" ? "var(--color-moss)" : "var(--ink)";
             return (
               <g key={n.id}>
                 <rect x={n.x + 3} y={n.y + 3} width={W} height={H} fill="var(--ink)" opacity="0.18" />

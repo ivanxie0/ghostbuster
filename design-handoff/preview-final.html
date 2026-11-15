@@ -1,0 +1,943 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GhostBuster final draft — design preview</title><script>(function(){try{var t=localStorage.getItem("gb-theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme="light"}})()</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&family=Atkinson+Hyperlegible+Next:wght@200..800&family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Mona+Sans:wght@400..900&family=Hanken+Grotesk:wght@400..800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet"><style>:root{--font-heading:"Schibsted Grotesk";--font-body:"Atkinson Hyperlegible Next";--font-mono-src:"Atkinson Hyperlegible Mono"}/* GhostBuster v2 — "Daylight Paper Trail"
+   Builds on v1 (same component names, same mechanics); switches the site to a light,
+   healthcare-grade theme. The live-call console stays dark (the one "night" surface).
+   Drop into app/globals.css (Tailwind v4). See DESIGN_SPEC_V2.md.
+
+   Fonts (app/layout.tsx) — default pairing "Editorial":
+     import { Schibsted_Grotesk, Atkinson_Hyperlegible_Next, Atkinson_Hyperlegible_Mono } from 'next/font/google'
+     const heading = Schibsted_Grotesk({ subsets:['latin'], variable:'--font-heading' })
+     const body    = Atkinson_Hyperlegible_Next({ subsets:['latin'], variable:'--font-body' })
+     const mono    = Atkinson_Hyperlegible_Mono({ subsets:['latin'], variable:'--font-mono-src' })
+     <html className={`${heading.variable} ${body.variable} ${mono.variable}`} data-theme="light" suppressHydrationWarning>
+   Other pairings (swap the imports, nothing else changes): see DESIGN_SPEC_V2.md §3.
+   If an import name isn't found in your Next version, npm i the @fontsource-variable/<name> package instead.
+
+   Theme: light is the default; [data-theme="dark"] on <html> switches everything.
+   Set it before paint with the inline script in DESIGN_SPEC_V2.md §3 (no flash).
+*/
+
+
+:root {
+  /* surfaces */
+  --page: #fbf8f3;         /* warm off-white (Claude cream lineage) */
+  --surface: #ffffff;
+  --sunk: #f3eee6;         /* wells, table headers, input bg on white */
+  --line: #e6dfd3;
+  --line-strong: #cfc6b6;
+
+  /* text (contrast on --page) */
+  --ink: #1b1a18;          /* 16.4:1 */
+  --ink-2: #47443e;        /* 9.2:1 */
+  --ink-3: #686459;        /* 5.6:1 — the floor */
+
+  /* brand */
+  --primary: #0d5c58;      /* deep care-teal: CTAs, links, focus. white on it 7.8:1 */
+  --primary-hover: #0a4a47;
+  --primary-tint: #e3efed;
+  --terra: #b5532f;        /* ghost mark, emphasis words (large text) 4.7:1 */
+  --terra-text: #a64b2a;   /* small terracotta text */
+  --terra-tint: #f8e7df;
+  --terra-footer: #d97757; /* the revealed footer panel (ink on it 5.9:1) */
+
+  --on-primary: #ffffff;
+  --header-bg: rgba(251,248,243,.92);
+  --crisis-bg: #1b1a18;
+  --crisis-fg: #f4f1ea;
+  --footer-bg: #1b1a18;
+  color-scheme: light;
+
+  /* statuses on light */
+  --st-ghost: #6e6a61;      --st-ghost-bg: #efebe4;
+  --st-unverified: #47443e; --st-unverified-bg: #f1ede6;
+  --st-calling: #2b52c4;    --st-calling-bg: #e7ecfb;
+  --st-available: #1d7347;  --st-available-bg: #e2f2e8;
+  --st-past: #b3361f;       --st-past-bg: #fbe6e1;
+  --st-noanswer: #855700;   --st-noanswer-bg: #faefd6;
+
+  /* the live-call console (kept dark from v1) */
+  --console: #1f1e1c;
+  --console-1: #2a2927;
+  --console-line: rgba(244,241,234,.12);
+  --console-text: #f4f1ea;
+  --console-text-3: #aeaa9f;
+  --console-calling: #9db2ff;
+  --console-past: #ff8f7a;
+  --console-available: #7fd1a2;
+  --console-noanswer: #e8bf6a;
+
+  /* paper (verdict + packet) */
+  --paper: #fffdf8;
+  --paper-rule: #e2d9c8;
+  --stamp: #b3361f;
+
+  /* type */
+  --font-display: var(--font-heading), system-ui, sans-serif;
+  --font-ui: var(--font-body), system-ui, sans-serif;
+  --font-data: var(--font-mono-src), ui-monospace, monospace;
+  --fs-hero: clamp(2.5rem, 5.2vw, 4.25rem);
+  --fs-display: clamp(2rem, 3.4vw, 2.875rem);
+  --fs-h2: clamp(1.625rem, 2.6vw, 2.25rem);
+  --fs-h3: 1.25rem;
+  --fs-lead: 1.1875rem;
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.8125rem;
+
+  /* shape */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+  --shadow-1: 0 1px 0 rgba(27,26,24,.04);
+  --shadow-2: 0 1px 2px rgba(27,26,24,.06), 0 10px 28px -14px rgba(27,26,24,.22);
+  --shadow-paper: 0 1px 0 rgba(27,26,24,.06), 0 24px 48px -16px rgba(27,26,24,.22);
+  --gutter: clamp(16px, 4vw, 48px);
+  --maxw: 1200px;
+
+  /* motion (unchanged from v1) */
+  --dur-1: 120ms; --dur-2: 240ms; --dur-3: 420ms; --dur-4: 700ms;
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --ease-snap: cubic-bezier(.3,1.4,.5,1);
+  --ease-io: cubic-bezier(.65,0,.35,1);
+}
+
+/* ---------- dark theme ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #161615;
+  --surface: #201f1d;
+  --sunk: #2a2926;
+  --line: #34322f;
+  --line-strong: #4a4743;
+  --ink: #f4f1ea;          /* 16.1:1 */
+  --ink-2: #cfcabf;        /* 11.1:1 */
+  --ink-3: #a09b90;        /* 6.5:1 — floor */
+  --primary: #6cc4b9;      /* 8.8:1; dark text on it 8.3:1 */
+  --primary-hover: #86d3c9;
+  --primary-tint: #1d3532;
+  --on-primary: #0b1f1d;
+  --terra: #e8906f;
+  --terra-text: #e8906f;
+  --terra-tint: #3d2a22;
+  --header-bg: rgba(22,22,21,.88);
+  --crisis-bg: #2a2926;
+  --crisis-fg: #f4f1ea;
+  --footer-bg: #0d0d0c;
+  --st-ghost: #a39f95;      --st-ghost-bg: #353330;
+  --st-unverified: #cfcabf; --st-unverified-bg: #2f2e2b;
+  --st-calling: #9db2ff;    --st-calling-bg: #343741;
+  --st-available: #7fd1a2;  --st-available-bg: #2f3b32;
+  --st-past: #ff8f7a;       --st-past-bg: #44312c;
+  --st-noanswer: #e8bf6a;   --st-noanswer-bg: #403929;
+  --console: #0e0e0d;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.5);
+  --shadow-2: 0 2px 6px rgba(0,0,0,.4), 0 16px 36px -10px rgba(0,0,0,.6);
+  --shadow-paper: 0 1px 0 rgba(0,0,0,.4), 0 28px 56px -16px rgba(0,0,0,.75);
+}
+[data-theme="dark"] .console { border-color: var(--line); }
+[data-theme="dark"] .notice { border-color: #5a4c2c; }
+[data-theme="dark"] .notice[data-tone="info"] { border-color: #2c4b47; }
+[data-theme="dark"] .notice[data-tone="error"] { border-color: #6a3b31; }
+[data-theme="dark"] .photo img { filter: brightness(.92); }
+html { transition: background-color var(--dur-2), color var(--dur-2); }
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-primary: var(--primary);
+  --color-primary-tint: var(--primary-tint);
+  --color-terra: var(--terra);
+  --color-terra-tint: var(--terra-tint);
+  --color-console: var(--console);
+  --color-paper: var(--paper);
+  --color-stamp: var(--stamp);
+  --color-st-ghost: var(--st-ghost);
+  --color-st-calling: var(--st-calling);
+  --color-st-available: var(--st-available);
+  --color-st-past: var(--st-past);
+  --color-st-noanswer: var(--st-noanswer);
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-data);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--page); color: var(--ink); scroll-padding-top: 120px; }
+body { margin: 0; font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
+.console :focus-visible { outline-color: var(--console-text); }
+::selection { background: var(--terra-tint); color: var(--ink); }
+img { max-width: 100%; display: block; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 100; background: var(--ink); color: var(--page); padding: 10px 14px; border-radius: var(--r-sm); }
+.skip-link:focus { top: 12px; }
+
+.t-hero    { font-family: var(--font-display); font-size: var(--fs-hero); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; margin: 0; text-wrap: balance; }
+.t-display { font-family: var(--font-display); font-size: var(--fs-display); line-height: 1.08; letter-spacing: -0.028em; font-weight: 700; margin: 0; text-wrap: balance; }
+.t-h2      { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.12; letter-spacing: -0.022em; font-weight: 650; margin: 0; text-wrap: balance; }
+.t-h3      { font-family: var(--font-display); font-size: var(--fs-h3); line-height: 1.3; letter-spacing: -0.01em; font-weight: 650; margin: 0; }
+.t-lead    { font-size: var(--fs-lead); line-height: 1.55; color: var(--ink-2); }
+.t-small   { font-size: var(--fs-small); line-height: 1.5; }
+.eyebrow   { font: 700 var(--fs-label)/1.3 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--terra-text); }
+.t-data    { font-family: var(--font-data); font-size: var(--fs-small); }
+.em        { color: var(--terra); }   /* no italic serif accent: that's an AI-design tell */
+.mark      { background: linear-gradient(transparent 62%, var(--terra-tint) 62%); padding: 0 .06em; }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5em; min-height: 48px; padding: 12px 22px;
+  border-radius: var(--r-sm); font: 700 var(--fs-body)/1 var(--font-ui); text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: background var(--dur-1), border-color var(--dur-1), box-shadow var(--dur-1), transform var(--dur-1); }
+.btn:active { transform: translateY(1px); }
+.btn .arrow { transition: transform var(--dur-1) var(--ease-out); }
+.btn:hover .arrow { transform: translateX(3px); }
+.btn-primary { background: var(--primary); color: var(--on-primary); border: 1px solid var(--primary); }
+.btn-lg { min-height: 56px; padding: 16px 28px; font-size: 1.125rem; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
+.btn-outline:hover { border-color: var(--ink-3); background: var(--sunk); }
+.btn-ghost { background: transparent; color: var(--primary); border: 1px solid transparent; padding-inline: 8px; }
+.btn-ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--sunk); color: var(--ink-3); border: 1px dashed var(--line-strong); cursor: not-allowed; box-shadow: none; transform: none; }
+.link { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.link:hover { text-decoration-thickness: 2px; }
+
+/* ---------- crisis banner + header ---------- */
+.crisis { position: sticky; top: 0; z-index: 50; background: var(--crisis-bg); color: var(--crisis-fg); text-align: center; padding: 8px var(--gutter); font-size: var(--fs-small); }
+.crisis a { color: inherit; font-weight: 700; text-underline-offset: 2px; }
+.site-header { position: sticky; top: 38px; z-index: 40; background: var(--header-bg); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 700 1.3rem var(--font-display); letter-spacing: -.03em; }
+.theme-toggle { width: 42px; height: 42px; display: inline-grid; place-items: center; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.theme-toggle:hover { border-color: var(--ink-3); }
+.theme-toggle .icon-moon { display: block; } .theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; } [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+.nav { display: flex; gap: 28px; align-items: center; }
+.nav a { color: var(--ink-2); text-decoration: none; font-weight: 600; font-size: var(--fs-small); white-space: nowrap; }
+.legal-short { display: none; }
+@media (max-width: 1180px) { .legal-long { display: none; } .legal-short { display: inline; } .nav { gap: 20px; } }
+.nav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.nav a.btn-primary, .nav a.btn-primary:hover { color: var(--on-primary); text-decoration: none; }
+@media (max-width: 760px) { .nav .hide-sm { display: none; } .nav .legal-short { display: inline; } }
+@media (max-width: 480px) { .nav .btn { display: none; } }
+@media (max-width: 640px) { .site-header { position: static; } }
+
+/* ---------- cards & surfaces ---------- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); }
+.card-lg { border-radius: var(--r-lg); box-shadow: var(--shadow-2); }
+.photo { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--sunk); }
+.photo.failed img { display: none; }
+.photo.failed::after { content: attr(data-fallback); position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--ink-3); font-size: var(--fs-small); }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- form ---------- */
+.field-label { display: block; font: 700 var(--fs-small)/1.3 var(--font-ui); color: var(--ink); margin-bottom: 6px; }
+.field-hint { font-size: var(--fs-small); color: var(--ink-3); }
+.field { width: 100%; height: 52px; padding: 0 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm); font: 400 var(--fs-body) var(--font-ui); box-sizing: border-box; }
+.field:hover { border-color: var(--ink-3); }
+.field:focus { border-color: var(--primary); outline: 3px solid var(--primary-tint); outline-offset: 0; }
+.field[aria-invalid="true"] { border-color: var(--st-past); }
+.field-zip { font-family: var(--font-data); letter-spacing: .1em; }
+select.field { appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%); background-position: calc(100% - 20px) 23px, calc(100% - 14px) 23px; background-size: 6px 6px; background-repeat: no-repeat; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--sunk); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.seg > button { min-height: 40px; padding: 8px 16px; border-radius: 3px; border: 0; background: transparent; color: var(--ink-2); font: 600 var(--fs-small) var(--font-ui); cursor: pointer; }
+.seg > button:hover { color: var(--ink); background: rgba(255,255,255,.7); }
+.seg > button[aria-checked="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); outline: 1px solid var(--line-strong); }
+
+/* hero search bar (Headway-style: the form arrives early) */
+.searchbar { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,.8fr) minmax(0,1.1fr); gap: 10px; padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: calc(var(--r-md) + 6px); box-shadow: var(--shadow-2); align-items: end; }
+.searchbar .field { border-color: var(--line); background: var(--page); }
+.searchbar label { font-size: var(--fs-label); color: var(--ink-3); font-weight: 700; display: block; margin: 0 0 4px 4px; }
+.searchbar > .btn { grid-column: 1 / -1; }
+@media (max-width: 560px) { .searchbar { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .searchbar .span-2 { grid-column: 1 / -1; } }
+
+/* ---------- trust row / proof ---------- */
+.trust-row { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; padding: 0; margin: 0; color: var(--ink-2); font-size: var(--fs-small); }
+.trust-row li { display: inline-flex; gap: 8px; align-items: center; }
+.trust-row svg { flex: none; color: var(--primary); }
+.source-note { font-size: var(--fs-label); color: var(--ink-3); }
+.source-note a { color: inherit; }
+
+/* ---------- status badge (same API as v1) ---------- */
+.badge { display: inline-flex; align-items: center; gap: .45em; padding: 4px 8px; border-radius: 3px; font: 700 var(--fs-label)/1.2 var(--font-ui); white-space: nowrap; }
+.badge[data-st="ghost"]      { color: var(--st-ghost); background: var(--st-ghost-bg); }
+.badge[data-st="unverified"] { color: var(--st-unverified); background: var(--st-unverified-bg); }
+.badge[data-st="calling"]    { color: var(--st-calling); background: var(--st-calling-bg); }
+.badge[data-st="available"]  { color: var(--st-available); background: var(--st-available-bg); }
+.badge[data-st="violation"]  { color: var(--st-past); background: var(--st-past-bg); }
+.badge[data-st="no_answer"]  { color: var(--st-noanswer); background: var(--st-noanswer-bg); }
+.demo-tag { display: inline-flex; align-items: center; padding: 3px 9px; border: 1px dashed var(--st-noanswer); border-radius: 3px; color: var(--st-noanswer); background: var(--st-noanswer-bg); font: 700 12px/1.2 var(--font-ui); letter-spacing: .02em; white-space: nowrap; }
+
+/* ---------- provider row (same API as v1, light) ---------- */
+.row { --edge: transparent; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; width: 100%; text-align: left; color: inherit; font: inherit;
+  padding: 16px 18px 16px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); cursor: pointer; transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.row::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--edge); }
+.row:hover { border-color: var(--line-strong); box-shadow: var(--shadow-1); }
+.row[aria-pressed="true"] { border-color: var(--ink-3); box-shadow: var(--shadow-2); }
+.row-name { font: 700 var(--fs-h3)/1.3 var(--font-ui); color: var(--ink); }
+.row-detail { grid-column: 1 / -1; font-size: var(--fs-small); color: var(--ink-2); }
+.row-detail b { color: var(--ink); }
+.row[data-st="calling"]   { --edge: var(--st-calling); }
+.row[data-st="calling"]::before { animation: pulse 1.2s ease-in-out infinite; }
+.row[data-st="calling"] .row-detail { color: var(--st-calling); }
+.row[data-st="available"] { --edge: var(--st-available); background: linear-gradient(90deg, var(--st-available-bg), var(--surface) 70%); }
+.row[data-st="violation"] { --edge: var(--st-past); background: linear-gradient(90deg, var(--st-past-bg), var(--surface) 70%); }
+.row[data-st="no_answer"] { --edge: var(--st-noanswer); }
+.row .hot { color: var(--st-past); }
+.row[data-st="available"] .hot { color: var(--st-available); }
+.row[data-st="ghost"] { padding-top: 12px; padding-bottom: 12px; grid-template-columns: auto 1fr auto; align-items: center; background: var(--page); box-shadow: none; }
+.row[data-st="ghost"] .row-name { color: var(--st-ghost); font-weight: 600; position: relative; }
+.row[data-st="ghost"] .row-name::after { content: ""; position: absolute; left: 0; right: 0; top: 54%; height: 2px; background: var(--st-ghost); transform-origin: left; animation: strike var(--dur-3) var(--ease-out) both; }
+.row[data-st="ghost"] .row-detail { grid-column: auto; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 640px) { .row[data-st="ghost"] { grid-template-columns: 1fr auto; } .row[data-st="ghost"] .row-detail { grid-column: 1 / -1; white-space: normal; } }
+.row.just-resolved { animation: wash 1200ms ease-out; }
+
+/* ---------- deadline ruler (same API as v1) ---------- */
+.ruler { --scale: 30; --wait: 0; --limit: 10; position: relative; padding-bottom: 20px; grid-column: 1 / -1; }
+.ruler-track { position: relative; height: 8px; border-radius: 4px; background: var(--sunk); }
+.ruler-lg .ruler-track { height: 14px; }
+.ruler-fill { position: absolute; inset: 0 auto 0 0; display: flex; width: calc(var(--wait) / var(--scale) * 100%); border-radius: 4px; overflow: hidden; transform-origin: left; animation: grow 600ms var(--ease-out) 200ms both; }
+.ruler-in  { width: calc(min(var(--wait), var(--limit)) / var(--wait) * 100%); background: var(--ink-3); }
+.ruler-out { flex: 1; background: var(--st-past); }
+.ruler[data-ok="true"] .ruler-in { background: var(--st-available); width: 100%; }
+.ruler-tick { position: absolute; top: -5px; width: 2px; height: calc(100% + 10px); background: var(--ink); left: calc(var(--limit) / var(--scale) * 100%); }
+.ruler-tick::after { content: attr(data-label); position: absolute; top: calc(100% + 3px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 700 12px var(--font-ui); color: var(--ink-3); }
+.console .ruler-track { background: var(--console-1); }
+.console .ruler-in { background: var(--console-text-3); }
+.console .ruler-out { background: var(--console-past); }
+.console .ruler-tick { background: var(--console-text); }
+.console .ruler-tick::after { color: var(--console-text-3); }
+
+/* ---------- live-call console (dark, kept from v1) ---------- */
+.console { background: var(--console); color: var(--console-text); border-radius: var(--r-md); border: 1px solid #000; }
+.console .label { font: 700 12px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--console-text-3); }
+.bubble { max-width: 88%; padding: 10px 14px; border-radius: var(--r-md); font-size: var(--fs-small); line-height: 1.5; animation: rise var(--dur-2) var(--ease-out) both; }
+.bubble-label { display: block; margin-bottom: 4px; font: 700 11px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+.bubble-agent { align-self: flex-start; background: rgba(157,178,255,.13); border: 1px solid rgba(157,178,255,.4); }
+.bubble-agent .bubble-label { color: var(--console-calling); }
+.bubble-office { align-self: flex-end; background: var(--console-1); border: 1px solid var(--console-line); }
+.bubble-office .bubble-label { color: var(--console-text-3); }
+.log-line { display: grid; grid-template-columns: 70px 22px 1fr; gap: 6px; padding: 4px 8px; font: 400 14px/1.5 var(--font-data); color: #d9d6cc; animation: rise var(--dur-2) var(--ease-out) both; }
+.log-time { color: var(--console-text-3); }
+.log-line[data-kind="user"] { color: var(--console-text); font-weight: 700; }
+.log-line[data-kind="violation"] .log-glyph { color: var(--console-past); }
+.log-line[data-kind="fallback"] { color: var(--console-noanswer); }
+
+/* ---------- paper verdict (same API as v1) ---------- */
+.paper { --ink: #1b1a18; --ink-2: #47443e; --ink-3: #686459; --terra: #b5532f; --primary: #0d5c58; --on-primary: #fff; --line: #e6dfd3; --sunk: #f3eee6; --st-past-bg: #fbe6e1; --st-past: #b3361f; --st-available: #1d7347; --st-available-bg: #e2f2e8;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; box-shadow: var(--shadow-paper); padding: 36px 40px; }
+@media (max-width: 640px) { .paper { padding: 22px; } }
+.ledger { font: 400 var(--fs-small)/1.5 var(--font-data); }
+.ledger-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; animation: rise var(--dur-2) var(--ease-out) both; }
+.ledger-row .lead { flex: 1; border-bottom: 2px dotted var(--paper-rule); transform: translateY(-4px); }
+.ledger-row .val { font-weight: 700; }
+.ledger-row .val.hot { color: var(--stamp); }
+.ledger-row.sub { padding-left: 2ch; color: var(--ink-2); }
+.stamp { display: inline-block; padding: 10px 16px; border: 3px double var(--stamp); color: var(--stamp); font: 700 1.4rem/1.1 var(--font-data); letter-spacing: .05em; text-transform: uppercase; text-align: center; transform: rotate(-6deg); }
+.stamp small { display: block; font-size: .58rem; letter-spacing: .1em; margin-top: 4px; }
+.print-in { animation: print var(--dur-4) var(--ease-io) both; }
+.stamp-in { animation: stamp 280ms var(--ease-snap) 750ms both; }
+
+/* ---------- notices ---------- */
+.notice { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 14px 16px; border-radius: var(--r-sm); background: var(--st-noanswer-bg); color: var(--ink); font-size: var(--fs-small); border: 1px solid #ecd9ad; }
+.notice[data-tone="info"] { background: var(--primary-tint); border-color: #c6dcd9; }
+.notice[data-tone="error"] { background: var(--st-past-bg); border-color: #f1c4ba; }
+
+/* ---------- FAQ ---------- */
+.faq details { border-top: 1px solid var(--line); padding: 18px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; font: 700 var(--fs-lead)/1.4 var(--font-ui); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font: 400 1.5rem/1 var(--font-ui); color: var(--primary); transition: transform var(--dur-2); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin: 10px 0 0; color: var(--ink-2); max-width: 70ch; }
+
+/* ---------- revealed footer (kept; mobile-safe) ---------- */
+.footer-reveal { background: var(--terra-footer); color: #141413; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
+.footer-reveal .t-hero { font-size: clamp(2.25rem, 8.5vw, 4.75rem); }
+.box-rule { border: 1px dashed #141413; padding: 18px; }
+.box-rule > legend { font: 700 var(--fs-label) var(--font-data); text-transform: uppercase; letter-spacing: .06em; padding: 0 6px; }
+.box-rule > legend::before { content: "+-- "; } .box-rule > legend::after { content: " --"; }
+@media (max-width: 640px) { .footer-reveal { position: static !important; min-height: auto; padding: 64px 0; } .footer-ghost { display: none; } }
+.site-footer { background: var(--footer-bg); color: #d9d6cc; font-size: var(--fs-small); }
+.site-footer a { color: #f4f1ea; }
+
+/* ---------- motion ---------- */
+.flip { display: inline-block; animation: flip var(--dur-3) var(--ease-snap) both; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out); }
+.reveal.in { opacity: 1; transform: none; }
+@keyframes rise   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes strike { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes flip   { 0% { transform: perspective(400px) rotateX(90deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; } }
+@keyframes wash   { from { box-shadow: inset 0 0 0 999px rgba(179,54,31,.12); } to { box-shadow: inset 0 0 0 999px transparent; } }
+@keyframes grow   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pulse  { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes print  { from { clip-path: inset(0 0 100% 0); transform: translateY(-6px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes stamp  { from { opacity: 0; transform: rotate(-6deg) scale(1.6); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
+@keyframes floaty { 0%, 100% { transform: translateY(-5px); } 50% { transform: translateY(5px); } }
+.floaty { animation: floaty 6s ease-in-out infinite; }
+
+@media print { .crisis, .site-header, .demo-pill, .demo-panel { display: none !important; } .paper { box-shadow: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+  .floaty, .row[data-st="calling"]::before { animation: none !important; }
+}
+
+
+/* =====================================================================
+   v3 additions: unified search bar, question flow, editorial (box-free) layouts
+   ===================================================================== */
+
+/* Unified search bar (Zocdoc/Airbnb pattern): one container, segments split by rules, one big action */
+.search-unified { display: grid; grid-template-columns: minmax(0,2.1fr) minmax(0,.85fr) minmax(0,1.25fr) auto; background: var(--surface);
+  border: 2px solid var(--ink); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-2); }
+.search-seg { position: relative; display: flex; flex-direction: column; justify-content: center; padding: 12px 18px; min-height: 76px; border-right: 1px solid var(--line-strong); cursor: text; }
+.search-seg label { font: 700 var(--fs-label)/1.2 var(--font-ui); color: var(--ink-2); margin-bottom: 4px; white-space: nowrap; }
+.search-seg select, .search-seg input { appearance: none; -webkit-appearance: none; border: 0; outline: 0; background: transparent; padding: 0; width: 100%;
+  font: 600 1.0625rem/1.3 var(--font-ui); color: var(--ink); cursor: pointer; text-overflow: ellipsis; }
+.search-seg select { padding-right: 22px; }
+.search-seg input { font-family: var(--font-data); letter-spacing: .08em; cursor: text; }
+.search-seg:has(select)::after { content: ""; position: absolute; right: 16px; bottom: 22px; width: 7px; height: 7px; border-right: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2); transform: rotate(45deg); pointer-events: none; }
+.search-seg:focus-within { background: var(--primary-tint); box-shadow: inset 0 -3px 0 var(--primary); }
+.search-go { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 30px; border: 0; background: var(--primary); color: var(--on-primary);
+  font: 700 1.1875rem/1 var(--font-ui); cursor: pointer; white-space: nowrap; transition: background var(--dur-1); }
+.search-go:hover { background: var(--primary-hover); }
+.search-go:focus-visible { outline: 3px solid var(--ink); outline-offset: -6px; }
+.search-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-size: var(--fs-small); color: var(--ink-2); }
+.search-meta b { color: var(--ink); }
+@media (max-width: 1180px) {
+  .search-unified { grid-template-columns: minmax(0,2fr) minmax(0,.85fr) minmax(0,1.25fr); }
+  .search-seg:nth-child(3) { border-right: 0; }
+  .search-go { grid-column: 1 / -1; min-height: 60px; border-top: 1px solid var(--line-strong); }
+}
+@media (max-width: 900px) {
+  .search-unified { grid-template-columns: minmax(0,1fr); }
+  .search-seg { border-right: 0; border-bottom: 1px solid var(--line-strong); min-height: 68px; }
+  .search-go { min-height: 60px; }
+}
+
+/* Header CTA: unmistakable */
+.cta-header { min-height: 44px; padding: 10px 18px; }
+
+/* Question flow (GOV.UK / NHS "one thing per page") */
+.flow { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(280px,1fr); gap: 64px; align-items: start; }
+@media (max-width: 900px) { .flow { grid-template-columns: minmax(0,1fr); gap: 32px; } }
+.flow-progress { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; font: 700 var(--fs-small) var(--font-ui); color: var(--ink-2); }
+.flow-bar { display: flex; gap: 4px; }
+.flow-bar span { width: 36px; height: 4px; background: var(--line-strong); border-radius: 2px; }
+.flow-bar span.done { background: var(--primary); }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; cursor: pointer; font-size: var(--fs-small); margin-bottom: 20px; }
+.q-title { font: 700 clamp(1.75rem, 3vw, 2.375rem)/1.12 var(--font-display); letter-spacing: -.025em; margin: 0 0 8px; text-wrap: balance; }
+.q-hint { color: var(--ink-2); margin: 0 0 22px; max-width: 46em; }
+.q-sub { font: 700 1.125rem/1.3 var(--font-display); margin: 28px 0 10px; }
+fieldset.q { border: 0; padding: 0; margin: 0; min-width: 0; }
+.radio-list { display: flex; flex-direction: column; }
+.radio-row { position: relative; display: grid; grid-template-columns: 26px 1fr; gap: 14px; align-items: start; padding: 16px 18px; background: var(--surface);
+  border: 1px solid var(--line-strong); margin-top: -1px; cursor: pointer; transition: background var(--dur-1); }
+.radio-row:first-child { border-radius: var(--r-md) var(--r-md) 0 0; margin-top: 0; }
+.radio-row:last-child { border-radius: 0 0 var(--r-md) var(--r-md); }
+.radio-row:hover { background: var(--sunk); }
+.radio-row input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.radio-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--ink-2); display: grid; place-items: center; margin-top: 1px; background: var(--surface); }
+.radio-row input:checked ~ .radio-dot { border-color: var(--primary); }
+.radio-row input:checked ~ .radio-dot::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); }
+.radio-row:has(input:checked) { background: var(--primary-tint); border-color: var(--primary); z-index: 1; box-shadow: inset 3px 0 0 var(--primary); }
+.radio-row:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; z-index: 2; }
+.radio-label { font: 600 1.0625rem/1.35 var(--font-ui); color: var(--ink); }
+.radio-hint { display: block; font-size: var(--fs-small); color: var(--ink-3); font-weight: 400; margin-top: 2px; }
+.input-xl { height: 60px; font: 600 1.375rem var(--font-data); letter-spacing: .12em; width: 10ch; padding: 0 16px; border: 2px solid var(--ink-2); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); }
+.input-xl:focus { border-color: var(--primary); outline: 3px solid var(--primary-tint); }
+.field-error { color: var(--st-past); font-weight: 700; margin: 0 0 8px; }
+.flow-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 28px; }
+
+/* Live summary panel ("your search so far") */
+.summary { border-top: 3px solid var(--ink); padding-top: 18px; position: sticky; top: 140px; }
+.summary h2 { font: 700 1.25rem var(--font-display); margin: 0 0 12px; letter-spacing: -.01em; }
+.summary dl { margin: 0; }
+.summary .sum-row { display: grid; grid-template-columns: 9em 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
+.summary dt { color: var(--ink-3); }
+.summary dd { margin: 0; color: var(--ink); font-weight: 700; }
+.summary dd.empty { color: var(--ink-3); font-weight: 400; }
+.deadline-box { margin-top: 18px; padding: 16px 0 0; }
+.deadline-box .num { font: 700 2.75rem/1 var(--font-display); letter-spacing: -.03em; color: var(--ink); }
+
+/* Check-your-answers list */
+.answers { border-top: 1px solid var(--line-strong); margin: 8px 0 0; }
+.answers .ans-row { display: grid; grid-template-columns: 12em 1fr auto; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line-strong); align-items: baseline; }
+.answers dt { font-weight: 700; } .answers dd { margin: 0; }
+@media (max-width: 640px) { .answers .ans-row { grid-template-columns: 1fr auto; } .answers dd { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Editorial, box-free layouts */
+.rule-top { border-top: 1px solid var(--line-strong); }
+.rows > * { display: grid; grid-template-columns: 5rem minmax(0,1fr) minmax(0,1.3fr); gap: 24px; padding: 26px 0; border-top: 1px solid var(--line-strong); align-items: baseline; }
+.rows > *:last-child { border-bottom: 1px solid var(--line-strong); }
+.rows .n { font: 700 1.5rem var(--font-data); color: var(--terra); }
+@media (max-width: 760px) { .rows > * { grid-template-columns: 3rem minmax(0,1fr); } .rows > * > p { grid-column: 2; } }
+.split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.split > * { padding: 8px 40px 8px 0; }
+.split > * + * { padding: 8px 0 8px 40px; border-left: 1px solid var(--line-strong); }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0,1fr); } .split > * + * { border-left: 0; border-top: 1px solid var(--line-strong); padding: 28px 0 0; margin-top: 28px; } }
+.story-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; align-items: center; padding: 56px 0; border-top: 1px solid var(--line-strong); }
+.story-row.flip > :first-child { order: 2; }
+@media (max-width: 860px) { .story-row { grid-template-columns: minmax(0,1fr); gap: 24px; } .story-row.flip > :first-child { order: 0; } }
+.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); column-gap: 56px; }
+.dl-grid > div { padding: 22px 0; border-top: 1px solid var(--line-strong); }
+@media (max-width: 760px) { .dl-grid { grid-template-columns: minmax(0,1fr); } }
+.page-view[hidden] { display: none !important; }
+
+/* v5: hero ASCII ghost (the mascot, back from v1) */
+#heroGhost { margin: 0; font: 700 clamp(9px, 1.05vw, 14px)/1 var(--font-data); letter-spacing: .02em; color: var(--terra); user-select: none; }
+@media (max-width: 900px) { #heroGhost { font-size: 7px; } }
+
+/* v6: healthcare ghost (cross badge + stethoscope) */
+#heroGhost .gx-cross, #asciiGhost .gx-cross { color: var(--primary); }
+#heroGhost .gx-steth { color: var(--ink); }
+#asciiGhost .gx-steth { color: #141413; }
+#asciiGhost .gx-cross { color: #0d5c58; }
+</style></head><body><a class="skip-link" href="#main">Skip to content</a>
+<div class="crisis" role="region" aria-label="Crisis support">In crisis? Call or text <a href="tel:988">988</a> to reach the Suicide &amp; Crisis Lifeline, any time.</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#" onclick="go('landing');return false" aria-label="GhostBuster home">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5C9.1 2.5 4.5 7.7 4.5 14.4V29l3.8-2.7 3.9 2.7 3.8-2.7 3.8 2.7 3.9-2.7 3.8 2.7V14.4C27.5 7.7 22.9 2.5 16 2.5z" style="fill:var(--terra)"/><ellipse cx="11.6" cy="14" rx="2.2" ry="3" style="fill:var(--page)"/><ellipse cx="20.4" cy="14" rx="2.2" ry="3" style="fill:var(--page)"/></svg>
+      GhostBuster
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="#how" onclick="go('landing')">How it works</a>
+      <a class="hide-sm" href="#rights" onclick="go('landing')">Your rights</a>
+      <a class="hide-sm" href="#team" onclick="go('landing')">About us</a>
+      <span class="t-small" style="color:var(--ink-3);white-space:nowrap"><span class="legal-long">Evidence log + templates · not legal advice</span><span class="legal-short">Not legal advice</span></span>
+      <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Switch between light and dark mode">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      </button>
+      <a class="btn btn-primary cta-header" href="#" onclick="startFlow();return false">Find care <span class="arrow" aria-hidden="true">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<!-- ===================== LANDING ===================== -->
+<div class="page-view" data-page="landing">
+
+  <section class="wrap" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:48px;align-items:center;padding-top:52px;padding-bottom:56px" id="hero">
+    <div>
+      <p class="t-small" style="margin:0 0 16px;color:var(--ink-2);font-weight:700">For California HMO &amp; Medi-Cal members</p>
+      <h1 class="t-hero">Your insurance directory is full of ghosts.</h1>
+      <p class="t-lead" style="margin:18px 0 30px;max-width:33em">We find out who's actually taking patients. If nobody can see you in time, we build the evidence to make your plan fix it.</p>
+
+      <form class="search-unified" onsubmit="heroSubmit(event)" aria-label="Find care">
+        <div class="search-seg" onclick="this.querySelector('select,input').focus()">
+          <label for="h-ins">Insurance company</label>
+          <select id="h-ins"><option>Blue Shield of California</option><option>Anthem Blue Cross</option><option>Health Net</option><option>Kaiser Permanente</option><option>Molina Healthcare</option><option>L.A. Care</option><option>Medi-Cal plan</option></select>
+        </div>
+        <div class="search-seg" onclick="this.querySelector('input').focus()">
+          <label for="h-zip">ZIP code</label>
+          <input id="h-zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="92103" value="92103">
+        </div>
+        <div class="search-seg" onclick="this.querySelector('select').focus()">
+          <label for="h-care">Type of care</label>
+          <select id="h-care"><option>Therapist</option><option>Psychiatrist</option><option>Primary care</option><option>Specialist</option></select>
+        </div>
+        <button class="search-go" type="submit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+          Find care
+        </button>
+      </form>
+      <p class="t-small" style="margin:14px 0 0;color:var(--ink-2);max-width:38em">It's free, and you don't need an account. We never ask for your name or health details, and nobody gets called until you say so.</p>
+      <p class="t-small" style="margin:22px 0 0;padding-top:14px;border-top:1px solid var(--line-strong);color:var(--ink-2);max-width:38em"><b style="color:var(--ink)">From our live test run:</b> of 90 licensed therapists listed near 92103 (Hillcrest, San Diego), 5 listings appear to be ghosts.</p>
+    </div>
+
+    <figure class="hero-ghost" style="margin:0;display:flex;flex-direction:column;align-items:center">
+      <pre id="heroGhost" class="floaty" aria-hidden="true"></pre>
+      <figcaption style="max-width:24em;margin-top:18px;font-size:var(--fs-small);color:var(--ink-2);border-top:1px solid var(--line-strong);padding-top:12px">
+        <b style="color:var(--ink);font-family:var(--font-display)">ghost listing</b> <span style="color:var(--ink-3)">(noun)</span><br>
+        A provider your plan lists as taking new patients, who can't actually see you.
+      </figcaption>
+    </figure>
+    </div>
+  </section>
+
+  <!-- sources line -->
+  <section style="border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong)" id="rights">
+    <p class="wrap t-small" style="margin:0 auto;padding-top:16px;padding-bottom:16px;color:var(--ink-2)">Built on public sources: California Health &amp; Safety Code <a class="link" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&amp;sectionNum=1367.03">§1367.03</a>, the national <a class="link" href="https://npiregistry.cms.hhs.gov/">NPI registry</a>, and the <a class="link" href="https://www.dmhc.ca.gov/">DMHC</a> grievance process. GhostBuster is an independent student project and isn't affiliated with any agency or health plan.</p>
+  </section>
+
+  <!-- story: alternating editorial rows -->
+  <section class="wrap" style="padding-top:88px">
+    <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:56px;align-items:end;padding-bottom:48px">
+      <h2 class="t-display">Finding a therapist who takes your insurance shouldn't be a second job.</h2>
+      <figure style="margin:0;border-left:3px solid var(--terra);padding-left:18px">
+        <blockquote style="margin:0;font:600 1.0625rem/1.5 var(--font-ui)">"A study published last month called almost six thousand therapists and psychiatrists listed in insurer directories. About one call in eight ended with an appointment option."</blockquote>
+        <figcaption class="source-note" style="margin-top:8px">JAMA Health Forum, Oct 2026 · five states, not California</figcaption>
+      </figure>
+    </div>
+    <div class="story-row">
+      <div><div class="t-data" style="color:var(--terra)">01</div><h3 class="t-h2" style="margin:8px 0 12px">The directory says yes.</h3><p style="margin:0;color:var(--ink-2);max-width:32em">Your health plan publishes a directory of in-network providers. Search for a therapist near you and it hands back a long, reassuring list.</p></div>
+      <pre aria-hidden="true" style="margin:0;padding:18px 20px;background:var(--sunk);border-radius:var(--r-md);font:14px/1.6 var(--font-data);color:var(--ink-2);overflow:auto">THERAPISTS NEAR 92103 ........ 10 results
+ R. Okafor, LMFT ...... <b style="color:var(--st-available)">accepting new patients</b>
+ S. Lindqvist, LMFT ... <b style="color:var(--st-available)">accepting new patients</b>
+ M. Hale, LCSW ........ <b style="color:var(--st-available)">accepting new patients</b>
+ G. Tanaka, PsyD ...... <b style="color:var(--st-available)">accepting new patients</b></pre>
+    </div>
+    <div class="story-row flip">
+      <div><div class="t-data" style="color:var(--terra)">02</div><h3 class="t-h2" style="margin:8px 0 12px">The phone says no.</h3><p style="margin:0;color:var(--ink-2);max-width:32em">Then you start calling. One office stopped taking new patients. One moved away. One number is disconnected. One never calls back. These are ghost listings, and you find out one call at a time.</p></div>
+      <div class="photo" style="aspect-ratio:3/2" data-fallback="Photo: doctor on the phone"><img data-photo="egCFrNJ6Djw" data-cdn="https://images.unsplash.com/photo-1758691462848-31a39258dbd8?fm=jpg&q=70&w=1400&auto=format&fit=crop" src="images/clinic-call.jpg" loading="lazy" onerror="photoFallback(this)" alt="A doctor on the phone at her desk, typing on a laptop" style="object-position:35% 40%"></div>
+    </div>
+    <div class="story-row">
+      <div><div class="t-data" style="color:var(--terra)">03</div><h3 class="t-h2" style="margin:8px 0 12px">The law is on your side.</h3><p style="margin:0;color:var(--ink-2);max-width:32em">California's timely-access rules set deadlines for state-regulated plans: 10 business days for a therapist or primary care appointment, 15 for a specialist, 48 hours for urgent care that needs no prior authorization. When a plan can't offer an appointment in time, it has to arrange one for you, including out of network.</p></div>
+      <div style="display:grid;gap:14px"><div class="photo" style="aspect-ratio:2/1" data-fallback="Photo: hospital waiting hall"><img data-photo="rqdWlkRzerg" data-cdn="https://images.unsplash.com/photo-1758654860024-9e352f70d1f9?fm=jpg&q=70&w=1400&auto=format&fit=crop" src="images/waiting-room.jpg" loading="lazy" onerror="photoFallback(this)" alt="Patients waiting on chairs along a hospital corridor, black and white" style="object-position:50% 45%"></div>
+      <div style="padding:22px 24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md)">
+        <div class="t-small" style="font-weight:700;margin-bottom:14px">Therapist, new patient</div>
+        <div class="ruler ruler-lg" style="--wait:29;--limit:10;--scale:31"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="legal limit: day 10"></div></div></div>
+        <p class="t-small" style="margin:10px 0 0;color:var(--ink-2)">Earliest opening offered: <b style="color:var(--st-past)">day 29</b></p>
+      </div></div>
+    </div>
+    <div class="story-row flip">
+      <div><div class="t-data" style="color:var(--terra)">04</div><h3 class="t-h2" style="margin:8px 0 12px">But the proof is on you.</h3><p style="margin:0;color:var(--ink-2);max-width:32em">To use those rules, you need to show the plan failed: who you called, when, and what they said. GhostBuster does that legwork for you and writes it down.</p></div>
+      <div class="photo" style="aspect-ratio:3/2" data-fallback="Photo: doctor writing notes"><img data-photo="8WYkI3cEZm8" data-cdn="https://images.unsplash.com/photo-1758691461990-03b49d969495?fm=jpg&q=70&w=1400&auto=format&fit=crop" src="images/clinic-chart.jpg" loading="lazy" onerror="photoFallback(this)" alt="A doctor writes notes on a clipboard across the desk from a patient"></div>
+    </div>
+  </section>
+
+  <!-- how it works: divider rows, not cards -->
+  <section class="wrap" style="padding-top:72px;padding-bottom:72px" id="how">
+    <div style="max-width:40em">
+      <h2 class="t-display">We make the calls. You keep the receipts.</h2>
+      <p class="t-lead" style="margin:16px 0 0">One search. About a minute of your time. Either an appointment you can actually get, or the paperwork that makes your plan find you one.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;margin-top:40px;align-items:start" class="how-grid">
+      <figure style="margin:0">
+        <img src="images/results-screenshot.png" width="1200" height="720" loading="lazy" alt="The GhostBuster results page during a search: provider rows with deadline bars, and a live call transcript" style="width:100%;height:auto;border:1px solid var(--line-strong);border-radius:var(--r-md)">
+        <figcaption class="source-note" style="margin-top:10px">The results page, partway through a search (demo data). Each answered call is measured against the legal limit; the transcript on the right is what goes in your evidence log.</figcaption>
+      </figure>
+      <div>
+        <ol class="rows" style="list-style:none;margin:0;padding:0">
+          <li style="grid-template-columns:3rem minmax(0,1fr)"><span class="n">1</span><div><h3 class="t-h3">Check providers near you</h3><p style="margin:6px 0 0;color:var(--ink-2)">We pull licensed providers near you from the national provider registry, then use Bright Data to check each one's public profile.</p></div></li>
+          <li style="grid-template-columns:3rem minmax(0,1fr)"><span class="n">2</span><div><h3 class="t-h3">Call the rest for you</h3><p style="margin:6px 0 0;color:var(--ink-2)">With your OK, an AI assistant calls each office and asks for the earliest new-patient opening. It says it's an AI in its first sentence.</p></div></li>
+          <li style="grid-template-columns:3rem minmax(0,1fr)"><span class="n">3</span><div><h3 class="t-h3">Hold the plan to the law</h3><p style="margin:6px 0 0;color:var(--ink-2)">California sets appointment deadlines. If nobody meets them, you get an evidence packet.</p></div></li>
+        </ol>
+        <button class="btn btn-primary btn-lg" style="margin-top:28px" onclick="startFlow()">Find care <span class="arrow" aria-hidden="true">→</span></button>
+      </div>
+    </div>
+    <div class="split" style="margin-top:64px">
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:start">
+        <div class="photo" style="aspect-ratio:1;border-radius:var(--r-md)" data-fallback="Photo"><img data-photo="tl447mekwuQ" data-cdn="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?fm=jpg&q=70&w=1400&auto=format&fit=crop" src="images/clinic-visit.jpg" loading="lazy" onerror="photoFallback(this)" alt="A smiling doctor talks with a patient in an exam room" style="object-position:58% 35%"></div>
+        <div><h3 class="t-h3" style="color:var(--st-available)">If someone can see you</h3><p style="margin:6px 0 0;color:var(--ink-2)">We show you who, when, and the number to call to book.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start">
+        <div><h3 class="t-h3" style="color:var(--st-past)">If nobody can in time</h3><p style="margin:6px 0 0;color:var(--ink-2)">You get the call log, a letter to your plan, a phone script, and how to reach the regulator.</p></div>
+        <div class="stamp" style="font-size:.95rem" aria-hidden="true">Past deadline<small>evidence attached</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- what to know: definition grid -->
+  <section style="background:var(--surface);border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong)">
+    <div class="wrap" style="padding-top:72px;padding-bottom:72px">
+      <h2 class="t-display" style="max-width:16em;margin-bottom:28px">Honest about what it is, and what it isn't.</h2>
+      <div class="dl-grid">
+        <div><h3 class="t-h3">It says it's an AI.</h3><p style="margin:6px 0 0;color:var(--ink-2)">The assistant opens every call by saying it is an AI assistant calling on behalf of a patient. It never shares your name or health details.</p></div>
+        <div><h3 class="t-h3">It's evidence, not legal advice.</h3><p style="margin:6px 0 0;color:var(--ink-2)">You get a call log and letter templates to send to your plan. What you do with them is your call.</p></div>
+        <div><h3 class="t-h3">Not every plan is covered.</h3><p style="margin:6px 0 0;color:var(--ink-2)">The deadlines apply to state-regulated California plans. Self-funded employer plans and Medicare follow federal rules instead.</p></div>
+        <div><h3 class="t-h3">This is a hackathon demo.</h3><p style="margin:6px 0 0;color:var(--ink-2)">Built in a weekend at SanD Hacks. In the demo, calls only go to our own team's phones, never to a real office.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-top:72px;padding-bottom:40px" id="team">
+    <h2 class="t-h2">Built by four UC San Diego students at SanD Hacks, Fall 2026.</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:24px" class="grid4">
+      <figure style="margin:0"><div class="photo" style="aspect-ratio:4/5;border-radius:var(--r-md)" data-fallback="Aryan Khanna"><img src="images/team-aryan.jpg" loading="lazy" alt="Aryan Khanna" onerror="this.closest('.photo').classList.add('failed')"></div><figcaption style="font:700 1.0625rem var(--font-display);margin-top:10px">Aryan Khanna</figcaption></figure>
+      <figure style="margin:0"><div class="photo" style="aspect-ratio:4/5;border-radius:var(--r-md)" data-fallback="Hardik Chopra"><img src="images/team-hardik.jpg" loading="lazy" alt="Hardik Chopra" onerror="this.closest('.photo').classList.add('failed')"></div><figcaption style="font:700 1.0625rem var(--font-display);margin-top:10px">Hardik Chopra</figcaption></figure>
+      <figure style="margin:0"><div class="photo" style="aspect-ratio:4/5;border-radius:var(--r-md)" data-fallback="Ivan Xie"><img src="images/team-ivan.jpg" loading="lazy" alt="Ivan Xie" onerror="this.closest('.photo').classList.add('failed')"></div><figcaption style="font:700 1.0625rem var(--font-display);margin-top:10px">Ivan Xie</figcaption></figure>
+      <figure style="margin:0"><div class="photo" style="aspect-ratio:4/5;border-radius:var(--r-md)" data-fallback="Jaideep Gorijavolu"><img src="images/team-jaideep.jpg" loading="lazy" alt="Jaideep Gorijavolu" onerror="this.closest('.photo').classList.add('failed')"></div><figcaption style="font:700 1.0625rem var(--font-display);margin-top:10px">Jaideep Gorijavolu</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="wrap faq" style="padding-top:48px;padding-bottom:88px;max-width:880px">
+    <h2 class="t-h2" style="margin-bottom:20px">Common questions</h2>
+    <details><summary>Will you call anyone without asking me?</summary><p>No. Calls only start after you approve them on the results page. You'll see exactly which offices will be called first.</p></details>
+    <details><summary>What does the AI say on the phone?</summary><p>It says it's an AI assistant calling on behalf of a patient and that the call is being transcribed, then asks only for the earliest opening, in person or by telehealth. It doesn't share your name, contact info, or health details.</p></details>
+    <details><summary>Is this legal advice?</summary><p>No. You get an evidence log and letter templates, not legal advice. What you do with them is your call.</p></details>
+    <details><summary>Does this work for my plan?</summary><p>California's deadlines apply to state-regulated coverage. They don't apply to self-funded employer or union plans, or to Medicare. Not sure? Ask HR or member services "Is my plan self-funded?"</p></details>
+    <details><summary>What do you store about me?</summary><p>Your search (insurer, plan type, ZIP, type of care) and the call results. No account, no name, no health details.</p></details>
+  </section>
+
+  <section class="footer-reveal" aria-label="Get started">
+    <div class="wrap" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:40px;align-items:center;padding-top:64px;padding-bottom:64px">
+      <div>
+        <h2 class="t-hero" style="color:#141413">Find out who's really there.</h2>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:32px" class="grid2">
+          <fieldset class="box-rule"><legend>Start here</legend><button class="btn btn-lg" onclick="startFlow()" style="background:#141413;color:#fff;border:0">Find care <span class="arrow">→</span></button><p class="t-small" style="margin:10px 0 0">about a minute · no account · free</p></fieldset>
+          <fieldset class="box-rule"><legend>In crisis?</legend><p style="margin:0">Call or text <a href="tel:988" style="color:#141413;font-weight:700">988</a> to reach the Suicide &amp; Crisis Lifeline, any time.</p></fieldset>
+        </div>
+      </div>
+      <pre class="footer-ghost" id="asciiGhost" aria-hidden="true" style="margin:0;font:12px/1.05 var(--font-data);color:#141413;justify-self:center"></pre>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== FIND CARE (question flow) ===================== -->
+<div class="page-view" data-page="find" hidden>
+  <section class="wrap" style="padding-top:40px;padding-bottom:96px">
+    <div class="flow">
+      <div id="flowMain" aria-live="polite"></div>
+      <aside class="summary" aria-label="Your search so far">
+        <h2>Your search</h2>
+        <dl id="sumList"></dl>
+        <div class="deadline-box">
+          <div class="t-small" style="color:var(--ink-3)">Legal deadline for this appointment</div>
+          <div class="num" id="sumDeadline">—</div>
+          <div class="t-small" style="color:var(--ink-2)" id="sumDeadlineNote">Answer the questions to see it.</div>
+        </div>
+        <p class="t-small" style="margin:22px 0 0;color:var(--ink-2);border-top:1px solid var(--line);padding-top:14px">We never ask your name, contact details or health information. No calls happen until you approve them.</p>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== RESULTS (preview) ===================== -->
+<div class="page-view" data-page="results" hidden>
+  <section class="wrap" style="padding-top:32px;padding-bottom:120px">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:end;border-bottom:1px solid var(--line-strong);padding-bottom:16px">
+      <div>
+        <div class="t-data" style="color:var(--ink-3)" id="caseLine">Case GB-327D24 · Blue Shield of California · HMO · 92103</div>
+        <h1 class="t-h2" style="margin-top:4px">Therapists <span style="color:var(--ink-3);font-weight:500">· legal limit 10 business days</span></h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="demo-tag">Demo data: fictional providers</span><span class="badge" data-st="calling" id="phase">● Calling offices</span></div>
+    </div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;margin:18px 0">
+      <div><div class="t-display" style="font-variant-numeric:tabular-nums">10</div><div class="t-small" style="color:var(--ink-3)">found</div></div>
+      <div><div class="t-display" style="color:var(--st-ghost)">5</div><div class="t-small" style="color:var(--ink-3)">ghosts</div></div>
+      <div><div class="t-display" style="color:var(--st-calling)"><span id="nCalled" class="flip">2</span><span style="font-size:.5em;color:var(--ink-3)"> of 5</span></div><div class="t-small" style="color:var(--ink-3)">called</div></div>
+      <div><div class="t-display" style="color:var(--st-past)"><span id="nPast" class="flip">1</span></div><div class="t-small" style="color:var(--ink-3)">past deadline</div></div>
+    </div>
+    <div id="slot" style="margin-bottom:18px"></div>
+    <div style="display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:24px" class="cols">
+      <div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="t-h3" style="font-size:1.0625rem">Licensed therapists near 92103</h2><span class="t-small" style="color:var(--ink-3)">from the national provider registry</span></div>
+        <p class="t-small" style="color:var(--ink-2);margin:6px 0 14px">A provider can lawfully set a longer wait if they note in your record that it won't harm your health. Telehealth appointments count.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="row" data-st="violation" aria-pressed="true"><span class="row-name">Elena Marsh, LCSW</span><span class="badge" data-st="violation">! Past legal deadline</span><span class="row-detail">Earliest <b class="hot">Dec 15</b> · <b class="hot">20 business days</b> vs 10 business days limit</span><div class="ruler" style="--wait:20;--limit:10"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div></button>
+          <button class="row" data-st="no_answer"><span class="row-name">Priya Natarajan, LPCC</span><span class="badge" data-st="no_answer">– No answer</span><span class="row-detail">No answer / no usable appointment date</span></button>
+          <div id="reyesSlot"><button class="row" data-st="calling"><span class="row-name">Dr. Daniel Reyes, PsyD</span><span class="badge" data-st="calling">))) Calling…</span><span class="row-detail">AI assistant is on the line…</span></button></div>
+          <button class="row" data-st="unverified"><span class="row-name">Dr. Michael Brennan, PhD <span class="demo-tag" style="margin-left:6px;vertical-align:2px">Demo</span></span><span class="badge" data-st="unverified">· Not checked</span><span class="row-detail">Looks real, not called yet</span></button>
+          <button class="row" data-st="ghost"><span class="row-name">Rachel Okafor, LMFT</span><span class="row-detail">Public profile says 'not accepting new clients'</span><span class="badge" data-st="ghost">◌ Ghost</span></button>
+          <button class="row" data-st="ghost"><span class="row-name">Sarah Lindqvist, LMFT</span><span class="row-detail">NPI Registry shows practice moved to Sacramento, CA</span><span class="badge" data-st="ghost">◌ Ghost</span></button>
+        </div>
+      </div>
+      <aside class="console" style="padding:18px;align-self:start;position:sticky;top:130px" aria-label="Call transcript">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px"><div class="label">Call transcript</div><span class="t-data" id="tally" style="font-size:13px;color:var(--console-calling);white-space:nowrap">[■■□□□] 2 of 5 called</span></div>
+        <div style="font:700 1.125rem var(--font-display)">Elena Marsh, LCSW</div><div class="t-small" style="color:var(--console-text-3)">(•••) •••-4529 · 3500 30th St, San Diego</div>
+        <div style="display:flex;gap:28px;margin:14px 0 8px"><div><div class="label">Wait</div><div style="font:700 1.75rem var(--font-display);color:var(--console-past)">20 <span style="font-size:.55em">business days</span></div></div><div><div class="label">Legal limit</div><div style="font:700 1.75rem var(--font-display)">10 <span style="font-size:.55em">business days</span></div></div></div>
+        <div class="ruler ruler-lg" style="--wait:20;--limit:10"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+          <div class="bubble bubble-agent"><span class="bubble-label">AI assistant</span>Hi, I'm an AI assistant calling on behalf of a patient, and this call is being recorded and transcribed…</div>
+          <div class="bubble bubble-office"><span class="bubble-label">Office</span>Let me check… our earliest new-patient opening is Tuesday, December 15.</div>
+        </div>
+        <div class="label" style="margin:18px 0 8px">Live activity</div>
+        <div id="log">
+          <div class="log-line" data-kind="user"><span class="log-time">12:59:31</span><span class="log-glyph">★</span><span>You approved AI calls to 5 offices.</span></div>
+          <div class="log-line" data-kind="violation"><span class="log-time">12:59:52</span><span class="log-glyph">!</span><span>Elena Marsh, LCSW: 20 business days (deadline 10). Past legal deadline</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;padding-top:28px;padding-bottom:28px">
+    <span>© 2026 GhostBuster · Evidence log + templates, not legal advice</span>
+    <nav aria-label="Footer" style="display:flex;flex-wrap:wrap;gap:18px"><a href="#">How it works</a><a href="#">Privacy</a><a href="#">Accessibility</a><a href="#">Contact</a></nav>
+    <span>Content last reviewed Nov 15, 2026</span>
+    <span style="flex-basis:100%;font-size:12px;opacity:.8">Photos via <a href="https://unsplash.com/license">Unsplash</a> (free license): <a href="https://unsplash.com/photos/egCFrNJ6Djw">Vitaly Gariev</a>, <a href="https://unsplash.com/photos/8WYkI3cEZm8">Vitaly Gariev</a>, <a href="https://unsplash.com/photos/tl447mekwuQ">National Cancer Institute</a>, <a href="https://unsplash.com/photos/rqdWlkRzerg">Navy Medicine</a>.</span>
+  </div>
+</footer>
+
+<div class="card" role="region" aria-label="Preview controls" id="controls" style="position:fixed;right:16px;bottom:16px;z-index:60;padding:12px 14px;width:min(340px,calc(100vw - 32px));box-shadow:var(--shadow-2)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="t-small" style="font-weight:700">Preview controls</span><button class="btn btn-ghost" style="min-height:28px;padding:0 6px;font-size:13px" onclick="document.getElementById('controls').style.display='none'">Hide</button></div>
+  <div class="seg" role="radiogroup" aria-label="Page" style="margin-bottom:8px">
+    <button role="radio" aria-checked="true" data-go="landing" onclick="go('landing')">Landing</button>
+    <button role="radio" aria-checked="false" data-go="find" onclick="startFlow()">Find care</button>
+    <button role="radio" aria-checked="false" data-go="results" onclick="go('results')">Results</button>
+  </div>
+  <div class="seg" role="radiogroup" aria-label="Font pairing" style="margin-bottom:8px">
+    <button role="radio" aria-checked="true" onclick="setFonts('editorial',this)">Editorial</button>
+    <button role="radio" aria-checked="false" onclick="setFonts('workhorse',this)">Workhorse</button>
+    <button role="radio" aria-checked="false" onclick="setFonts('civic',this)">Civic</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="btn btn-outline" style="min-height:34px;padding:6px 10px;font-size:14px" onclick="toggleTheme()">Light / dark</button>
+    <button class="btn btn-outline" style="min-height:34px;padding:6px 10px;font-size:14px" onclick="go('results');resolveCall()">Resolve a call</button>
+    <button class="btn btn-outline" style="min-height:34px;padding:6px 10px;font-size:14px" onclick="go('results');finishRun()">Finish run</button>
+  </div>
+</div>
+
+<template id="verdictTpl">
+  <article class="paper print-in">
+    <div style="display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap-reverse;align-items:flex-start">
+      <div style="flex:1 1 420px">
+        <div class="t-small" style="color:var(--ink-3);font-weight:700">Finding · Timely access grievance ready</div>
+        <h2 class="t-display" style="margin:10px 0">No provider we reached could offer a timely appointment.</h2>
+        <p style="margin:0;color:var(--ink-2)">You can now ask your plan to arrange timely care, including out-of-network at in-network cost.</p>
+      </div>
+      <div class="stamp stamp-in" style="margin:8px 12px 0 0">Past deadline<small>×4 offices · limit 10 business days</small></div>
+    </div>
+    <div class="ledger" style="margin:24px 0;border-top:1px solid var(--paper-rule);border-bottom:1px solid var(--paper-rule);padding:6px 0">
+      <div class="ledger-row" style="animation-delay:1100ms"><span>Offices reached</span><span class="lead"></span><span class="val">5</span></div>
+      <div class="ledger-row sub" style="animation-delay:1180ms"><span>Past legal deadline</span><span class="lead"></span><span class="val hot">4</span></div>
+      <div class="ledger-row sub" style="animation-delay:1260ms"><span>Didn't answer</span><span class="lead"></span><span class="val">1</span></div>
+      <div class="ledger-row" style="animation-delay:1340ms"><span>Other listings that appear unavailable</span><span class="lead"></span><span class="val">5</span></div>
+      <div class="ledger-row" style="animation-delay:1420ms"><span>Legal limit</span><span class="lead"></span><span class="val">10 business days</span></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <a class="btn btn-primary btn-lg" href="#">Open grievance packet <span class="arrow">→</span></a>
+      <span class="t-small" style="color:var(--ink-3)">Evidence log + template, not legal advice.</span>
+    </div>
+  </article>
+</template>
+
+<style>
+@media (max-width: 900px) {
+  #hero { grid-template-columns: minmax(0,1fr) !important; gap: 32px !important; padding-top: 28px !important; }
+  #hero figure.card { left: 12px !important; bottom: 12px !important; }
+  #rights .wrap { grid-template-columns: minmax(0,1fr) !important; } #rights .wrap > div { padding: 18px 0 !important; border-left: 0 !important; border-top: 1px solid var(--line); }
+  .how-grid { grid-template-columns: minmax(0,1fr) !important; }
+  .story-row ~ * {} section.wrap > div[style*="align-items:end"] { grid-template-columns: minmax(0,1fr) !important; }
+  .grid4 { grid-template-columns: repeat(2,minmax(0,1fr)) !important; } .grid2 { grid-template-columns: minmax(0,1fr) !important; }
+  .cols { grid-template-columns: minmax(0,1fr) !important; } .cols aside { position: static !important; }
+  .footer-reveal .wrap { grid-template-columns: minmax(0,1fr) !important; }
+  .summary { position: static; }
+}
+@media (max-width: 560px) { .split > div:first-child { grid-template-columns: 96px 1fr !important; } }
+</style>
+<script>
+// photos: local file in ./images -> Unsplash CDN -> Unsplash ID link -> labelled placeholder
+function photoFallback(img){ const s=+(img.dataset.stage||0); img.dataset.stage=s+1;
+  if(s===0) img.src=img.dataset.cdn; else if(s===1) img.src='https://unsplash.com/photos/'+img.dataset.photo+'/download?force=true&w=1400'; else img.closest('.photo').classList.add('failed'); }
+document.querySelectorAll('.photo:not(:has(img))').forEach(p=>p.classList.add('failed'));
+function toggleTheme(){ const h=document.documentElement; const n=h.dataset.theme==='dark'?'light':'dark'; h.dataset.theme=n; try{localStorage.setItem('gb-theme',n)}catch(e){} }
+const PAIRS={editorial:['"Schibsted Grotesk"','"Atkinson Hyperlegible Next"','"Atkinson Hyperlegible Mono"'],workhorse:['"Mona Sans"','"Hanken Grotesk"','"IBM Plex Mono"'],civic:['"IBM Plex Sans"','"IBM Plex Sans"','"IBM Plex Mono"']};
+function setFonts(k,btn){ const r=document.documentElement.style; const [h,b,m]=PAIRS[k]; r.setProperty('--font-heading',h); r.setProperty('--font-body',b); r.setProperty('--font-mono-src',m); if(btn){btn.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-checked','false')); btn.setAttribute('aria-checked','true');} }
+function go(page){ document.querySelectorAll('.page-view').forEach(v=>v.hidden=v.dataset.page!==page); document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-checked',b.dataset.go===page)); scrollTo({top:0}); }
+
+/* ---------- Find care: one question per page ---------- */
+const A={insurer:null,plan:null,care:null,appt:null,prior:'',zip:''};
+const STEPS=['insurer','plan','care','zip','review'];
+let step=0, err='';
+const INSURERS=['Blue Shield of California','Anthem Blue Cross','Health Net','Kaiser Permanente','Molina Healthcare','L.A. Care','Medi-Cal plan'];
+const PLANS=[['hmo','HMO','Most plans that need a referral to see a specialist'],['ppo','PPO','You can see out-of-network providers for a higher cost'],['medi_cal','Medi-Cal','California\'s Medicaid program, through a managed care plan'],['unknown','Not sure','That\'s fine. We\'ll show what to check']];
+const PLAN_LABEL={hmo:'HMO',ppo:'PPO',medi_cal:'Medi-Cal',unknown:'Not sure'};
+const CARE=['Therapist','Psychiatrist','Primary care','Specialist'];
+function deadline(){ if(!A.care||!A.appt) return null; if(A.appt==='Urgent') return ['48 hours','for urgent care that needs no prior authorization'];
+  if(A.appt==='Follow-up') return ['10 business days','from your last appointment'];
+  return (A.care==='Psychiatrist'||A.care==='Specialist')?['15 business days','for a new-patient appointment']:['10 business days','for a new-patient appointment']; }
+function radios(name,opts,val){ return '<div class="radio-list">'+opts.map(o=>{const [v,l,h]=Array.isArray(o)?o:[o,o,''];return `<label class="radio-row"><input type="radio" name="${name}" value="${v}" ${val===v?'checked':''} onchange="setA('${name}',this.value)"><span class="radio-dot" aria-hidden="true"></span><span class="radio-label">${l}${h?`<span class="radio-hint">${h}</span>`:''}</span></label>`}).join('')+'</div>'; }
+function setA(k,v){ A[k]=v; if(k==='insurer'&&v==='Medi-Cal plan') A.plan='medi_cal'; if(k==='care'&&v!=='Therapist'&&A.appt==='Follow-up') A.appt=null; err=''; if(k==='plan'||k==='care'||k==='appt') render(false); else renderSummary(); }
+function progress(){ const n=Math.min(step+1,4); return `<div class="flow-progress"><span>${step<4?`Question ${n} of 4`:'Review'}</span><span class="flow-bar" aria-hidden="true">${[0,1,2,3].map(i=>`<span class="${i<=step?'done':''}"></span>`).join('')}</span></div>`; }
+function coverage(){ if(!A.plan) return ''; const strong=A.plan==='ppo'||A.plan==='unknown';
+  const body='California\'s appointment deadlines apply to state-regulated coverage: plans licensed by the Department of Managed Health Care (most HMOs, many PPOs, most Covered California plans, Medi-Cal managed care) and health insurance policies regulated by the California Department of Insurance.';
+  const more='<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:700">Who does this apply to?</summary><p style="margin:8px 0 0">They do not apply to self-funded employer or union plans, which are under federal law even if an insurer\'s name is on your card, or to Medicare. Not sure which you have? Ask HR or member services "Is my plan self-funded?" before relying on these deadlines.</p></details>';
+  return strong?`<div class="notice" style="display:block;margin-top:18px"><b style="display:block;margin-bottom:4px">Check this before relying on the deadlines</b>${body}${more}</div>`:`<div class="t-small" style="margin-top:16px;color:var(--ink-2);max-width:46em">${body}${more}</div>`; }
+function render(focus=true){
+  const m=document.getElementById('flowMain'); const s=STEPS[step]; let h='';
+  h+= step>0?`<button class="back-link" onclick="step--;render()">‹ Back</button>`:`<button class="back-link" onclick="go('landing')">‹ Back to home</button>`;
+  h+=progress();
+  if(err) h+=`<div class="notice" data-tone="error" role="alert" style="display:block;margin-bottom:18px"><b>There's a problem.</b> ${err}</div>`;
+  if(s==='insurer'){ h+=`<fieldset class="q"><legend><h1 class="q-title" tabindex="-1">Which insurance company is on your card?</h1></legend><p class="q-hint">We use this to name your plan in the grievance letter. We don't check your coverage or contact your insurer.</p>${radios('insurer',INSURERS,A.insurer)}</fieldset>`; }
+  if(s==='plan'){ h+=`<fieldset class="q"><legend><h1 class="q-title" tabindex="-1">What type of plan do you have?</h1></legend><p class="q-hint">It's usually printed on the front of your member card.</p>${radios('plan',PLANS,A.plan)}</fieldset>${coverage()}`; }
+  if(s==='care'){ const appts=[['New patient','New patient','You haven\'t seen this provider before']].concat(A.care==='Therapist'?[['Follow-up','Follow-up','A next session with a therapist you already see']]:[]).concat([['Urgent','Urgent','Care you need within 48 hours']]);
+    h+=`<fieldset class="q"><legend><h1 class="q-title" tabindex="-1">What kind of care do you need?</h1></legend><p class="q-hint">Pick the closest match. Each one has its own legal deadline.</p>${radios('care',CARE,A.care)}</fieldset>`;
+    if(A.care){ h+=`<fieldset class="q"><legend class="q-sub">What kind of appointment?</legend>${radios('appt',appts,A.appt)}</fieldset>`;
+      if(A.appt==='Follow-up') h+=`<div style="margin-top:16px"><label class="field-label" for="prior">Date of your last appointment <span style="font-weight:400;color:var(--ink-3)">(optional)</span></label><p class="t-small" style="margin:0 0 8px;color:var(--ink-3)">The follow-up clock starts here.</p><input id="prior" type="date" class="field" style="max-width:220px" value="${A.prior}" onchange="A.prior=this.value"></div>`; } }
+  if(s==='zip'){ h+=`<h1 class="q-title" tabindex="-1"><label for="zip">Where do you want to be seen?</label></h1><p class="q-hint" id="zip-hint">Enter a 5-digit California ZIP code. We search for licensed providers near it.</p>${err?'<p class="field-error" id="zip-err">Enter a 5-digit ZIP code.</p>':''}<input id="zip" class="input-xl" inputmode="numeric" maxlength="5" autocomplete="postal-code" aria-describedby="zip-hint${err?' zip-err':''}" ${err?'aria-invalid="true"':''} value="${A.zip}" oninput="A.zip=this.value.replace(/\\D/g,'');this.value=A.zip;renderSummary()">`; }
+  if(s==='review'){ const d=deadline(); const row=(k,v,st)=>`<div class="ans-row"><dt>${k}</dt><dd>${v}</dd><button class="link" style="background:none;border:0;cursor:pointer;font:inherit" onclick="step=${st};render()">Change<span class="sr-only" style="position:absolute;left:-9999px"> ${k.toLowerCase()}</span></button></div>`;
+    h+=`<h1 class="q-title" tabindex="-1">Check your answers</h1><p class="q-hint">Make sure these are right. They decide which providers we check and which legal deadline applies.</p>
+      <dl class="answers">${row('Insurance company',A.insurer,0)}${row('Plan type',PLAN_LABEL[A.plan],1)}${row('Type of care',A.care+' · '+A.appt+(A.prior?' (last visit '+A.prior+')':''),2)}${row('ZIP code',A.zip,3)}</dl>
+      <h2 class="q-sub">What happens next</h2>
+      <ol style="margin:0;padding-left:1.25em;color:var(--ink-2)"><li>We find licensed ${A.care.toLowerCase()==='primary care'?'primary care providers':A.care.toLowerCase()+'s'} near ${A.zip} and check each public profile.</li><li>We show you which listings look like ghosts.</li><li>You decide whether our AI assistant calls the rest. Nothing is called without your OK.</li></ol>
+      <div class="flow-actions"><button class="btn btn-primary btn-lg" onclick="submitFlow()">Check providers near me <span class="arrow" aria-hidden="true">→</span></button><span class="t-small" style="color:var(--ink-3)">Legal deadline: <b style="color:var(--ink)">${d[0]}</b></span></div>`; }
+  else { h+=`<div class="flow-actions"><button class="btn btn-primary btn-lg" onclick="next()">Continue</button></div>`; }
+  m.innerHTML=h; renderSummary(); if(focus){ const t=m.querySelector('.q-title'); t&&t.focus({preventScroll:true}); }
+}
+function next(){ const s=STEPS[step];
+  if(s==='insurer'&&!A.insurer) err='Select your insurance company.';
+  else if(s==='plan'&&!A.plan) err='Select your plan type, or choose "Not sure".';
+  else if(s==='care'&&(!A.care||!A.appt)) err=!A.care?'Select the kind of care you need.':'Select the kind of appointment.';
+  else if(s==='zip'&&!/^\d{5}$/.test(A.zip)) err='Enter a 5-digit ZIP code.';
+  else { err=''; step++; }
+  render(); scrollTo({top:0,behavior:'smooth'}); }
+function renderSummary(){ const r=(k,v)=>`<div class="sum-row"><dt>${k}</dt><dd class="${v?'':'empty'}">${v||'Not answered yet'}</dd></div>`;
+  document.getElementById('sumList').innerHTML=r('Insurance',A.insurer)+r('Plan type',A.plan&&PLAN_LABEL[A.plan])+r('Care',A.care&&(A.care+(A.appt?' · '+A.appt:'')))+r('ZIP code',/^\d{5}$/.test(A.zip)?A.zip:'');
+  const d=deadline(); const n=document.getElementById('sumDeadline'); const old=n.textContent; n.textContent=d?d[0]:'—'; if(d&&old!==d[0]){ n.classList.remove('flip'); void n.offsetWidth; n.classList.add('flip'); }
+  document.getElementById('sumDeadlineNote').textContent=d?d[1]:'Answer the questions to see it.'; }
+function startFlow(prefill){ if(!prefill){ step=0; } go('find'); render(); }
+function heroSubmit(e){ e.preventDefault(); A.insurer=document.getElementById('h-ins').value; A.care=document.getElementById('h-care').value; A.zip=document.getElementById('h-zip').value.replace(/\D/g,'');
+  if(A.insurer==='Medi-Cal plan') A.plan='medi_cal'; step=A.plan?2:1; go('find'); render(); }
+function submitFlow(){ document.getElementById('caseLine').textContent=`Case GB-327D24 · ${A.insurer} · ${PLAN_LABEL[A.plan]} · ${A.zip}`; go('results'); }
+
+/* ---------- ASCII ghost, reveal, results demo ---------- */
+/* ASCII ghost, ported from v1 AsciiGhost.tsx: silhouette + shading ramp, plus a rippling hem and a blink */
+function ghostFrame(W,H,t,blink,html){const ramp=" .:-=+*#%@",head=H*0.42,cx=W/2-.5;const rows=[];
+  for(let y=0;y<H;y++){const ch=[],cl=[],m=[];for(let x=0;x<W;x++){const nx=(x-W/2+.5)/(W/2),ny=(y-head)/head;let inside;
+    if(y<=head) inside=nx*nx+ny*ny<=1; else {const hem=H-1-(1+Math.sin((x/W)*Math.PI*6+t))*1.5; inside=Math.abs(nx)<=1&&y<hem;}
+    const ey=head*1.02, erx=W*0.075, ery=blink?0.6:H*0.1;
+    const eyeL=((x-W*0.33)/erx)**2+((y-ey)/ery)**2<1, eyeR=((x-W*0.67)/erx)**2+((y-ey)/ery)**2<1;
+    const mouth=((x-W/2)/(W*0.07))**2+((y-(head+H*0.2))/(H*0.045))**2<1;
+    m.push(inside&&!eyeL&&!eyeR&&!mouth);if(!inside||eyeL||eyeR||mouth){ch.push(" ");cl.push(0);continue}
+    const light=1-Math.min(1,Math.hypot(nx+.55,ny+.9)/3.1); ch.push(ramp[Math.max(3,Math.min(9,Math.round(light*10)))]);cl.push(0);}
+    rows.push({ch,cl,m});}
+  const put=(x,y,c,k)=>{x=Math.round(x);if(y>=0&&y<H&&x>=0&&x<W&&rows[y].m[x]){rows[y].ch[x]=c;rows[y].cl[x]=k}};
+  const clr=(x,y)=>{x=Math.round(x);if(y>=0&&y<H&&x>=0&&x<W&&rows[y].ch[x]!==" "){rows[y].ch[x]=" ";rows[y].cl[x]=0}};
+  /* medical cross on the chest, with a clear ring so it reads as a badge */
+  const cy=Math.round(head+H*0.33), vh=Math.max(1,Math.round(H*0.065)), hw=Math.round(W*0.11), vw=Math.max(1,Math.round(W*0.04));
+  const inCross=(dx,dy)=>(Math.abs(dx)<=vw&&dy>=-vh&&dy<=vh+1)||(dy>=0&&dy<=1&&Math.abs(dx)<=hw);
+  for(let y=cy-vh-1;y<=cy+vh+2;y++)for(let x=0;x<W;x++){const dx=x-cx,dy=y-cy;
+    if(inCross(dx,dy))put(x,y,"@",1); else if(inCross(dx-1,dy)||inCross(dx+1,dy)||inCross(dx,dy-1)||inCross(dx,dy+1)||inCross(dx-2,dy)||inCross(dx+2,dy))clr(x,y);}
+  /* stethoscope: two tubes hanging from the neck, chest piece on the right */
+  const y0=Math.round(head-1), y1=Math.round(head+H*0.3), s=0.32;
+  for(let y=y0;y<=y1;y++){const l=W*0.24+(y-y0)*s, r=W*0.76-(y-y0)*s;
+    clr(l-1,y);put(l,y,"|",2);put(l+1,y,"|",2);clr(l+2,y);
+    clr(r-2,y);put(r-1,y,"|",2);put(r,y,"|",2);clr(r+1,y);}
+  const lx=W*0.24+(y1-y0)*s; clr(lx-1,y1+1);put(lx,y1+1,"\\",2);put(lx+1,y1+1,"/",2);clr(lx+2,y1+1);
+  const px=W*0.76-(y1-y0)*s-.5, py=y1+1;
+  for(let dy=-1;dy<=3;dy++)for(let dx=-4;dx<=4;dx++)clr(px+dx,py+dy);
+  put(px-2,py,"/",2);put(px-1,py,"@",2);put(px,py,"@",2);put(px+1,py,"@",2);put(px+2,py,"\\",2);
+  put(px-2,py+1,"|",2);put(px-1,py+1,"(",1);put(px,py+1,"+",1);put(px+1,py+1,")",1);put(px+2,py+1,"|",2);
+  put(px-2,py+2,"\\",2);put(px-1,py+2,"@",2);put(px,py+2,"@",2);put(px+1,py+2,"@",2);put(px+2,py+2,"/",2);
+  if(!html) return rows.map(r=>r.ch.join("")).join("\n");
+  const cls=["","gx-cross","gx-steth"];
+  return rows.map(r=>{let o="",cur=0,buf="";const flush=()=>{if(!buf)return;o+=cur?`<span class="${cls[cur]}">${buf}</span>`:buf;buf=""};
+    r.ch.forEach((c,i)=>{if(r.cl[i]!==cur){flush();cur=r.cl[i]}buf+=c});flush();return o}).join("\n");}
+(function(){const hero=document.getElementById('heroGhost'),foot=document.getElementById('asciiGhost');
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  foot.innerHTML=ghostFrame(34,22,0,false,true);
+  if(still){hero.innerHTML=ghostFrame(42,30,0,false,true);return;}
+  let t=0,next=performance.now()+3200,blinkUntil=0;
+  setInterval(()=>{const now=performance.now();if(now>next){blinkUntil=now+140;next=now+3000+Math.random()*3500;}
+    t+=0.35;hero.innerHTML=ghostFrame(42,30,t,now<blinkUntil,true);},120);})();
+function bump(id,v){const el=document.getElementById(id);const n=el.cloneNode();n.textContent=v;el.replaceWith(n)}
+let done=false;
+function resolveCall(){if(done)return;done=true;
+ document.getElementById('reyesSlot').innerHTML='<button class="row just-resolved" data-st="violation"><span class="row-name">Dr. Daniel Reyes, PsyD</span><span class="badge flip" data-st="violation">! Past legal deadline</span><span class="row-detail">Earliest <b class="hot">Dec 29</b> · <b class="hot">29 business days</b> vs 10 business days limit</span><div class="ruler" style="--wait:29;--limit:10;--scale:31"><div class="ruler-track"><div class="ruler-fill"><div class="ruler-in"></div><div class="ruler-out"></div></div><div class="ruler-tick" data-label="limit 10"></div></div></div></button>';
+ bump('nCalled','3');bump('nPast','2');document.getElementById('tally').textContent='[■■■□□] 3 of 5 called';
+ document.getElementById('log').insertAdjacentHTML('beforeend','<div class="log-line" data-kind="violation"><span class="log-time">13:00:41</span><span class="log-glyph">!</span><span>Dr. Daniel Reyes, PsyD: 29 business days (deadline 10). Past legal deadline</span></div>');}
+function finishRun(){resolveCall();bump('nCalled','5');bump('nPast','4');document.getElementById('tally').textContent='[■■■■■] 5 of 5 called';const p=document.getElementById('phase');p.dataset.st='unverified';p.textContent='✓ Complete';
+ const s=document.getElementById('slot');s.innerHTML='';s.appendChild(document.getElementById('verdictTpl').content.cloneNode(true));
+ setTimeout(()=>scrollTo({top:s.getBoundingClientRect().top+scrollY-130,behavior:'smooth'}),50);}
+</script>
+</body></html>

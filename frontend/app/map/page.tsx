@@ -148,7 +148,7 @@ export default function GhostMapPage() {
                   const active = z.zip === zip;
                   return (
                     <g key={z.zip} onClick={() => setZip(z.zip)} className="cursor-pointer" role="button" aria-label={`ZIP ${z.zip}`}>
-                      <circle cx={info.x} cy={info.y} r={r} fill={total ? "var(--signal)" : "var(--paper)"} fillOpacity={total ? 0.12 + 0.75 * frac : 1}
+                      <circle cx={info.x} cy={info.y} r={r} fill={total ? "var(--color-signal)" : "var(--surface)"} fillOpacity={total ? 0.12 + 0.75 * frac : 1}
                         stroke="var(--ink)" strokeWidth={active ? 3 : 1.25} strokeDasharray={total ? undefined : "4 3"} />
                       <text x={info.x} y={info.y + 5} textAnchor="middle" className="font-mono" fontSize="14" fontWeight="700" fill="var(--ink)">{z.zip}</text>
                       <text x={info.x} y={info.y + r + 16} textAnchor="middle" className="font-mono" fontSize="11" fill="var(--ink)" opacity="0.7">
@@ -156,7 +156,7 @@ export default function GhostMapPage() {
                       </text>
                       {hasDemo && (
                         <g>
-                          <rect x={info.x + r * 0.7} y={info.y - r * 0.7 - 9} width="34" height="14" fill="var(--sun)" stroke="var(--ink)" strokeWidth="0.75" />
+                          <rect x={info.x + r * 0.7} y={info.y - r * 0.7 - 9} width="34" height="14" fill="var(--st-noanswer-bg)" stroke="var(--ink)" strokeWidth="0.75" />
                           <text x={info.x + r * 0.7 + 17} y={info.y - r * 0.7 + 1.5} textAnchor="middle" className="font-mono" fontSize="9" fontWeight="700" fill="var(--ink)">DEMO</text>
                         </g>
                       )}
