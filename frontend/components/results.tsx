@@ -11,10 +11,11 @@ import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
 
 // ---------------------------------------------------------------- activity log model
 // focus: the results page auto-selects this provider (call results; not directory ghosts)
-export type LogEvent = { id: number; at: string; text: string; tone: GhostStatus | "info" | "user"; pid?: string; focus?: boolean };
+export type LogEvent = { id: number; at: string; text: string; tone: GhostStatus | "info" | "user" | "fallback"; pid?: string; focus?: boolean };
 
 const TONE_DOT: Record<LogEvent["tone"], string> = {
   info: "bg-zinc-400",
+  fallback: "bg-amber-400",
   user: "bg-white",
   ghost: "bg-zinc-500",
   unverified: "bg-sky-400",
@@ -66,6 +67,10 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
     const ghosts = next.providers.filter((p) => p.ghost_status === "ghost").length;
     out.push({ tone: "info", text: `${ghosts} ghosts flagged. ${callable} offices look real — waiting for your OK to call.` });
   }
+  // Pipeline stages that fell back to cached/seed data (real mode), in order, once each.
+  for (const f of (next.fallbacks ?? []).slice(prev?.fallbacks?.length ?? 0)) {
+    out.push({ tone: "fallback", text: `Fallback · ${f.stage}: ${f.detail}` });
+  }
   if (prev && prev.search.status !== "done" && s.status === "done") out.push({ tone: "info", text: "All calls complete." });
   return out;
 }
@@ -109,10 +114,12 @@ export function Counters({ providers }: { providers: Provider[] }) {
 }
 
 // ---------------------------------------------------------------- consent
-export function ConsentCard({ search, count, onApprove, busy }: { search: Search; count: number; onApprove: () => void; busy: boolean }) {
+export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { search: Search; count: number; skipped?: number; onApprove: () => void; busy: boolean }) {
   return (
     <section className="rise rounded-3xl border-2 border-indigo-400 bg-indigo-950/50 p-6 sm:p-8">
-      <h2 className="text-3xl font-extrabold">Want us to call the {count} remaining offices?</h2>
+      <h2 className="text-3xl font-extrabold">
+        Want us to call {skipped > 0 ? `the ${count} demo offices` : `the ${count} remaining offices`}?
+      </h2>
       <p className="mt-3 text-xl text-zinc-200">
         With your permission, our AI assistant will act as your <b>authorized representative</b> and phone each office
         below. It will:
@@ -126,6 +133,12 @@ export function ConsentCard({ search, count, onApprove, busy }: { search: Search
         Calls are <b>recorded and transcribed</b> so the transcript can go in your evidence log.
       </p>
       <p className="mt-3 text-base text-indigo-200/80">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
+      {skipped > 0 && (
+        <p className="mt-1 text-base text-indigo-200/80">
+          The other {skipped} listed offices are real providers from the public registry. They won&apos;t be called and
+          won&apos;t get a result.
+        </p>
+      )}
       <button
         onClick={onApprove}
         disabled={busy}
@@ -214,7 +227,7 @@ function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
     case "ghost": return <span className="text-zinc-400">{p.ghost_reason}</span>;
-    case "unverified": return <span className="text-zinc-400">Looks real — not called yet</span>;
+    case "unverified": return <span className="text-zinc-400">{p.ghost_reason ?? "Looks real — not called yet"}</span>;
     case "calling": return <span className="text-indigo-200">AI assistant is on the line…</span>;
     case "no_answer": return <span className="text-amber-200">{p.ghost_reason ?? "No answer"}</span>;
     default:

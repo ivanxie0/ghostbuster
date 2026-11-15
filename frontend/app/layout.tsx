@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import DemoPanel from "@/components/DemoPanel";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <span className="text-sm text-zinc-400">Evidence log + templates · not legal advice</span>
         </header>
         {children}
+        <DemoPanel />
       </body>
     </html>
   );
