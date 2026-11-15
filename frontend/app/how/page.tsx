@@ -65,6 +65,10 @@ const CARDS = [
     title: "Never fakes results for real providers",
     body: "Real registry providers never get a simulated call or a made-up result. Fictional demo providers are labeled “Demo data”, every stage has a timeout and a cached fallback, and each fallback is shown in the activity log.",
   },
+  {
+    title: "Clinic-friendly by design",
+    body: "The rules for calling real offices: at most one call per office per week, only during office hours, and results shared between patients so an office isn’t called again and again. During the hackathon it only dials our team’s own phones.",
+  },
 ];
 
 export default function HowPage() {
