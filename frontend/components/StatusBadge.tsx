@@ -8,11 +8,11 @@ export default function StatusBadge({ status, big = false, confirmed = false }: 
   return (
     <span
       key={isConfirmed ? "confirmed-ghost" : status}
-      className={`flip-in inline-flex items-center gap-1.5 whitespace-nowrap rounded-full font-bold uppercase tracking-wide ${
-        big ? "px-4 py-1.5 text-base" : "px-3 py-1 text-sm"
+      className={`flip-in inline-flex items-center gap-1.5 whitespace-nowrap rounded-[2px] font-mono font-semibold uppercase tracking-wider ${
+        big ? "px-3 py-1.5 text-sm" : "px-2.5 py-1 text-xs"
       } ${isConfirmed ? CONFIRMED_GHOST_STYLE.badge : STATUS_STYLE[status].badge}`}
     >
-      {status === "calling" && <span className="h-2 w-2 rounded-full bg-white" />}
+      {status === "calling" && <span className="h-2 w-2 rounded-full bg-paper" />}
       {isConfirmed ? "Confirmed ghost" : STATUS_LABEL[status]}
     </span>
   );

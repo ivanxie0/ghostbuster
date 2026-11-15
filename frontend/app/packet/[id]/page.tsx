@@ -37,24 +37,24 @@ export default function PacketPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 pb-20 pt-2">
-      <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 bg-[var(--background)]/95 px-6 py-4 backdrop-blur print:hidden">
+      <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ink bg-paper/95 px-6 py-4 backdrop-blur print:hidden">
         <div>
-          <Link href={`/results/${id}`} className="text-base text-zinc-400 hover:text-white">← Back to results</Link>
-          <h1 className="text-4xl font-extrabold tracking-tight">Your timely access grievance</h1>
-          <p className="text-lg text-zinc-400">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
+          <Link href={`/results/${id}`} className="label text-ink/60 hover:text-ink">← Back to results</Link>
+          <h1 className="display mt-2 text-5xl">Your timely access grievance</h1>
+          <p className="mt-2 font-mono text-xs text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={savePdf}
             disabled={!html}
-            className="rounded-2xl bg-white px-6 py-4 text-xl font-bold text-zinc-900 shadow-lg transition hover:bg-zinc-200 disabled:opacity-50"
+            className="btn btn-solid"
           >
-            ⬇ Save as PDF
+            Save as PDF <span aria-hidden>↓</span>
           </button>
           <button
             onClick={download}
             disabled={!html}
-            className="rounded-2xl border-2 border-zinc-600 px-5 py-4 text-lg font-semibold hover:bg-zinc-800 disabled:opacity-50"
+            className="btn"
           >
             Download .html
           </button>
@@ -62,14 +62,14 @@ export default function PacketPage() {
       </div>
 
       {error && (
-        <div className="rounded-2xl border-2 border-red-500 bg-red-950/50 p-6 text-xl">
+        <div className="rounded-[2px] border border-signal bg-[#fdf0ee] p-6 text-xl">
           Couldn&apos;t load the packet: {error}.{" "}
           <Link href="/search" className="underline">Start a new search</Link>
         </div>
       )}
-      {!html && !error && <div className="h-[70vh] animate-pulse rounded-2xl bg-zinc-900" />}
+      {!html && !error && <div className="h-[70vh] animate-pulse rounded-[2px] border border-dashed border-ink/30 bg-ink/5" />}
       {html && (
-        <div className="rise overflow-hidden rounded-xl bg-white shadow-2xl shadow-black/60 ring-1 ring-white/10">
+        <div className="rise overflow-hidden rounded-[2px] border border-ink bg-white shadow-[8px_8px_0_rgba(20,20,15,.15)]">
           <iframe
             ref={frame}
             title="Timely access grievance"
@@ -80,7 +80,7 @@ export default function PacketPage() {
           />
         </div>
       )}
-      <p className="mt-4 text-center text-base text-zinc-500 print:hidden">
+      <p className="label mt-6 text-center text-ink/60 print:hidden">
         Evidence log + templates, not legal advice. Review and fill in your member ID before sending.
       </p>
     </main>

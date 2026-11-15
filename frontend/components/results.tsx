@@ -14,15 +14,15 @@ import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
 export type LogEvent = { id: number; at: string; text: string; tone: GhostStatus | "info" | "user" | "fallback"; pid?: string; focus?: boolean };
 
 const TONE_DOT: Record<LogEvent["tone"], string> = {
-  info: "bg-zinc-400",
-  fallback: "bg-amber-400",
-  user: "bg-white",
-  ghost: "bg-zinc-500",
-  unverified: "bg-sky-400",
-  calling: "bg-indigo-400 animate-pulse",
-  available: "bg-emerald-400",
-  violation: "bg-red-500",
-  no_answer: "bg-amber-400",
+  info: "bg-ink/35",
+  fallback: "bg-sun ring-1 ring-ink/50",
+  user: "bg-ink",
+  ghost: "bg-ink/25",
+  unverified: "bg-ink/60",
+  calling: "bg-cobalt animate-pulse",
+  available: "bg-moss",
+  violation: "bg-signal",
+  no_answer: "bg-sun ring-1 ring-ink/50",
 };
 
 /** Turn the difference between two polls into human-readable log lines. */
@@ -80,13 +80,13 @@ export function PhasePill({ detail }: { detail: SearchDetail }) {
   const { status } = detail.search;
   const calling = detail.providers.some((p) => p.ghost_status === "calling");
   const [label, cls] =
-    status === "scraping" ? ["Scanning directory", "bg-sky-500/20 text-sky-200 ring-sky-400/60"]
-    : status === "done" ? ["Complete", "bg-zinc-100 text-zinc-900 ring-white"]
-    : calling ? ["Calling offices", "bg-indigo-500/25 text-indigo-100 ring-indigo-400"]
-    : ["Ready to call", "bg-amber-500/20 text-amber-100 ring-amber-400/70"];
+    status === "scraping" ? ["Scanning directory", "bg-paper text-ink"]
+    : status === "done" ? ["Complete", "bg-ink text-paper"]
+    : calling ? ["Calling offices", "bg-cobalt text-paper"]
+    : ["Ready to call", "bg-sun text-ink"];
   return (
-    <span key={label} className={`flip-in inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-base font-bold ring-2 ${cls}`}>
-      {status !== "done" && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-current" />}
+    <span key={label} className={`flip-in inline-flex items-center gap-2 rounded-[2px] border border-ink px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-wider ${cls}`}>
+      {status !== "done" && <span className="h-2 w-2 animate-pulse rounded-full bg-current" />}
       {label}
     </span>
   );
@@ -94,9 +94,9 @@ export function PhasePill({ detail }: { detail: SearchDetail }) {
 
 function Counter({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 px-5 py-4">
-      <div key={value} className={`flip-in text-5xl font-extrabold tabular-nums sm:text-6xl ${tone}`}>{value}</div>
-      <div className="mt-1 text-base font-semibold uppercase tracking-wider text-zinc-400">{label}</div>
+    <div className="border-t border-ink bg-paper px-1 pb-2 pt-3">
+      <div className="label text-ink/65">{label}</div>
+      <div key={value} className={`flip-in display mt-1 text-6xl lining-nums tabular-nums sm:text-7xl ${tone}`}>{value}</div>
     </div>
   );
 }
@@ -104,11 +104,11 @@ function Counter({ label, value, tone }: { label: string; value: number; tone: s
 export function Counters({ providers }: { providers: Provider[] }) {
   const n = (s: GhostStatus) => providers.filter((p) => p.ghost_status === s).length;
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      <Counter label="Listed" value={providers.length} tone="text-white" />
-      <Counter label="Ghosts" value={n("ghost")} tone="text-zinc-300" />
-      <Counter label="Checked" value={providers.filter(wasCalled).length} tone="text-sky-300" />
-      <Counter label="Past deadline" value={n("violation")} tone="text-red-400" />
+    <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
+      <Counter label="Listed" value={providers.length} tone="text-ink" />
+      <Counter label="Ghosts" value={n("ghost")} tone="text-ink/45" />
+      <Counter label="Checked" value={providers.filter(wasCalled).length} tone="text-cobalt" />
+      <Counter label="Past deadline" value={n("violation")} tone="text-signal" />
     </div>
   );
 }
@@ -116,25 +116,26 @@ export function Counters({ providers }: { providers: Provider[] }) {
 // ---------------------------------------------------------------- consent
 export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { search: Search; count: number; skipped?: number; onApprove: () => void; busy: boolean }) {
   return (
-    <section className="rise rounded-3xl border-2 border-indigo-400 bg-indigo-950/50 p-6 sm:p-8">
-      <h2 className="text-3xl font-extrabold">
+    <section className="rise card p-6 shadow-[6px_6px_0_var(--cobalt)] sm:p-8">
+      <p className="label text-cobalt">Your permission needed</p>
+      <h2 className="display mt-2 text-4xl sm:text-5xl">
         Want us to call {skipped > 0 ? `the ${count} demo offices` : `the ${count} remaining offices`}?
       </h2>
-      <p className="mt-3 text-xl text-zinc-200">
+      <p className="mt-4 text-xl text-ink/85">
         With your permission, our AI assistant will act as your <b>authorized representative</b> and phone each office
         below. It will:
       </p>
-      <ul className="mt-3 space-y-1.5 text-lg text-zinc-200">
+      <ul className="mt-3 space-y-1.5 text-xl text-ink/85">
         <li>✓ say at the start of the call that it&apos;s an <b>AI assistant calling on behalf of a patient</b> and that the call is being transcribed</li>
         <li>✓ ask only for the <b>earliest opening, in person or by telehealth</b>, with {search.insurer} {PLAN_LABEL[search.plan_type]}</li>
         <li>✓ <b>not</b> share your name, contact info, or health details</li>
       </ul>
-      <p className="mt-3 text-lg text-zinc-200">
+      <p className="mt-3 text-xl text-ink/85">
         Calls are <b>recorded and transcribed</b> so the transcript can go in your evidence log.
       </p>
-      <p className="mt-3 text-base text-indigo-200/80">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
+      <p className="rule-dotted mt-4 pt-3 font-mono text-xs text-ink/65">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
       {skipped > 0 && (
-        <p className="mt-1 text-base text-indigo-200/80">
+        <p className="mt-1 font-mono text-xs text-ink/65">
           The other {skipped} listed offices are real providers from the public registry. They won&apos;t be called and
           won&apos;t get a result.
         </p>
@@ -142,7 +143,7 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
       <button
         onClick={onApprove}
         disabled={busy}
-        className="mt-6 rounded-2xl bg-indigo-500 px-8 py-4 text-2xl font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400 disabled:opacity-60"
+        className="btn btn-solid btn-lg mt-6"
       >
         {busy ? "Starting calls…" : `Yes, check these ${count} for me`}
       </button>
@@ -154,31 +155,31 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
 export function EndingA({ search, provider, id, violations }: { search: Search; provider: Provider; id: string; violations: number }) {
   const w = waitVsDeadline(search, provider);
   return (
-    <section className="rise rounded-3xl border-2 border-emerald-400 bg-emerald-950/60 p-6 sm:p-8">
-      <p className="text-lg font-bold uppercase tracking-widest text-emerald-300">Good news</p>
-      <h2 className="mt-1 text-4xl font-extrabold leading-tight sm:text-5xl">
+    <section className="rise card border-moss p-6 shadow-[6px_6px_0_var(--moss)] sm:p-8">
+      <p className="label inline-block bg-moss px-2 py-1 text-paper">Good news</p>
+      <h2 className="display mt-3 text-5xl sm:text-6xl">
         {provider.name} can see you {longDate(provider.earliest_date)}.
       </h2>
-      <p className="mt-3 text-2xl text-emerald-100">
+      <p className="mt-4 text-2xl text-ink">
         That&apos;s <b>{w?.wait}</b> away — within the legal limit of {w?.limit}.
       </p>
-      {provider.address && <p className="mt-2 text-lg text-emerald-200/80">{provider.address}</p>}
+      {provider.address && <p className="mt-2 font-mono text-sm text-ink/65">{provider.address}</p>}
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <a
           href={provider.phone ? `tel:${provider.phone}` : provider.source_url ?? "#"}
           target={provider.phone ? undefined : "_blank"}
           rel="noreferrer"
-          className="rounded-2xl bg-emerald-400 px-8 py-4 text-2xl font-bold text-emerald-950 shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-300"
+          className="btn btn-solid btn-lg"
         >
-          {provider.phone ? `📞 Call to book · ${maskPhone(provider.phone)}` : "📅 Book this appointment →"}
+          {provider.phone ? `Call to book · ${maskPhone(provider.phone)}` : "Book this appointment →"}
         </a>
         {violations > 0 && (
-          <Link href={`/packet/${id}`} className="rounded-2xl border-2 border-emerald-300/50 px-6 py-4 text-lg font-semibold text-emerald-100 hover:bg-emerald-900/50">
+          <Link href={`/packet/${id}`} className="btn">
             Save the evidence log anyway
           </Link>
         )}
       </div>
-      <p className="mt-4 text-base text-emerald-200/70">
+      <p className="rule-dotted mt-5 pt-3 font-mono text-xs text-ink/65">
         Tip: say you&apos;re a {search.insurer} {PLAN_LABEL[search.plan_type]} member and ask for the {shortDate(provider.earliest_date)} new-patient slot.
       </p>
     </section>
@@ -193,31 +194,31 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
   const listedGhosts = n("ghost") - confirmed;
   const selfFunded = search.plan_type === "ppo" || search.plan_type === "unknown";
   return (
-    <section className="rise rounded-3xl border-2 border-red-500 bg-red-950/60 p-6 sm:p-8">
-      <p className="text-lg font-bold uppercase tracking-widest text-red-300">Timely access grievance ready</p>
-      <h2 className="mt-1 text-4xl font-extrabold leading-tight sm:text-5xl">
+    <section className="rise card border-signal p-6 shadow-[6px_6px_0_var(--signal)] sm:p-8">
+      <p className="label inline-block bg-signal px-2 py-1 text-paper">Timely access grievance ready</p>
+      <h2 className="display mt-3 text-5xl sm:text-6xl">
         No provider we reached could offer a timely appointment.
       </h2>
-      <p className="mt-3 text-2xl font-semibold leading-snug text-white">
+      <p className="mt-4 text-2xl font-semibold leading-snug text-ink">
         Under California law, your plan must now arrange timely care, including out-of-network at in-network cost.
       </p>
-      <p className="mt-4 text-xl leading-snug text-red-100">
+      <p className="mt-4 text-xl leading-snug text-ink/85">
         Legal limit: {deadlineText(search)}. Of {checked} offices we reached, <b>{n("violation")}</b> were past the legal
         deadline{confirmed > 0 && <>, <b>{confirmed}</b> said they aren&apos;t taking this plan or new patients</>}, and{" "}
         <b>{n("no_answer")}</b> didn&apos;t answer. <b>{listedGhosts}</b> more listings appear unavailable.
       </p>
-      <p className="mt-2 text-lg text-red-100/80">
+      <p className="mt-2 text-xl text-ink/70">
         Your packet has the evidence log, a grievance letter to {search.insurer}, a phone script, and next steps with the DMHC.
       </p>
       {selfFunded && (
-        <p className="mt-3 rounded-xl border border-amber-500/70 bg-amber-950/50 p-3 text-lg text-amber-100">
+        <p className="mt-4 rounded-[2px] border border-ink bg-sun p-3 text-lg text-ink">
           If your PPO is a self-funded employer plan, these California rules may not apply — the call log is still useful evidence.
         </p>
       )}
-      <Link href={`/packet/${id}`} className="mt-6 inline-block rounded-2xl bg-white px-8 py-4 text-2xl font-bold text-red-700 shadow-lg transition hover:bg-red-50">
-        ⬇ Download grievance packet
+      <Link href={`/packet/${id}`} className="btn btn-solid btn-lg mt-6">
+        Download grievance packet <span aria-hidden>↓</span>
       </Link>
-      <p className="mt-3 text-base text-red-200/70">Evidence log + template, not legal advice.</p>
+      <p className="label mt-4 text-ink/60">Evidence log + template, not legal advice.</p>
     </section>
   );
 }
@@ -226,14 +227,14 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
 function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
-    case "ghost": return <span className="text-zinc-400">{maskPhonesIn(p.ghost_reason ?? "")}</span>;
-    case "unverified": return <span className="text-zinc-400">{maskPhonesIn(p.ghost_reason ?? "Looks real — not called yet")}</span>;
-    case "calling": return <span className="text-indigo-200">AI assistant is on the line…</span>;
-    case "no_answer": return <span className="text-amber-200">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
+    case "ghost": return <span className="text-ink/55">{maskPhonesIn(p.ghost_reason ?? "")}</span>;
+    case "unverified": return <span className="text-ink/60">{maskPhonesIn(p.ghost_reason ?? "Looks real — not called yet")}</span>;
+    case "calling": return <span className="text-cobalt">AI assistant is on the line…</span>;
+    case "no_answer": return <span className="text-ink/80">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
     default:
       return (
         <span className={STATUS_STYLE[p.ghost_status].text}>
-          Earliest <b>{shortDate(p.earliest_date)}</b> · <b>{w?.wait}</b> <span className="text-zinc-400">vs {w?.limit} limit</span>
+          Earliest <b>{shortDate(p.earliest_date)}</b> · <b>{w?.wait}</b> <span className="text-ink/55">vs {w?.limit} limit</span>
         </span>
       );
   }
@@ -245,7 +246,7 @@ export function DemoDataTag({ providers }: { providers: Provider[] }) {
   if (!demo) return null;
   const all = demo === providers.length;
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-yellow-400/70 bg-yellow-400/10 px-3 py-1 text-sm font-bold uppercase tracking-wider text-yellow-200">
+    <span className="label inline-flex items-center gap-2 rounded-[2px] border border-ink bg-sun px-2 py-1 text-ink">
       ⚑ {all ? "Demo data — fictional providers" : `Includes ${demo} fictional demo providers (marked)`}
     </span>
   );
@@ -254,8 +255,8 @@ export function DemoDataTag({ providers }: { providers: Provider[] }) {
 /** Jai's legal caveats — always visible on results. */
 export function LegalNote() {
   return (
-    <p className="rounded-xl border border-zinc-700 bg-zinc-900/60 px-4 py-2.5 text-base text-zinc-300">
-      <span className="font-semibold text-zinc-100">Note:</span> A provider can lawfully set a longer wait if they note
+    <p className="rounded-[2px] border border-dotted border-ink/50 bg-paper px-4 py-2.5 text-lg text-ink/80">
+      <span className="label mr-1 text-ink">Note</span> A provider can lawfully set a longer wait if they note
       in your record that it won&apos;t harm your health. Telehealth appointments count.
     </p>
   );
@@ -273,22 +274,22 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
             <button
               onClick={() => onSelect(p.id)}
               aria-pressed={selected === p.id}
-              className={`relative w-full rounded-2xl border-2 px-5 py-4 text-left transition-all duration-500 ${confirmed ? CONFIRMED_GHOST_STYLE.row : st.row} ${
-                selected === p.id ? "outline outline-3 outline-offset-2 outline-white/80" : "hover:brightness-125"
+              className={`relative w-full rounded-[2px] border px-5 py-4 text-left transition-all duration-500 ${confirmed ? CONFIRMED_GHOST_STYLE.row : st.row} ${
+                selected === p.id ? "outline outline-2 outline-offset-2 outline-ink" : "hover:-translate-y-px hover:shadow-[3px_3px_0_rgba(20,20,15,.25)]"
               }`}
             >
               {p.ghost_status !== "unverified" && (
-                <span key={p.ghost_status} className="flash pointer-events-none absolute inset-0 rounded-2xl" style={{ ["--flash" as string]: st.flash }} />
+                <span key={p.ghost_status} className="flash pointer-events-none absolute inset-0 rounded-[2px]" style={{ ["--flash" as string]: st.flash }} />
               )}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className={`truncate text-xl font-bold ${p.ghost_status === "ghost" ? "line-through decoration-zinc-500" : ""}`}>
+                  <div className={`truncate text-2xl font-semibold tracking-tight ${p.ghost_status === "ghost" ? "line-through decoration-ink/40 decoration-1" : ""}`}>
                     {p.name}
                     {mixed && isDemoProvider(p) && (
-                      <span className="ml-2 align-middle rounded border border-yellow-400/60 px-1.5 py-0.5 text-xs font-bold uppercase text-yellow-200 no-underline">Demo</span>
+                      <span className="ml-2 inline-block align-middle rounded-[2px] border border-ink bg-sun px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-wider text-ink no-underline">Demo</span>
                     )}
                   </div>
-                  <div className="mt-1 text-lg leading-snug">{rowDetail(search, p)}</div>
+                  <div className="mt-1 font-mono text-sm leading-snug">{rowDetail(search, p)}</div>
                 </div>
                 <StatusBadge status={p.ghost_status} confirmed={confirmed} />
               </div>
@@ -304,18 +305,20 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
 export function TranscriptPanel({ search, provider }: { search: Search; provider: Provider | null }) {
   if (!provider)
     return (
-      <div className="flex h-full min-h-48 items-center justify-center rounded-2xl border-2 border-dashed border-zinc-800 p-6 text-center text-lg text-zinc-500">
+      <div className="flex h-full min-h-48 items-center justify-center rounded-[2px] border border-dashed border-ink/45 bg-paper p-6 text-center font-mono text-sm text-ink/55">
         Select a provider to see their details and call transcript.
       </div>
     );
   const w = waitVsDeadline(search, provider);
   const lines = (provider.call_transcript ?? "").split("\n").filter(Boolean);
   return (
-    <div className="rounded-2xl border-2 border-zinc-800 bg-zinc-900/70 p-5">
+    <div className="window">
+      <div className="window-bar"><span>call-transcript.txt</span><span className="text-ink/50">{maskPhone(provider.phone) || "no phone listed"}</span></div>
+      <div className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-2xl font-bold leading-tight">{provider.name}</h3>
-          <p className="mt-1 text-base text-zinc-400">
+          <h3 className="display text-3xl">{provider.name}</h3>
+          <p className="mt-2 font-mono text-xs text-ink/60">
             {[maskPhone(provider.phone), provider.address].filter(Boolean).join(" · ")}
           </p>
         </div>
@@ -323,39 +326,39 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
       </div>
 
       {w && provider.earliest_date && (
-        <div className={`mt-4 grid grid-cols-2 gap-3 rounded-xl p-3 ${provider.violation ? "bg-red-950/60" : "bg-emerald-950/60"}`}>
+        <div className={`mt-4 grid grid-cols-2 gap-3 rounded-[2px] border p-3 ${provider.violation ? "border-signal bg-[#fdf0ee]" : "border-moss bg-[#eef7f1]"}`}>
           <div>
-            <div className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Wait</div>
-            <div className={`text-2xl font-extrabold ${provider.violation ? "text-red-300" : "text-emerald-300"}`}>{w.wait}</div>
+            <div className="label text-ink/60">Wait</div>
+            <div className={`display text-3xl ${provider.violation ? "text-signal" : "text-moss"}`}>{w.wait}</div>
           </div>
           <div>
-            <div className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Legal limit</div>
-            <div className="text-2xl font-extrabold text-white">{w.limit}</div>
+            <div className="label text-ink/60">Legal limit</div>
+            <div className="display text-3xl text-ink">{w.limit}</div>
           </div>
         </div>
       )}
 
       <div className="scroll-dark mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">
         {provider.ghost_status === "calling" && (
-          <div className="flex items-center gap-4 rounded-xl bg-indigo-950/70 p-4 text-indigo-200">
+          <div className="flex items-center gap-4 rounded-[2px] border border-cobalt bg-[#eef1fc] p-4 text-cobalt">
             <span className="eq" aria-hidden><span /><span /><span /><span /><span /></span>
-            <span className="text-lg font-semibold">Live call in progress — transcript arrives when the call ends.</span>
+            <span className="font-mono text-sm font-semibold">Live call in progress — transcript arrives when the call ends.</span>
           </div>
         )}
         {provider.ghost_status === "ghost" && wasCalled(provider) && (
-          <p className="rounded-xl border border-red-500/60 bg-zinc-900 p-3 text-lg text-zinc-200">
+          <p className="rounded-[2px] border border-signal bg-paper p-3 text-lg text-ink">
             Confirmed on the call: <b>listed, but not accepting this plan/new patients.</b>
           </p>
         )}
         {provider.ghost_status === "ghost" && !wasCalled(provider) && (
-          <p className="text-lg text-zinc-300">
+          <p className="text-lg text-ink/80">
             Not called — this listing is a ghost: <b>{maskPhonesIn(provider.ghost_reason ?? "")}</b>.{" "}
             {provider.source_url && (
-              <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-indigo-300 underline">Source</a>
+              <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">Source</a>
             )}
           </p>
         )}
-        {provider.ghost_status === "unverified" && <p className="text-lg text-zinc-400">Not called yet.</p>}
+        {provider.ghost_status === "unverified" && <p className="font-mono text-sm text-ink/55">Not called yet.</p>}
         {lines.map((l, i) => {
           const text = maskPhonesIn(l.replace(/^(Agent|Office):\s*/, ""));
           const system = text.startsWith("("); // e.g. "(no answer — voicemail box full)"
@@ -363,15 +366,16 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
           const agent = !system && l.startsWith("Agent:");
           return (
             <div key={i} className={`slide-in flex ${office ? "justify-end" : "justify-start"}`} style={{ animationDelay: `${i * 80}ms` }}>
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-lg leading-snug ${
-                office ? "rounded-br-sm bg-zinc-700 text-white" : agent ? "rounded-bl-sm bg-indigo-600 text-white" : "bg-zinc-800 text-zinc-300 italic"
+              <div className={`max-w-[85%] rounded-[2px] px-4 py-2.5 text-lg leading-snug ${
+                office ? "border border-ink bg-paper text-ink" : agent ? "bg-ink text-paper" : "border border-dotted border-ink/45 text-ink/65 italic"
               }`}>
-                {(office || agent) && <div className="mb-0.5 text-xs font-bold uppercase tracking-wider opacity-70">{office ? "Office" : "AI assistant"}</div>}
+                {(office || agent) && <div className="mb-1 font-mono text-[0.62rem] font-semibold uppercase tracking-widest opacity-65">{office ? "Office" : "AI assistant"}</div>}
                 {text}
               </div>
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );
@@ -383,17 +387,17 @@ export function ActivityLog({ events, onPick }: { events: LogEvent[]; onPick: (p
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: "smooth" });
   }, [events.length]);
   return (
-    <div className="rounded-2xl border-2 border-zinc-800 bg-black/40 p-4">
-      <h3 className="mb-2 text-sm font-bold uppercase tracking-widest text-zinc-400">Live activity</h3>
-      <ol ref={ref} className="scroll-dark max-h-72 space-y-2 overflow-y-auto pr-1 font-mono">
+    <div className="window">
+      <h3 className="window-bar font-medium"><span>live-activity.log</span><span className="text-ink/50">{events.length} lines</span></h3>
+      <ol ref={ref} className="scroll-dark max-h-72 space-y-2 overflow-y-auto p-4 font-mono">
         {events.map((e) => (
-          <li key={e.id} className="slide-in flex gap-3 text-base leading-snug">
-            <span className="shrink-0 tabular-nums text-zinc-500">{e.at}</span>
-            <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${TONE_DOT[e.tone]}`} />
+          <li key={e.id} className="slide-in flex gap-3 text-[0.8rem] leading-snug">
+            <span className="shrink-0 tabular-nums text-ink/45">{e.at}</span>
+            <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${TONE_DOT[e.tone]}`} />
             {e.pid ? (
-              <button onClick={() => onPick(e.pid!)} className="text-left text-zinc-100 hover:underline">{maskPhonesIn(e.text)}</button>
+              <button onClick={() => onPick(e.pid!)} className="text-left text-ink underline-offset-2 hover:underline">{maskPhonesIn(e.text)}</button>
             ) : (
-              <span className={e.tone === "user" ? "font-bold text-white" : "text-zinc-300"}>{maskPhonesIn(e.text)}</span>
+              <span className={e.tone === "user" ? "font-bold text-ink" : "text-ink/70"}>{maskPhonesIn(e.text)}</span>
             )}
           </li>
         ))}

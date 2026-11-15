@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import DemoPanel from "@/components/DemoPanel";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const display = Cormorant_Garamond({ variable: "--font-display", subsets: ["latin"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"] });
+const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "GhostBuster",
@@ -14,21 +14,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}>
+    <html lang="en">
+      <body className={`${display.variable} ${mono.variable} font-sans antialiased min-h-screen`}>
         {/* Honesty rule: crisis line on every screen, including the first. Hidden when printing. */}
-        <div className="sticky top-0 z-50 bg-red-700 text-white text-center text-base font-semibold py-2 print:hidden">
+        <div className="sticky top-0 z-50 bg-ink py-2 text-center font-mono text-sm font-medium tracking-wide text-paper print:hidden">
           In crisis? Call or text{" "}
-          <a href="tel:988" className="underline decoration-2 underline-offset-2">
+          <a href="tel:988" className="bg-sun px-1.5 py-0.5 font-bold text-ink">
             988
           </a>{" "}
           — the Suicide &amp; Crisis Lifeline, 24/7
         </div>
-        <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 print:hidden">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-            <span aria-hidden className="text-2xl">👻</span> GhostBuster
+        <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 print:hidden">
+          <Link href="/" className="display text-3xl" aria-label="GhostBuster home">
+            Ghost<span className="block-mark ml-0.5">buster</span>
           </Link>
-          <span className="text-sm text-zinc-400">Evidence log + templates · not legal advice</span>
+          <span className="label text-right text-ink/60">Evidence log + templates · not legal advice</span>
         </header>
         {children}
         <DemoPanel />

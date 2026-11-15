@@ -27,10 +27,8 @@ function Segmented<T extends string>({
           aria-checked={value === o}
           key={o}
           onClick={() => onChange(o)}
-          className={`rounded-xl border-2 px-4 py-3 text-lg font-semibold transition ${
-            value === o
-              ? "border-indigo-400 bg-indigo-500/20 text-white"
-              : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-500"
+          className={`rounded-[2px] border border-ink px-4 py-3 font-mono text-sm font-medium uppercase tracking-wider transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt ${
+            value === o ? "bg-ink text-paper" : "bg-paper text-ink hover:bg-ink/10"
           }`}
         >
           {labels[o]}
@@ -44,8 +42,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between gap-4">
-        <span className="text-lg font-semibold text-zinc-100">{label}</span>
-        {hint && <span className="text-sm text-zinc-500">{hint}</span>}
+        <span className="label text-ink">{label}</span>
+        {hint && <span className="label text-right text-ink/55">{hint}</span>}
       </div>
       {children}
     </div>
@@ -59,10 +57,10 @@ function CoverageNote({ strong }: { strong: boolean }) {
     <div
       key={strong ? "strong" : "plain"}
       role="note"
-      className={`slide-in mt-3 rounded-xl p-4 leading-snug ${
+      className={`slide-in mt-3 rounded-[2px] p-4 leading-snug ${
         strong
-          ? "border-2 border-amber-500 bg-amber-950/60 text-lg text-amber-100"
-          : "border border-zinc-700 bg-zinc-900/60 text-base text-zinc-300"
+          ? "border border-ink bg-sun text-xl text-ink shadow-[4px_4px_0_var(--ink)]"
+          : "border border-dotted border-ink/50 bg-paper text-lg text-ink/80"
       }`}
     >
       <p>
@@ -72,9 +70,7 @@ function CoverageNote({ strong }: { strong: boolean }) {
       </p>
       <details className="group mt-2">
         <summary
-          className={`cursor-pointer list-none font-semibold ${
-            strong ? "text-amber-300 hover:text-amber-200" : "text-indigo-300 hover:text-indigo-200"
-          }`}
+          className="label cursor-pointer list-none text-ink underline-offset-4 hover:underline"
         >
           <span className="inline-block transition-transform group-open:rotate-90">▸</span> Who does this apply to?
         </summary>
@@ -105,7 +101,7 @@ export default function SearchPage() {
   const zipOk = /^\d{5}$/.test(form.zip);
   const warnCoverage = form.plan_type === "ppo" || form.plan_type === "unknown";
   const input =
-    "w-full rounded-xl border-2 border-zinc-700 bg-zinc-900 px-4 py-3 text-xl text-white outline-none focus:border-indigo-400";
+    "field";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,10 +123,11 @@ export default function SearchPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 pb-20 pt-6">
-      <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Find care</h1>
-      <p className="mt-2 text-xl text-zinc-400">Tell us about your plan. We&apos;ll check who&apos;s really available.</p>
+      <p className="label text-ink/60">Step 01 / 03 · your plan</p>
+      <h1 className="display mt-3 text-6xl sm:text-7xl">Find care</h1>
+      <p className="mt-3 text-2xl text-ink/75">Tell us about your plan. We&apos;ll check who&apos;s really available.</p>
 
-      <form onSubmit={submit} className="mt-8 space-y-7">
+      <form onSubmit={submit} className="card mt-8 space-y-7 p-6 sm:p-8">
         <Field label="Insurance company">
           <select
             className={input}
@@ -159,7 +156,7 @@ export default function SearchPage() {
 
         <Field label="ZIP code">
           <input
-            className={`${input} max-w-48 font-mono tracking-widest`}
+            className={`${input} max-w-48 tracking-widest`}
             inputMode="numeric"
             maxLength={5}
             value={form.zip}
@@ -201,7 +198,7 @@ export default function SearchPage() {
             <Field label="Date of your last appointment" hint="Optional — the follow-up clock starts here">
               <input
                 type="date"
-                className={`${input} max-w-64 [color-scheme:dark]`}
+                className={`${input} max-w-64`}
                 value={form.prior_appointment_date ?? ""}
                 onChange={(e) => patch({ prior_appointment_date: e.target.value || null })}
               />
@@ -209,11 +206,11 @@ export default function SearchPage() {
           </div>
         )}
 
-        {error && <p className="text-lg font-semibold text-red-400">{error}</p>}
+        {error && <p className="font-mono text-sm font-semibold text-signal">{error}</p>}
 
         <button
           disabled={busy || !zipOk}
-          className="w-full rounded-2xl bg-indigo-500 px-8 py-5 text-2xl font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400 disabled:opacity-50 sm:w-auto"
+          className="btn btn-solid btn-lg w-full sm:w-auto"
         >
           {busy ? "Starting…" : "Check my directory →"}
         </button>

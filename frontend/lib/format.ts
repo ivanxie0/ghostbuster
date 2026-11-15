@@ -33,48 +33,48 @@ export const STATUS_LABEL: Record<GhostStatus, string> = {
 /** Tailwind classes per status: badge, row accent, text accent, flash color. */
 export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; text: string; flash: string }> = {
   ghost: {
-    badge: "bg-zinc-700 text-zinc-200",
+    badge: "bg-ink/10 text-ink/60",
     // (confirmed-on-call ghosts add CONFIRMED_GHOST_STYLE on top of this)
-    row: "border-zinc-800 bg-zinc-900/40 opacity-70",
-    text: "text-zinc-400",
-    flash: "rgba(161,161,170,.5)",
+    row: "border-dashed border-ink/35 bg-paper text-ink/55",
+    text: "text-ink/50",
+    flash: "rgba(20,20,15,.3)",
   },
   unverified: {
-    badge: "bg-sky-900 text-sky-100 ring-1 ring-sky-500/50",
-    row: "border-zinc-700 bg-zinc-900",
-    text: "text-sky-300",
-    flash: "rgba(56,189,248,.5)",
+    badge: "bg-paper text-ink ring-1 ring-ink",
+    row: "border-ink/40 bg-paper",
+    text: "text-ink/70",
+    flash: "rgba(20,20,15,.3)",
   },
   calling: {
-    badge: "bg-indigo-500 text-white animate-pulse",
-    row: "border-indigo-400 bg-indigo-950/60 ring-2 ring-indigo-400/60",
-    text: "text-indigo-200",
-    flash: "rgba(129,140,248,.6)",
+    badge: "bg-cobalt text-paper animate-pulse",
+    row: "border-cobalt bg-[#eef1fc] shadow-[4px_4px_0_var(--cobalt)]",
+    text: "text-cobalt",
+    flash: "rgba(30,64,201,.5)",
   },
   available: {
-    badge: "bg-emerald-500 text-emerald-950",
-    row: "border-emerald-500 bg-emerald-950/50",
-    text: "text-emerald-300",
-    flash: "rgba(16,185,129,.7)",
+    badge: "bg-moss text-paper",
+    row: "border-moss bg-[#eef7f1]",
+    text: "text-moss",
+    flash: "rgba(29,122,70,.55)",
   },
   violation: {
-    badge: "bg-red-500 text-white",
-    row: "border-red-500 bg-red-950/50",
-    text: "text-red-300",
-    flash: "rgba(239,68,68,.7)",
+    badge: "bg-signal text-paper",
+    row: "border-signal bg-[#fdf0ee]",
+    text: "text-signal",
+    flash: "rgba(212,53,31,.55)",
   },
   no_answer: {
-    badge: "bg-amber-400 text-amber-950",
-    row: "border-amber-500/70 bg-amber-950/40",
-    text: "text-amber-300",
-    flash: "rgba(245,158,11,.6)",
+    badge: "bg-sun text-ink",
+    row: "border-ink/50 bg-[#fffbe0]",
+    text: "text-ink",
+    flash: "rgba(255,214,10,.8)",
   },
 };
 
 /** Confirmed ghost: ghost grey with a red outline. */
 export const CONFIRMED_GHOST_STYLE = {
-  badge: "bg-zinc-700 text-zinc-100 ring-2 ring-red-500",
-  row: "border-red-500/70 bg-zinc-900/60",
+  badge: "bg-ink/10 text-ink ring-2 ring-signal",
+  row: "border-signal bg-paper text-ink/70",
 };
 
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
