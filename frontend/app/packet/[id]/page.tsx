@@ -37,11 +37,11 @@ export default function PacketPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 pb-20 pt-2">
-      <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ink bg-paper/95 px-6 py-4 backdrop-blur print:hidden">
+      <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-page/95 px-6 py-4 backdrop-blur print:hidden">
         <div>
-          <Link href={`/results/${id}`} className="label text-ink/60 hover:text-ink">← Back to results</Link>
-          <h1 className="display mt-2 text-5xl">Your timely access grievance</h1>
-          <p className="mt-2 font-mono text-xs text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
+          <Link href={`/results/${id}`} className="text-sm font-medium text-ink/60 hover:text-ink">← Back to results</Link>
+          <h1 className="display mt-1 text-4xl">Your timely access grievance</h1>
+          <p className="mt-1 text-sm text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -62,14 +62,14 @@ export default function PacketPage() {
       </div>
 
       {error && (
-        <div className="rounded-[2px] border border-signal bg-[#fdf0ee] p-6 text-xl">
+        <div className="rounded-xl border border-signal/40 bg-[#fdf3f1] p-6 text-lg">
           Couldn&apos;t load the packet: {error}.{" "}
           <Link href="/search" className="underline">Start a new search</Link>
         </div>
       )}
-      {!html && !error && <div className="h-[70vh] animate-pulse rounded-[2px] border border-dashed border-ink/30 bg-ink/5" />}
+      {!html && !error && <div className="h-[70vh] animate-pulse rounded-xl bg-ink/5" />}
       {html && (
-        <div className="rise overflow-hidden rounded-[2px] border border-ink bg-white shadow-[8px_8px_0_rgba(20,20,15,.15)]">
+        <div className="rise card overflow-hidden">
           <iframe
             ref={frame}
             title="Timely access grievance"
@@ -80,7 +80,7 @@ export default function PacketPage() {
           />
         </div>
       )}
-      <p className="label mt-6 text-center text-ink/60 print:hidden">
+      <p className="mt-6 text-center text-sm text-ink/55 print:hidden">
         Evidence log + templates, not legal advice. Review and fill in your member ID before sending.
       </p>
     </main>

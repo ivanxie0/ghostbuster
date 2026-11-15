@@ -27,8 +27,8 @@ function Segmented<T extends string>({
           aria-checked={value === o}
           key={o}
           onClick={() => onChange(o)}
-          className={`rounded-[2px] border border-ink px-4 py-3 font-mono text-sm font-medium uppercase tracking-wider transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt ${
-            value === o ? "bg-ink text-paper" : "bg-paper text-ink hover:bg-ink/10"
+          className={`rounded-lg border px-4 py-3 text-base font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-deep ${
+            value === o ? "border-ink bg-ink text-paper" : "border-ink/20 bg-paper text-ink hover:border-ink/60"
           }`}
         >
           {labels[o]}
@@ -42,8 +42,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between gap-4">
-        <span className="label text-ink">{label}</span>
-        {hint && <span className="label text-right text-ink/55">{hint}</span>}
+        <span className="text-base font-semibold text-ink">{label}</span>
+        {hint && <span className="text-right text-sm text-ink/55">{hint}</span>}
       </div>
       {children}
     </div>
@@ -57,10 +57,10 @@ function CoverageNote({ strong }: { strong: boolean }) {
     <div
       key={strong ? "strong" : "plain"}
       role="note"
-      className={`slide-in mt-3 rounded-[2px] p-4 leading-snug ${
+      className={`slide-in mt-3 p-4 leading-relaxed ${
         strong
-          ? "border border-ink bg-sun text-xl text-ink shadow-[4px_4px_0_var(--ink)]"
-          : "border border-dotted border-ink/50 bg-paper text-lg text-ink/80"
+          ? "notice text-base"
+          : "rounded-lg border border-line bg-page text-sm text-ink/75"
       }`}
     >
       <p>
@@ -70,7 +70,7 @@ function CoverageNote({ strong }: { strong: boolean }) {
       </p>
       <details className="group mt-2">
         <summary
-          className="label cursor-pointer list-none text-ink underline-offset-4 hover:underline"
+          className="cursor-pointer list-none text-sm font-semibold underline-offset-4 hover:underline"
         >
           <span className="inline-block transition-transform group-open:rotate-90">▸</span> Who does this apply to?
         </summary>
@@ -123,9 +123,8 @@ export default function SearchPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 pb-20 pt-6">
-      <p className="label text-ink/60">Step 01 / 03 · your plan</p>
-      <h1 className="display mt-3 text-6xl sm:text-7xl">Find care</h1>
-      <p className="mt-3 text-2xl text-ink/75">Tell us about your plan. We&apos;ll check who&apos;s really available.</p>
+      <h1 className="display mt-6 text-5xl">Find care</h1>
+      <p className="mt-3 text-lg text-ink/70">Tell us about your plan. We&apos;ll check who&apos;s really available.</p>
 
       <form onSubmit={submit} className="card mt-8 space-y-7 p-6 sm:p-8">
         <Field label="Insurance company">
@@ -156,7 +155,7 @@ export default function SearchPage() {
 
         <Field label="ZIP code">
           <input
-            className={`${input} max-w-48 tracking-widest`}
+            className={`${input} max-w-48 font-mono tracking-widest`}
             inputMode="numeric"
             maxLength={5}
             value={form.zip}
@@ -206,7 +205,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {error && <p className="font-mono text-sm font-semibold text-signal">{error}</p>}
+        {error && <p className="text-sm font-semibold text-signal">{error}</p>}
 
         <button
           disabled={busy || !zipOk}

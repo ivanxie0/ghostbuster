@@ -33,48 +33,48 @@ export const STATUS_LABEL: Record<GhostStatus, string> = {
 /** Tailwind classes per status: badge, row accent, text accent, flash color. */
 export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; text: string; flash: string }> = {
   ghost: {
-    badge: "bg-ink/10 text-ink/60",
+    badge: "bg-ink/8 text-ink/60",
     // (confirmed-on-call ghosts add CONFIRMED_GHOST_STYLE on top of this)
-    row: "border-dashed border-ink/35 bg-paper text-ink/55",
+    row: "border-line bg-page text-ink/55",
     text: "text-ink/50",
     flash: "rgba(20,20,15,.3)",
   },
   unverified: {
-    badge: "bg-paper text-ink ring-1 ring-ink",
-    row: "border-ink/40 bg-paper",
+    badge: "bg-paper text-ink/70 ring-1 ring-ink/25",
+    row: "border-line bg-paper",
     text: "text-ink/70",
     flash: "rgba(20,20,15,.3)",
   },
   calling: {
     badge: "bg-cobalt text-paper animate-pulse",
-    row: "border-cobalt bg-[#eef1fc] shadow-[4px_4px_0_var(--cobalt)]",
+    row: "border-cobalt/60 bg-[#f1f4fd] ring-2 ring-cobalt/20",
     text: "text-cobalt",
     flash: "rgba(30,64,201,.5)",
   },
   available: {
     badge: "bg-moss text-paper",
-    row: "border-moss bg-[#eef7f1]",
+    row: "border-moss/50 bg-[#f0f8f3]",
     text: "text-moss",
     flash: "rgba(29,122,70,.55)",
   },
   violation: {
     badge: "bg-signal text-paper",
-    row: "border-signal bg-[#fdf0ee]",
+    row: "border-signal/40 bg-[#fdf3f1]",
     text: "text-signal",
     flash: "rgba(212,53,31,.55)",
   },
   no_answer: {
-    badge: "bg-sun text-ink",
-    row: "border-ink/50 bg-[#fffbe0]",
-    text: "text-ink",
-    flash: "rgba(255,214,10,.8)",
+    badge: "bg-[#f7e7bd] text-[#6b4e0a]",
+    row: "border-[#ecd9a4] bg-[#fdf8ea]",
+    text: "text-[#6b4e0a]",
+    flash: "rgba(183,121,31,.45)",
   },
 };
 
 /** Confirmed ghost: ghost grey with a red outline. */
 export const CONFIRMED_GHOST_STYLE = {
-  badge: "bg-ink/10 text-ink ring-2 ring-signal",
-  row: "border-signal bg-paper text-ink/70",
+  badge: "bg-ink/8 text-ink ring-1 ring-signal",
+  row: "border-signal/50 bg-page text-ink/70",
 };
 
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */

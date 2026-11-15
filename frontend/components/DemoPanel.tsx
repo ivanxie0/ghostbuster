@@ -101,7 +101,7 @@ export default function DemoPanel() {
         <button
           onClick={() => setOpen(true)}
           title="Demo controls (Shift+D)"
-          className="fixed bottom-3 right-3 z-50 rounded-[2px] border border-ink bg-sun px-2.5 py-1 font-mono text-[0.68rem] font-semibold text-ink shadow-[3px_3px_0_var(--ink)]"
+          className="fixed bottom-3 right-3 z-50 notice !rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
         >
           ⚠ {indicator}
         </button>
@@ -111,10 +111,10 @@ export default function DemoPanel() {
         <div
           role="dialog"
           aria-label="Demo controls"
-          className="slide-in fixed bottom-3 right-3 z-50 w-80 rounded-[2px] border border-ink bg-paper p-4 font-mono text-xs text-ink shadow-[6px_6px_0_var(--ink)]"
+          className="slide-in fixed bottom-3 right-3 z-50 card w-80 p-4 text-sm text-ink shadow-xl"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider">Demo controls</h2>
+            <h2 className="text-base font-semibold">Demo controls</h2>
             <button onClick={() => setOpen(false)} className="rounded px-2 text-ink/60 hover:text-ink" aria-label="Close">
               ✕
             </button>
@@ -137,7 +137,7 @@ export default function DemoPanel() {
           <button
             onClick={resetToPreset}
             disabled={busy !== null}
-            className="mt-4 w-full rounded-[2px] bg-ink px-3 py-2.5 text-left font-semibold text-paper hover:bg-cobalt disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-ink px-3 py-2.5 text-left font-semibold text-paper hover:bg-cobalt disabled:opacity-50"
           >
             {busy === "reset" ? "Starting…" : "↺ Reset: preset demo search"}
             <span className="block text-xs font-normal text-paper/75">
@@ -145,7 +145,7 @@ export default function DemoPanel() {
             </span>
           </button>
 
-          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-[2px] border border-ink/50 p-3">
+          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3">
             <input
               type="checkbox"
               className="mt-0.5 h-4 w-4 accent-[var(--ink)]"

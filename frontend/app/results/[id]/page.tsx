@@ -96,12 +96,12 @@ export default function ResultsPage() {
       <main className="mx-auto max-w-3xl px-6 py-16 text-center">
         {expired ? (
           <>
-            <h1 className="display text-5xl">This search has expired</h1>
-            <p className="mt-3 text-xl text-ink/65">The server restarted. Start a new search.</p>
+            <h1 className="display text-4xl">This search has expired</h1>
+            <p className="mt-3 text-lg text-ink/65">The server restarted. Start a new search.</p>
             <Link href="/search" className="btn btn-solid mt-6">New search</Link>
           </>
         ) : (
-          <p className="animate-pulse font-mono text-base text-ink/60">{error ? `Reconnecting… (${error})` : "Loading…"}</p>
+          <p className="animate-pulse text-lg text-ink/60">{error ? `Reconnecting… (${error})` : "Loading…"}</p>
         )}
       </main>
     );
@@ -134,13 +134,13 @@ export default function ResultsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl space-y-7 px-6 pb-20 pt-2">
+    <main className="mx-auto max-w-7xl space-y-6 px-6 pb-20 pt-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="label text-ink/65">
+          <p className="text-sm font-medium text-ink/60">
             {search.insurer} · {PLAN_LABEL[search.plan_type]} · ZIP {search.zip}
           </p>
-          <h1 className="display mt-2 text-5xl sm:text-6xl">
+          <h1 className="display mt-1 text-4xl sm:text-5xl">
             {SPECIALTY_LABEL[search.specialty]} · legal limit {deadlineText(search)}
           </h1>
         </div>
@@ -150,14 +150,14 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      {error && <p className="rounded-[2px] border border-signal bg-[#fdf0ee] p-3 font-mono text-sm text-signal">Connection issue: {error} — retrying…</p>}
+      {error && <p className="rounded-lg border border-signal/40 bg-[#fdf3f1] p-3 text-sm text-signal">Connection issue: {error} — retrying…</p>}
 
       <Counters providers={providers} />
       <LegalNote />
 
       {search.status === "scraping" && (
-        <div className="relative h-3 overflow-hidden rounded-[2px] border border-ink bg-paper">
-          <div className="scan-bar absolute inset-y-0 w-1/3 bg-ink" />
+        <div className="relative h-1.5 overflow-hidden rounded-full bg-ink/10">
+          <div className="scan-bar absolute inset-y-0 w-1/3 rounded-full bg-cobalt" />
         </div>
       )}
 
@@ -174,13 +174,13 @@ export default function ResultsPage() {
 
       <div className="grid gap-6 lg:grid-cols-12">
         <section className="lg:col-span-7">
-          <h2 className="label mb-3 border-t border-ink pt-3 text-ink/70">
+          <h2 className="label mb-3 text-ink/60">
             Listed in the {search.insurer} directory
           </h2>
           {providers.length === 0 ? (
             <div className="space-y-3">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-20 animate-pulse rounded-[2px] border border-dashed border-ink/30 bg-ink/5" />
+                <div key={i} className="h-20 animate-pulse rounded-xl bg-ink/5" />
               ))}
             </div>
           ) : (
