@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -48,7 +48,7 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
         break;
       case "ghost":
         out.push(isConfirmedGhost(p) || wasCalled(p)
-          ? { tone: "ghost", pid: p.id, focus: true, text: `${name}: ${reason ?? "listed, but not accepting this plan/new patients"}` }
+          ? { tone: "ghost", pid: p.id, focus: true, text: `${name}: ${reason ? honestReason(reason) : "not accepting this plan/new patients"}` }
           : { tone: "ghost", pid: p.id, text: `Ghost: ${name} — ${reason ?? "not accepting"}` });
         break;
       case "available":
@@ -334,7 +334,7 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
 function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
-    case "ghost": return <span className="text-ink/55">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "")}</span>;
+    case "ghost": return <span className="text-ink/55">{maskPhonesIn(profileCheck(p)?.text ?? honestReason(p.ghost_reason))}</span>;
     case "unverified": return <span className="text-ink/60">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "Looks real — not called yet")}</span>;
     case "calling": return <span className="text-cobalt">AI assistant is on the line…</span>;
     case "no_answer": return <span className="text-ink/80">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
@@ -470,7 +470,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         )}
         {provider.ghost_status === "ghost" && wasCalled(provider) && (
           <p className="rounded-lg border border-signal/40 bg-signal/10 p-3 text-base text-ink">
-            Confirmed on the call: <b>listed, but not accepting this plan/new patients.</b>
+            Confirmed on the call: <b>not accepting this plan/new patients.</b>
           </p>
         )}
         {provider.ghost_status === "ghost" && !wasCalled(provider) && (

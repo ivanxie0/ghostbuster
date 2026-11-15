@@ -33,6 +33,6 @@ DMHC will tell you if it does not regulate your plan. In general:
 FREE ONE-ON-ONE HELP
 Health Consumer Alliance, DMHC's consumer assistance partner: 1-888-804-3536. They can help you file the grievance and the DMHC form.
 
-Summary of this search: {n_listed} providers listed, {n_ghosts} unavailable listings, {n_called} offices called, {n_violations} past the legal deadline of {deadline_text}, {n_no_answer} no answer. Search reference {search_id}, generated {today}.
+Summary of this search: {n_listed} providers checked, {n_ghosts} that appear unavailable, {n_called} offices called, {n_violations} past the legal deadline of {deadline_text}, {n_no_answer} no answer. Search reference {search_id}, generated {today}.
 
 If you are in crisis, call or text 988.

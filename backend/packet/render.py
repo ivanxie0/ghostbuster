@@ -58,10 +58,10 @@ T = {
         "notice": "<b>Evidence log + template — not legal advice.</b> Review and fill in the blanks before sending. In crisis? Call or text <b>988</b>.",
         "title": "Timely Access Grievance", "generated": "generated", "ref": "ref",
         "reps": "Calls were placed on {today}, with the enrollee&#39;s permission, by an AI assistant acting as the <b>enrollee&#39;s authorized representative</b>. The assistant identified itself as an AI calling on behalf of a patient.",
-        "c_listed": "Listed in directory", "c_ghosts": "Listings that appear unavailable", "c_called": "Offices reached", "c_past": "Past legal deadline",
+        "c_listed": "Providers checked", "c_ghosts": "Providers that appear unavailable", "c_called": "Offices reached", "c_past": "Past legal deadline",
         "f_avail": "At least one provider we reached offered a timely appointment.",
         "f_none": "No provider we reached could offer a timely appointment.", "f_zero": "No offices were reached.",
-        "part1": "Part 1 — Evidence log", "calls_h": "Calls to listed providers", "ghosts_h": "Directory listings that appear unavailable",
+        "part1": "Part 1 — Evidence log", "calls_h": "Calls to providers near you", "ghosts_h": "Providers that appear unavailable",
         "part2": "Part 2 — Grievance letter to {insurer}", "next": "Next steps",
         "steps": [
             "<b>File the grievance.</b> Send the letter above the way your plan accepts grievances, and call member services with the script below. Keep copies and write down dates.",
@@ -78,10 +78,10 @@ T = {
         "notice": "<b>Registro de evidencia y plantilla — no es asesoría legal.</b> Revise y complete los espacios antes de enviarlo. ¿Está en crisis? Llame o envíe un mensaje de texto al <b>988</b>.",
         "title": "Queja de acceso oportuno", "generated": "generado el", "ref": "ref.",
         "reps": "Las llamadas se hicieron el {today}, con el permiso del miembro, por un asistente de IA que actuó como <b>representante autorizado del miembro</b>. El asistente se identificó como una IA que llamaba en nombre de un paciente.",
-        "c_listed": "En el directorio", "c_ghosts": "Listados que no parecen disponibles", "c_called": "Consultorios contactados", "c_past": "Fuera del plazo legal",
+        "c_listed": "Proveedores revisados", "c_ghosts": "Proveedores que no parecen disponibles", "c_called": "Consultorios contactados", "c_past": "Fuera del plazo legal",
         "f_avail": "Al menos un proveedor con el que nos comunicamos ofreció una cita a tiempo.",
         "f_none": "Ningún proveedor con el que nos comunicamos pudo ofrecer una cita a tiempo.", "f_zero": "No se contactó a ningún consultorio.",
-        "part1": "Parte 1 — Registro de evidencia", "calls_h": "Llamadas a proveedores del directorio", "ghosts_h": "Listados del directorio que no parecen disponibles",
+        "part1": "Parte 1 — Registro de evidencia", "calls_h": "Llamadas a proveedores cercanos", "ghosts_h": "Proveedores que no parecen disponibles",
         "part2": "Parte 2 — Carta de queja a {insurer}", "next": "Próximos pasos",
         "steps": [
             "<b>Presente la queja.</b> Envíe la carta de arriba como su plan acepte las quejas y llame a servicios para miembros con el guion de abajo. Guarde copias y anote las fechas.",
@@ -96,7 +96,7 @@ T = {
     },
 }
 
-CALLED_GHOST_LABEL = "Listed, but not accepting this plan/new patients"
+CALLED_GHOST_LABEL = "Not accepting this plan / new patients"
 LABEL = {"available": "Available in time", "violation": "Past legal deadline", "no_answer": "No answer",
          "ghost": "Appears unavailable", "unverified": "Not called", "calling": "Call in progress"}
 
@@ -158,6 +158,12 @@ def _flag_source(p) -> str:
     return m.group(1) if m else (p.source_url or "")
 
 
+def _reason(p) -> str:
+    """ghost_reason for display: phones masked, and no claim the provider is listed in the plan's directory
+    (rules/deadlines.py stores "Confirmed on call: listed, but not accepting ..."; providers come from the NPI registry)."""
+    return mask_phones_in(p.ghost_reason).replace("listed, but not accepting", "not accepting")
+
+
 def _e(v) -> str:
     return html.escape("" if v is None else str(v))
 
@@ -206,11 +212,11 @@ def render_packet(search_id: str, lang: str = "en") -> str:
         f"<td>{short_datetime(p.checked_at.astimezone(TZ)) if p.checked_at else ''}</td>"
         f"<td><span class='pill {p.ghost_status}'>{CALLED_GHOST_LABEL if p.ghost_status == 'ghost' else LABEL[p.ghost_status]}</span></td>"
         f"<td>{short_date(p.earliest_date) if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
-        f"<td>{_e(mask_phones_in(p.ghost_reason))}</td></tr>"
+        f"<td>{_e(_reason(p))}</td></tr>"
         for p in called
     ) or "<tr><td colspan='7' class='muted'>No offices were called.</td></tr>"
     ghost_rows = "".join(
-        f"<tr><td><b>{_e(p.name)}</b></td><td>{_e(mask_phone(p.phone))}</td><td>{_e(mask_phones_in(p.ghost_reason))}</td>"
+        f"<tr><td><b>{_e(p.name)}</b></td><td>{_e(mask_phone(p.phone))}</td><td>{_e(_reason(p))}</td>"
         f"<td class='small'>{_e(_flag_source(p))}"
         f"{'<br><span class=muted>checked ' + short_date(p.checked_at.astimezone(TZ)) + '</span>' if p.checked_at and p.source_url else ''}</td></tr>"
         for p in ghosts
@@ -231,7 +237,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     demo_banner = (
         "<div class='demo'><b>DEMO DATA — fictional providers.</b> "
         + ("Every provider in this packet is" if all_demo else "Providers with example.com sources are")
-        + " made up for a hackathon demonstration. They are not real offices and no real listing is being labeled.</div>"
+        + " made up for a hackathon demonstration. They are not real offices and no real provider is being labeled.</div>"
     ) if demo else ""
     any_available = any(p.ghost_status == "available" for p in called)
     finding = tr["f_avail"] if any_available else tr["f_none"] if called else tr["f_zero"]
@@ -261,7 +267,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
 <p class="small muted">{tr['calls_note']}</p>
 <table><tr><th>Provider</th><th>Phone</th><th>Called</th><th>Result</th><th>Earliest</th><th>Wait</th><th>Notes</th></tr>{log_rows}</table>
 <h3>{tr['ghosts_h']}</h3>
-<table><tr><th>Provider</th><th>Listed phone</th><th>Why flagged</th><th>Source</th></tr>{ghost_rows}</table>
+<table><tr><th>Provider</th><th>Phone on record</th><th>Why flagged</th><th>Source</th></tr>{ghost_rows}</table>
 
 <h2 class="pb">{tr['part2'].format(insurer=_e(s.insurer))}</h2><pre>{_tpl('letter.txt', ctx, lang)}</pre>
 

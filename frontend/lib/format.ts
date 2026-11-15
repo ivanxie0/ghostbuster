@@ -104,6 +104,11 @@ export function checkedDate(iso: string | null | undefined): string {
   return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" });
 }
 
+/** Display text for a stored ghost_reason: no claim the provider is listed in the plan's directory
+ *  (rules/deadlines.py stores "Confirmed on call: listed, but not accepting ..."; providers come from the NPI registry). */
+export const honestReason = (reason: string | null | undefined): string =>
+  (reason ?? "").replace("listed, but not accepting", "not accepting");
+
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
 export function maskPhone(phone: string | null | undefined): string {
   if (!phone) return "";
