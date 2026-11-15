@@ -72,7 +72,7 @@ Response `200`:
 { "started": 2, "provider_ids": ["6f1c...0002", "6f1c...0004"] }
 ```
 Errors: `404` unknown search, `400 {"error": "provider_ids not in this search: [...]"}`.
-Each called row moves `unverified → calling → available | violation | no_answer`.
+Each called row moves `unverified → calling → available | violation | no_answer | ghost` (`ghost` = office said on the call it isn't taking new patients / the plan; `ghost_reason` starts with `Confirmed on call:`).
 
 FAKE_MODE note: by default (`FAKE_AUTO_VERIFY=false`) the simulation waits for this endpoint — the user's
 consent click. Set `FAKE_AUTO_VERIFY=true` to auto-start calls on all `unverified` providers ~10s after the

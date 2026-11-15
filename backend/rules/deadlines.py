@@ -84,13 +84,16 @@ def check_violation(provider: Provider, search: Search, asked_at: datetime | Non
     deadline = limit_h // 24 if urgent else DEADLINES[search.specialty][search.appointment_type]
 
     if provider.earliest_date is None:
-        # calls/webhook.py appends "Result: not accepting ..." when the office said so (status stays no_answer).
-        said_no = "\nResult: not accepting" in (provider.call_transcript or "")
+        # calls/webhook.py appends "Result: not accepting ..." when the office said so -> a ghost confirmed
+        # on the call (calling -> ghost). The UI keys on the "Confirmed on call:" prefix.
+        if "\nResult: not accepting" in (provider.call_transcript or ""):
+            return provider.model_copy(update={
+                "ghost_status": "ghost", "deadline_days": deadline, "violation": False, "business_days_wait": None,
+                "ghost_reason": "Confirmed on call: listed, but not accepting new patients with this plan",
+            })
         return provider.model_copy(update={
             "ghost_status": "no_answer", "deadline_days": deadline, "violation": False,
-            "business_days_wait": None,
-            "ghost_reason": ("Called: listed, but not accepting new patients with this plan" if said_no
-                             else "No answer / no usable appointment date"),
+            "business_days_wait": None, "ghost_reason": "No answer / no usable appointment date",
         })
 
     start = clock_start(search, asked_at)

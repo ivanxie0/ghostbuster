@@ -103,7 +103,10 @@ def test_not_accepting_reason_in_rules():
                created_at=datetime(2026, 11, 14, 14, tzinfo=TZ), status="verifying")
     p = Provider(name="T", specialty="therapist", call_transcript="Office: no\nResult: not accepting new patients")
     out = check_violation(p, s)
-    assert out.ghost_status == "no_answer" and "not accepting" in out.ghost_reason
+    assert out.ghost_status == "ghost" and out.ghost_reason.startswith("Confirmed on call:")
+    assert out.call_transcript  # transcript kept as evidence
+    plain = check_violation(Provider(name="T", specialty="therapist", call_transcript="Agent: (voicemail)"), s)
+    assert plain.ghost_status == "no_answer"
 
 
 def test_weekday_plus_date_prefers_date():
