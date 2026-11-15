@@ -58,6 +58,7 @@ export default function Home() {
         <p className="label text-ink/60">GhostBuster produces an evidence log and letter templates. It is not legal advice.</p>
         <nav className="label flex gap-5">
           <Link href="/map" className="underline underline-offset-4 hover:text-cobalt">San Diego Ghost Map →</Link>
+          <Link href="/how" className="underline underline-offset-4 hover:text-cobalt">How it works →</Link>
         </nav>
       </footer>
     </main>
