@@ -9,7 +9,7 @@ Contract: start_verification(search_id, provider_ids) -> dict[provider_id, statu
 
 HONESTY / SAFETY (non-negotiable):
   - ONLY dial numbers in TEAMMATE_PHONE_1/2/3 (is_allowed_number). Never a real provider.
-  - First sentence: it is an AI assistant calling on behalf of a patient, and the call is transcribed.
+  - First sentence: it is an AI assistant calling on behalf of a patient, and the call is recorded and transcribed.
 
 Agent config (prompt, tools, 60s cap) lives in calls/setup_agent.py — run it to create/update the agent.
 Real calls happen when ELEVENLABS_API_KEY + ELEVENLABS_AGENT_ID + ELEVENLABS_PHONE_NUMBER_ID are set.
@@ -26,8 +26,8 @@ from app.models import Provider, Search
 
 API = "https://api.elevenlabs.io/v1/convai"
 CALL_TIMEOUT_S = 90      # task 4: no result after this -> no_answer
-RINGING_TIMEOUT_S = 20   # + ~10s Twilio trial preamble + 55s max conversation < 90s
-MAX_CALL_S = 55
+RINGING_TIMEOUT_S = 20   # 20s ring + 60s max conversation < 90s watchdog
+MAX_CALL_S = 60          # ElevenLabs minimum is 60
 
 # conversation_id -> (search_id, provider_id). call_initiation_failure webhooks carry no dynamic
 # variables, so webhook.py resolves them through this map (same process).
@@ -35,7 +35,7 @@ CONVERSATIONS: dict[str, tuple[str, str]] = {}
 
 # ElevenLabs {{var}} syntax; filled from dynamic_variables (see call_vars). Discloses AI + transcription first.
 FIRST_MESSAGE = (
-    "Hi, I'm an AI assistant calling on behalf of a patient, and this call is being transcribed. "
+    "Hi, I'm an AI assistant calling on behalf of a patient, and this call is being recorded and transcribed. "
     "I'm checking availability with {{provider_name}} for a patient with {{insurer}} {{plan_label}}. "
     "Do you take that plan, and what's the earliest {{visit_kind}} appointment you have, in person or by telehealth?"
 )

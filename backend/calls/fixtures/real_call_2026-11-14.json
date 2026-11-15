@@ -1,0 +1,1649 @@
+{
+  "type": "post_call_transcription",
+  "event_timestamp": 1794711402,
+  "data": {
+    "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+    "agent_name": "GhostBuster caller",
+    "conversation_product": "agent",
+    "status": "done",
+    "user_id": "REDACTED",
+    "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+    "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq",
+    "metadata": {
+      "start_time_unix_secs": 1794711342,
+      "accepted_time_unix_secs": 1794711342,
+      "call_duration_secs": 60,
+      "queue_wait_secs": null,
+      "cost": 482,
+      "deletion_settings": {
+        "deletion_time_unix_secs": null,
+        "deleted_logs_at_time_unix_secs": null,
+        "deleted_audio_at_time_unix_secs": null,
+        "deleted_transcript_at_time_unix_secs": null,
+        "delete_transcript_and_pii": false,
+        "delete_audio": false
+      },
+      "feedback": {
+        "type": null,
+        "overall_score": null,
+        "likes": 0,
+        "dislikes": 0,
+        "rating": null,
+        "comment": null
+      },
+      "authorization_method": "signed_url",
+      "charging": {
+        "dev_discount": false,
+        "is_burst": false,
+        "tier": "creator",
+        "llm_usage": {
+          "irreversible_generation": {
+            "model_usage": {
+              "deepseek-v41-flash": {
+                "input": {
+                  "tokens": 580,
+                  "price": 0.00031900000000000006
+                },
+                "input_cache_read": {
+                  "tokens": 12672,
+                  "price": 0.0034848000000000006
+                },
+                "input_cache_write": {
+                  "tokens": 2208,
+                  "price": 0.0012144
+                },
+                "output_total": {
+                  "tokens": 170,
+                  "price": 0.0025499999999999997
+                }
+              }
+            },
+            "detailed_model_usage": [
+              {
+                "config": {
+                  "model": "deepseek-v41-flash",
+                  "service_tier": "standard"
+                },
+                "usage": {
+                  "input": {
+                    "tokens": 580,
+                    "price": 0.00031900000000000006
+                  },
+                  "input_cache_read": {
+                    "tokens": 12672,
+                    "price": 0.0034848000000000006
+                  },
+                  "input_cache_write": {
+                    "tokens": 2208,
+                    "price": 0.0012144
+                  },
+                  "output_total": {
+                    "tokens": 170,
+                    "price": 0.0025499999999999997
+                  }
+                }
+              }
+            ]
+          },
+          "initiated_generation": {
+            "model_usage": {
+              "deepseek-v41-flash": {
+                "input": {
+                  "tokens": 580,
+                  "price": 0.00031900000000000006
+                },
+                "input_cache_read": {
+                  "tokens": 12672,
+                  "price": 0.0034848000000000006
+                },
+                "input_cache_write": {
+                  "tokens": 2208,
+                  "price": 0.0012144
+                },
+                "output_total": {
+                  "tokens": 170,
+                  "price": 0.0025499999999999997
+                }
+              }
+            },
+            "detailed_model_usage": [
+              {
+                "config": {
+                  "model": "deepseek-v41-flash",
+                  "service_tier": "standard"
+                },
+                "usage": {
+                  "input": {
+                    "tokens": 580,
+                    "price": 0.00031900000000000006
+                  },
+                  "input_cache_read": {
+                    "tokens": 12672,
+                    "price": 0.0034848000000000006
+                  },
+                  "input_cache_write": {
+                    "tokens": 2208,
+                    "price": 0.0012144
+                  },
+                  "output_total": {
+                    "tokens": 170,
+                    "price": 0.0025499999999999997
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "llm_price": 0.007568200000000001,
+        "llm_charge": 42,
+        "call_charge": 440,
+        "platform_charge": 440,
+        "platform_usage": {
+          "category_usage": {
+            "voice": {
+              "credits": 440,
+              "price": 0.0800147678599848,
+              "quantity": 1.00018459824981
+            }
+          }
+        },
+        "platform_price": 0.0800147678599848,
+        "free_minutes_consumed": 0.0,
+        "free_llm_dollars_consumed": 0.0,
+        "tts_usage": {
+          "primary_tts_model": "eleven_v4_turbo",
+          "total_audio_output_seconds": 60.24000000000001,
+          "total_characters": 978,
+          "per_voice_usage": [
+            {
+              "voice_id": "cjVigY5qzO86Huf0OWal",
+              "audio_output_seconds": 60.24000000000001
+            }
+          ]
+        },
+        "asr_usage": {
+          "asr_model": "scribe_realtime",
+          "total_transcription_calls": 89,
+          "total_audio_input_seconds": 17.400000000000006
+        },
+        "analysis": null,
+        "subagent_charge": 0,
+        "voice_surcharge_charge": null,
+        "user_memory": null
+      },
+      "phone_call": {
+        "direction": "outbound",
+        "phone_number_id": "phnum_5201m7ehfb36f8btnftdrvhs6agf",
+        "agent_number": "+15550000000",
+        "external_number": "REDACTED",
+        "call_result": "answered",
+        "type": "twilio",
+        "stream_sid": "REDACTED",
+        "call_sid": "REDACTED"
+      },
+      "batch_call": null,
+      "termination_reason": "Conversation has exceeded maximum duration",
+      "error": null,
+      "warnings": [
+        "Call ended due to maximum call duration limit."
+      ],
+      "main_language": "en",
+      "rag_usage": null,
+      "text_only": false,
+      "features_usage": {
+        "language_detection": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_agent": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_number": {
+          "enabled": false,
+          "used": false
+        },
+        "multivoice": {
+          "enabled": false,
+          "used": false
+        },
+        "dtmf_tones": {
+          "enabled": false,
+          "used": false
+        },
+        "external_mcp_servers": {
+          "enabled": false,
+          "used": false
+        },
+        "pii_zrm_workspace": false,
+        "pii_zrm_agent": false,
+        "tool_dynamic_variable_updates": {
+          "enabled": false,
+          "used": false
+        },
+        "is_livekit": false,
+        "voicemail_detection": {
+          "enabled": true,
+          "used": false
+        },
+        "dtmf_input": {
+          "enabled": false,
+          "used": false
+        },
+        "workflow": {
+          "enabled": false,
+          "version": 1,
+          "tool_node": {
+            "enabled": false,
+            "used": false
+          },
+          "standalone_agent_node": {
+            "enabled": false,
+            "used": false
+          },
+          "phone_number_node": {
+            "enabled": false,
+            "used": false
+          },
+          "end_node": {
+            "enabled": false,
+            "used": false
+          },
+          "override_agent_node": {
+            "enabled": false,
+            "used": false
+          },
+          "say_node": {
+            "enabled": false,
+            "used": false
+          },
+          "update_state_node": {
+            "enabled": false,
+            "used": false
+          },
+          "subgraph_node": {
+            "enabled": false,
+            "used": false
+          },
+          "transfer_to_genesys_node": {
+            "enabled": false,
+            "used": false
+          },
+          "start_procedure_node": {
+            "enabled": false,
+            "used": false
+          }
+        },
+        "agent_testing": {
+          "enabled": false,
+          "tests_ran_after_last_modification": false,
+          "tests_ran_in_last_7_days": false
+        },
+        "versioning": {
+          "enabled": true,
+          "used": false
+        },
+        "file_input": {
+          "enabled": true,
+          "used": false
+        },
+        "freeform_procedure": {
+          "enabled": false,
+          "used": false
+        },
+        "structured_procedure": {
+          "enabled": false,
+          "used": false
+        }
+      },
+      "eleven_assistant": {
+        "is_eleven_assistant": false
+      },
+      "initiator_id": null,
+      "conversation_initiation_source": "twilio",
+      "conversation_initiation_source_version": null,
+      "timezone": null,
+      "async_metadata": null,
+      "whatsapp": null,
+      "sms": null,
+      "agent_created_from": "api",
+      "agent_last_updated_from": "api",
+      "stream_state": null,
+      "voice_rewards": [],
+      "avatar_sessions": [],
+      "cost_fiat": 0.0875829678599848
+    },
+    "analysis": {
+      "evaluation_criteria_results": {},
+      "data_collection_results": {},
+      "evaluation_criteria_results_list": [],
+      "data_collection_results_list": [],
+      "call_successful": "success",
+      "call_success_score": null,
+      "transcript_summary": "The AI assistant called to check new-patient appointment availability for a patient with Blue Shield of California HMO. The clinic confirmed they accept this insurance. However, the clinic stated they do not have any new-patient appointments available. The conversation ended due to unintelligible responses from the user.",
+      "call_summary_title": "New Patient Availability",
+      "scoped": [],
+      "sentiment_analysis": {
+        "overall_label": "neutral",
+        "overall_sentiment_score": 0.0,
+        "overall_frustration_score": 0.1,
+        "min_user_sentiment_score": -0.1,
+        "max_user_frustration_score": 0.2,
+        "num_scored_user_turns": 4
+      },
+      "not_applicable": []
+    },
+    "user_message_count": 7,
+    "agent_message_count": 8,
+    "visited_agents": [
+      {
+        "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g"
+      }
+    ],
+    "conversation_initiation_client_data": {
+      "conversation_config_override": {
+        "asr": null,
+        "turn": null,
+        "tts": null,
+        "conversation": null,
+        "agent": null
+      },
+      "custom_llm_extra_body": {},
+      "user_id": null,
+      "source_info": {
+        "source": null,
+        "version": null
+      },
+      "branch_id": null,
+      "environment": null,
+      "starting_workflow_node_id": null,
+      "experiments": [],
+      "procedure_ids": null,
+      "start_procedure_ids": null,
+      "dynamic_variables": {
+        "search_id": "dial-test",
+        "provider_id": "dial-test",
+        "provider_name": "Dr. Test",
+        "insurer": "Blue Shield of California",
+        "plan_label": "HMO",
+        "visit_kind": "new-patient",
+        "system__agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "system__agent_turns": 8,
+        "system__current_agent_turns": 8,
+        "system__current_subagent_turns": 8,
+        "system__current_agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+        "system__conversation_id": "conv_7801m7ej3756ez4s69ajgazxpng0",
+        "system__call_duration_secs": 60,
+        "system__time_utc": "2026-11-15T02:56:42.885110+00:00",
+        "system__timezone": null,
+        "system__time": "Sunday, 02:56 15 November 2026",
+        "system__time_date": "Sunday, 15 November 2026",
+        "system__time_hour": 2,
+        "system__time_minute": 56,
+        "system__time_second": 42,
+        "system__is_text_only": false,
+        "system__channel": "twilio",
+        "system__caller_id": "+15550000000",
+        "system__guardrail_synthetic_voice": false,
+        "system__guardrail_human_voice": false,
+        "system__called_number": "REDACTED",
+        "system__call_sid": "REDACTED",
+        "system__call_id": null,
+        "system__conversation_history": "{\"x-elevenlabs-history\": true, \"entries\": [{\"role\": \"agent\", \"message\": \"Hi, I'm an AI assistant calling on behalf of a patient, and this call is being transcribed. I'm checking availability with Dr. Test for a patient with Blue Shield of California HMO. Do you take that plan, and what's the earliest new-patient appointment you have, in person or by telehealth?\"}, {\"role\": \"user\", \"message\": \"Yes, I have that plan, and I don't have an appointment yet.\"}, {\"role\": \"agent\", \"message\": \"[happy] Great, thank you. So just to confirm, you do accept Blue Shield of California HMO for a new-patient visit with Dr. Test?\"}, {\"role\": \"user\", \"message\": \"Yes.\"}, {\"role\": \"agent\", \"message\": \"[happy] Perfect, thank you. And what's the earliest new-patient appointment you have, in person or by ...\"}, {\"role\": \"user\", \"message\": \"In person.\"}, {\"role\": \"agent\", \"message\": \"[happy] Got it, in ...\"}, {\"role\": \"user\", \"message\": \"I don't have any.\"}, {\"role\": \"agent\", \"message\": \"[slow] Just to make sure I understand, you don't have any new-patient appointments available right now?\"}, {\"role\": \"user\", \"message\": \"No.\"}, {\"role\": \"agent\", \"message\": \"[slow] So no new-patient openings at all right ...\"}, {\"role\": \"user\", \"message\": \"Wait, I have to stick your La Torcian.\"}, {\"role\": \"agent\", \"message\": \"I'm sorry, I didn't quite catch that. Could you say it...\"}, {\"role\": \"user\", \"message\": \"The butterfly that can wear clothes.\"}, {\"role\": \"agent\", \"message\": \"[slow] I'm not sure I ...\"}]}",
+        "system__user_id": "REDACTED",
+        "system__initiator_id": null,
+        "system__environment": "production",
+        "system__agents_user_id": null,
+        "system__user_verification_level": null,
+        "system__uploaded_file_ids": []
+      },
+      "tool_mock_config": {
+        "mocking_strategy": "none",
+        "fallback_strategy": "raise_error",
+        "mocked_tool_names": []
+      },
+      "tool_mock_overrides": {}
+    },
+    "environment": "production",
+    "experiment_assignments": null,
+    "hiding_reason": null,
+    "smb_metadata": null,
+    "conversation_id": "conv_7801m7ej3756ez4s69ajgazxpng0",
+    "has_audio": true,
+    "has_user_audio": true,
+    "has_response_audio": true,
+    "has_auxiliary_audio": false,
+    "transcript": [
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "Hi, I'm an AI assistant calling on behalf of a patient, and this call is being transcribed. I'm checking availability with Dr. Test for a patient with Blue Shield of California HMO. Do you take that plan, and what's the earliest new-patient appointment you have, in person or by telehealth?",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 0,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.07565868698293343
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.08262327697593719
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.0
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 1,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "Yes, I have that plan, and I don't have an appointment yet.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 19,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.016400548978708684
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 145,
+        "used_static_kb_document_ids": [],
+        "analysis": {
+          "user_sentiment_score": 0.0,
+          "user_frustration_score": 0.0
+        },
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[happy] Great, thank you. So just to confirm, you do accept Blue Shield of California HMO for a new-patient visit with Dr. Test?",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 23,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.3043747289921157
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.24152466095983982
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.346951077983249
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.07398899702820927
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.5705865649762564
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.16
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.016400548978708684
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.016400548978708684
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 168,
+                "price": 9.240000000000001e-05
+              },
+              "input_cache_read": {
+                "tokens": 128,
+                "price": 3.52e-05
+              },
+              "input_cache_write": {
+                "tokens": 1824,
+                "price": 0.0010032
+              },
+              "output_total": {
+                "tokens": 33,
+                "price": 0.000495
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 168,
+                  "price": 9.240000000000001e-05
+                },
+                "input_cache_read": {
+                  "tokens": 128,
+                  "price": 3.52e-05
+                },
+                "input_cache_write": {
+                  "tokens": 1824,
+                  "price": 0.0010032
+                },
+                "output_total": {
+                  "tokens": 33,
+                  "price": 0.000495
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 145,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "Yes.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 32,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.01569552900036797
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 207,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[happy] Perfect, thank you. And what's the earliest new-patient appointment you have, in person or by ...",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 33,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.13372339500347152
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.08180391695350409
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.1548495540046133
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.07815570698585361
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.5645439510047436
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.32
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.01569552900036797
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.01569552900036797
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 110,
+                "price": 6.050000000000001e-05
+              },
+              "input_cache_read": {
+                "tokens": 1920,
+                "price": 0.000528
+              },
+              "input_cache_write": {
+                "tokens": 128,
+                "price": 7.04e-05
+              },
+              "output_total": {
+                "tokens": 26,
+                "price": 0.00039
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 110,
+                  "price": 6.050000000000001e-05
+                },
+                "input_cache_read": {
+                  "tokens": 1920,
+                  "price": 0.000528
+                },
+                "input_cache_write": {
+                  "tokens": 128,
+                  "price": 7.04e-05
+                },
+                "output_total": {
+                  "tokens": 26,
+                  "price": 0.00039
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": true,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": "[happy] Perfect, thank you. And what's the earliest new-patient appointment you have, in person or by telehealth?",
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 207,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "In person.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 39,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.03387156897224486
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 248,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[happy] Got it, in ...",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 39,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.1276699150330387
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.07573721703374758
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.15935684402938932
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.0830989169771783
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 6.660592200967949
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 6.4
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.03387156897224486
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.03387156897224486
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 13,
+                "price": 7.15e-06
+              },
+              "input_cache_read": {
+                "tokens": 2048,
+                "price": 0.0005632
+              },
+              "input_cache_write": {
+                "tokens": 128,
+                "price": 7.04e-05
+              },
+              "output_total": {
+                "tokens": 25,
+                "price": 0.000375
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 13,
+                  "price": 7.15e-06
+                },
+                "input_cache_read": {
+                  "tokens": 2048,
+                  "price": 0.0005632
+                },
+                "input_cache_write": {
+                  "tokens": 128,
+                  "price": 7.04e-05
+                },
+                "output_total": {
+                  "tokens": 25,
+                  "price": 0.000375
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": true,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": "[happy] Got it, in person. And what's the earliest date you have available for that new-patient visit?",
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 248,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "I don't have any.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 40,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.023944348969962448
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 260,
+        "used_static_kb_document_ids": [],
+        "analysis": {
+          "user_sentiment_score": 0.0,
+          "user_frustration_score": 0.0
+        },
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[slow] Just to make sure I understand, you don't have any new-patient appointments available right now?",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 41,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.17167733301175758
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.09959341603098437
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.1831021829857491
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.08202987699769437
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.48498043897142634
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.192
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.023944348969962448
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.023944348969962448
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 31,
+                "price": 1.705e-05
+              },
+              "input_cache_read": {
+                "tokens": 2048,
+                "price": 0.0005632
+              },
+              "input_cache_write": {
+                "tokens": 128,
+                "price": 7.04e-05
+              },
+              "output_total": {
+                "tokens": 23,
+                "price": 0.000345
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 31,
+                  "price": 1.705e-05
+                },
+                "input_cache_read": {
+                  "tokens": 2048,
+                  "price": 0.0005632
+                },
+                "input_cache_write": {
+                  "tokens": 128,
+                  "price": 7.04e-05
+                },
+                "output_total": {
+                  "tokens": 23,
+                  "price": 0.000345
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 260,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "No.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 48,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.016259528987575322
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 308,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[slow] So no new-patient openings at all right ...",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 49,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.12350161600625142
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.07148743799189106
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.14493160496931523
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.08610479696653783
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.4366163509739563
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.192
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.016259528987575322
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.016259528987575322
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 59,
+                "price": 3.245e-05
+              },
+              "input_cache_read": {
+                "tokens": 2176,
+                "price": 0.0005984000000000001
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0.0
+              },
+              "output_total": {
+                "tokens": 18,
+                "price": 0.00027
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 59,
+                  "price": 3.245e-05
+                },
+                "input_cache_read": {
+                  "tokens": 2176,
+                  "price": 0.0005984000000000001
+                },
+                "input_cache_write": {
+                  "tokens": 0,
+                  "price": 0.0
+                },
+                "output_total": {
+                  "tokens": 18,
+                  "price": 0.00027
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": true,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": "[slow] So no new-patient openings at all right now, is that correct?",
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 308,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "Wait, I have to stick your La Torcian.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 51,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.02925192902330309
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 333,
+        "used_static_kb_document_ids": [],
+        "analysis": {
+          "user_sentiment_score": -0.1,
+          "user_frustration_score": 0.2
+        },
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "I'm sorry, I didn't quite catch that. Could you say it...",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 53,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.10145705699687824
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.07007399800932035
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.12392240599729121
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.07967192697105929
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.5805259019699879
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.352
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.02925192902330309
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.02925192902330309
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 86,
+                "price": 4.7300000000000005e-05
+              },
+              "input_cache_read": {
+                "tokens": 2176,
+                "price": 0.0005984000000000001
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0.0
+              },
+              "output_total": {
+                "tokens": 18,
+                "price": 0.00027
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 86,
+                  "price": 4.7300000000000005e-05
+                },
+                "input_cache_read": {
+                  "tokens": 2176,
+                  "price": 0.0005984000000000001
+                },
+                "input_cache_write": {
+                  "tokens": 0,
+                  "price": 0.0
+                },
+                "output_total": {
+                  "tokens": 18,
+                  "price": 0.00027
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": true,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": "I'm sorry, I didn't quite catch that. Could you say it again?",
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 333,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "user",
+        "agent_metadata": null,
+        "message": "The butterfly that can wear clothes.",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": null,
+        "time_in_call_secs": 55,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_asr_trailing_service_latency": {
+              "elapsed_time": 0.029926528979558498
+            }
+          },
+          "convai_asr_provider": "Scribe v2 Realtime",
+          "convai_tts_model": null,
+          "convai_tts_cascade": null,
+          "voice_id": null
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": null,
+        "reasoning": [],
+        "source_medium": "audio",
+        "source_event_id": 364,
+        "used_static_kb_document_ids": [],
+        "analysis": {
+          "user_sentiment_score": -0.1,
+          "user_frustration_score": 0.2
+        },
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      },
+      {
+        "role": "agent",
+        "agent_metadata": {
+          "agent_id": "agent_2701m7ej2t9rf6rat6a42za4szp4",
+          "branch_id": "agtbrch_7401m7ej2vcbf59spk0mna2cd47g",
+          "workflow_node_id": null,
+          "version_id": "agtvrsn_5401m7ej2vcpekzbhdr52pcftaaq"
+        },
+        "message": "[slow] I'm not sure I ...",
+        "multivoice_message": null,
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "producing_llm": "deepseek-v41-flash",
+        "time_in_call_secs": 58,
+        "conversation_turn_metrics": {
+          "metrics": {
+            "convai_llm_service_ttf_sentence": {
+              "elapsed_time": 0.11435941501986235
+            },
+            "convai_llm_service_ttfb": {
+              "elapsed_time": 0.07328991702524945
+            },
+            "convai_llm_service_tt_last_sentence": {
+              "elapsed_time": 0.15683148399693891
+            },
+            "convai_tts_service_ttfb": {
+              "elapsed_time": 0.083815986989066
+            },
+            "convai_ttf_audio_since_silence": {
+              "elapsed_time": 0.404690461026039
+            },
+            "convai_turn_silence_before_initiation": {
+              "elapsed_time": 0.16
+            },
+            "convai_turn_asr_latency": {
+              "elapsed_time": 0.029926528979558498
+            },
+            "convai_turn_asr_excess": {
+              "elapsed_time": 0.029926528979558498
+            }
+          },
+          "convai_asr_provider": null,
+          "convai_tts_model": "eleven_v4_turbo",
+          "convai_tts_cascade": null,
+          "voice_id": "cjVigY5qzO86Huf0OWal"
+        },
+        "rag_retrieval_info": null,
+        "llm_usage": {
+          "model_usage": {
+            "deepseek-v41-flash": {
+              "input": {
+                "tokens": 113,
+                "price": 6.215e-05
+              },
+              "input_cache_read": {
+                "tokens": 2176,
+                "price": 0.0005984000000000001
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0.0
+              },
+              "output_total": {
+                "tokens": 27,
+                "price": 0.000405
+              }
+            }
+          },
+          "detailed_model_usage": [
+            {
+              "config": {
+                "model": "deepseek-v41-flash",
+                "service_tier": "standard"
+              },
+              "usage": {
+                "input": {
+                  "tokens": 113,
+                  "price": 6.215e-05
+                },
+                "input_cache_read": {
+                  "tokens": 2176,
+                  "price": 0.0005984000000000001
+                },
+                "input_cache_write": {
+                  "tokens": 0,
+                  "price": 0.0
+                },
+                "output_total": {
+                  "tokens": 27,
+                  "price": 0.000405
+                }
+              }
+            }
+          ]
+        },
+        "interrupted": true,
+        "ignored_as_backchannel": false,
+        "platform_event": null,
+        "original_message": "[slow] I'm not sure I understood that. Do you know roughly how far out the earliest new-patient opening might be?",
+        "reasoning": [],
+        "source_medium": null,
+        "source_event_id": 364,
+        "used_static_kb_document_ids": [],
+        "analysis": null,
+        "user_identifier": null,
+        "id": null,
+        "created_at_unix_ms": null,
+        "compaction": null,
+        "triggered_guardrails": [],
+        "workflow_goal": null,
+        "file_input": null,
+        "file_inputs": [],
+        "contextual_update_info": null,
+        "config_snapshot_id": null,
+        "origin": null,
+        "reasoned": false
+      }
+    ],
+    "tag_ids": [],
+    "realtime_config_snapshots": null,
+    "orchestrator": "conversational",
+    "realtime_context": null,
+    "otlp_traces": null
+  }
+}

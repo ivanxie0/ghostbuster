@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -82,8 +82,8 @@ export function PhasePill({ detail }: { detail: SearchDetail }) {
   const [label, cls] =
     status === "scraping" ? ["Scanning directory", "border-line bg-paper text-ink"]
     : status === "done" ? ["Complete", "border-ink bg-ink text-paper"]
-    : calling ? ["Calling offices", "border-cobalt bg-cobalt text-paper"]
-    : ["Ready to call", "border-[#ecd9a4] bg-[#fdf6e3] text-[#6b4e0a]"];
+    : calling ? ["Calling offices", "border-cobalt bg-cobalt text-char"]
+    : ["Ready to call", "border-sun/35 bg-sun/10 text-sun"];
   return (
     <span key={label} className={`flip-in inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold ${cls}`}>
       {status !== "done" && <span className="h-2 w-2 animate-pulse rounded-full bg-current" />}
@@ -92,24 +92,50 @@ export function PhasePill({ detail }: { detail: SearchDetail }) {
   );
 }
 
-function Counter({ label, value, tone }: { label: string; value: number; tone: string }) {
+/** ASCII bar: filled blocks for value out of total. */
+function asciiBar(value: number, total: number, width = 12) {
+  const n = total > 0 ? Math.round((value / total) * width) : 0;
+  return "█".repeat(n) + "░".repeat(width - n);
+}
+
+/** One quotable number: "5 of 10 listings appear unavailable". Real registry providers aren't insurer
+ *  listings, so the noun is "listings" only when every provider is demo data. */
+export function GhostRate({ providers }: { providers: Provider[] }) {
+  if (!providers.length) return null;
+  const unavailable = providers.filter((p) => p.ghost_status === "ghost").length;
+  const noun = providers.every(isDemoProvider) ? "listings" : "providers";
   return (
-    <div className="card px-5 py-4">
-      <div className="label text-ink/60">{label}</div>
-      <div key={value} className={`flip-in display mt-1 text-5xl tabular-nums ${tone}`}>{value}</div>
-    </div>
+    <p className="display text-4xl leading-tight sm:text-5xl" aria-live="polite">
+      <span key={unavailable} className="flip-in inline-block italic text-accent tabular-nums">{unavailable}</span>
+      <span className="tabular-nums"> of {providers.length}</span> {noun} <span className="text-ink/55">appear unavailable.</span>
+    </p>
   );
 }
 
+/** Tally sheet: one ruled strip, big numerals, ASCII bars scaled to the number listed. */
 export function Counters({ providers }: { providers: Provider[] }) {
   const n = (s: GhostStatus) => providers.filter((p) => p.ghost_status === s).length;
+  const total = providers.length;
+  const cols = [
+    { label: "listed", value: total, tone: "text-ink", bar: "text-ink/35" },
+    { label: "ghosts", value: n("ghost"), tone: "text-ink/50", bar: "text-ink/30" },
+    { label: "checked by phone", value: providers.filter(wasCalled).length, tone: "text-cobalt", bar: "text-cobalt/70" },
+    { label: "past deadline", value: n("violation"), tone: "text-signal", bar: "text-signal/80" },
+  ];
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      <Counter label="Listed" value={providers.length} tone="text-ink" />
-      <Counter label="Ghosts" value={n("ghost")} tone="text-ink/45" />
-      <Counter label="Checked" value={providers.filter(wasCalled).length} tone="text-cobalt" />
-      <Counter label="Past deadline" value={n("violation")} tone="text-signal" />
-    </div>
+    <section aria-label="Tally">
+      <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-xs text-ink/40">+-- TALLY {"-".repeat(160)}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4">
+        {cols.map((c, i) => (
+          <div key={c.label} className={`px-4 py-4 ${i % 2 ? "border-l" : ""} ${i > 0 ? "md:border-l" : ""} border-dashed border-ink/20`}>
+            <div key={c.value} className={`flip-in display text-6xl tabular-nums ${c.tone}`}>{c.value}</div>
+            <div className="mt-1 font-mono text-xs text-ink/60">{c.label}</div>
+            <div aria-hidden className={`mt-2 font-mono text-[11px] tracking-tighter ${c.bar}`}>{asciiBar(c.value, total)}</div>
+          </div>
+        ))}
+      </div>
+      <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-xs text-ink/40">+{"-".repeat(170)}</div>
+    </section>
   );
 }
 
@@ -152,19 +178,76 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
 }
 
 // ---------------------------------------------------------------- endings
+/** Rubber stamp for the verdict. */
+function Stamp({ tone, top, bottom }: { tone: "signal" | "moss"; top: string; bottom: string }) {
+  const c = tone === "signal" ? "border-signal text-signal" : "border-moss text-moss";
+  return (
+    <div aria-hidden className={`stamp inline-block rounded-md border-[3px] border-double px-5 py-3 text-center font-mono uppercase ${c}`}>
+      <div className="text-2xl font-bold tracking-[0.18em]">{top}</div>
+      <div className="mt-1 border-t border-current pt-1 text-[11px] tracking-[0.25em] opacity-80">{bottom}</div>
+    </div>
+  );
+}
+
+/** Dotted-leader ledger row: "past legal deadline ........ 4". */
+function Ledger({ rows }: { rows: { k: string; v: React.ReactNode; tone?: string }[] }) {
+  return (
+    <dl className="mt-8 space-y-2.5 font-mono text-sm">
+      {rows.map((r) => (
+        <div key={r.k} className="flex items-baseline gap-2">
+          <dt className="text-ink/65">{r.k}</dt>
+          <span aria-hidden className="mb-1 flex-1 border-b border-dotted border-ink/30" />
+          <dd className={`text-right font-semibold tabular-nums ${r.tone ?? "text-ink"}`}>{r.v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function Verdict({ tone, rule, children, aside }: { tone: "signal" | "moss"; rule: string; children: React.ReactNode; aside: React.ReactNode }) {
+  const rail = tone === "signal" ? "bg-signal" : "bg-moss";
+  const text = tone === "signal" ? "text-signal/80" : "text-moss/80";
+  return (
+    <section className="rise relative overflow-hidden rounded-2xl border border-line bg-paper">
+      <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${rail}`} />
+      <div aria-hidden className={`overflow-hidden whitespace-nowrap px-8 pt-5 font-mono text-xs ${text}`}>+-- {rule} {"-".repeat(160)}</div>
+      <div className="grid gap-10 px-8 pb-8 pt-6 lg:grid-cols-12">
+        <div className="lg:col-span-7">{children}</div>
+        <div className="lg:col-span-5 lg:border-l lg:border-dashed lg:border-ink/20 lg:pl-10">{aside}</div>
+      </div>
+    </section>
+  );
+}
+
 export function EndingA({ search, provider, id, violations }: { search: Search; provider: Provider; id: string; violations: number }) {
   const w = waitVsDeadline(search, provider);
   return (
-    <section className="rise card border-moss/50 p-6 ring-4 ring-moss/10 sm:p-8">
+    <Verdict
+      tone="moss"
+      rule="FINDING · APPOINTMENT AVAILABLE"
+      aside={
+        <>
+          <Stamp tone="moss" top="In time" bottom={`limit ${w?.limit ?? deadlineText(search)}`} />
+          <Ledger
+            rows={[
+              { k: "earliest opening", v: shortDate(provider.earliest_date) },
+              { k: "wait", v: w?.wait ?? "—", tone: "text-moss" },
+              { k: "legal limit", v: w?.limit ?? deadlineText(search) },
+              ...(violations > 0 ? [{ k: "other offices past deadline", v: violations, tone: "text-signal" }] : []),
+            ]}
+          />
+        </>
+      }
+    >
       <p className="label text-moss">Good news</p>
-      <h2 className="display mt-2 text-4xl sm:text-5xl">
-        {provider.name} can see you {longDate(provider.earliest_date)}.
+      <h2 className="display mt-3 text-4xl sm:text-5xl">
+        {provider.name} can see you <span className="italic text-moss">{longDate(provider.earliest_date)}</span>.
       </h2>
-      <p className="mt-4 text-xl text-ink">
+      <p className="mt-4 text-xl text-ink/85">
         That&apos;s <b>{w?.wait}</b> away — within the legal limit of {w?.limit}.
       </p>
       {provider.address && <p className="mt-2 text-base text-ink/60">{provider.address}</p>}
-      <div className="mt-6 flex flex-wrap items-center gap-4">
+      <div className="mt-7 flex flex-wrap items-center gap-4">
         <a
           href={provider.phone ? `tel:${provider.phone}` : provider.source_url ?? "#"}
           target={provider.phone ? undefined : "_blank"}
@@ -179,10 +262,10 @@ export function EndingA({ search, provider, id, violations }: { search: Search; 
           </Link>
         )}
       </div>
-      <p className="rule-dotted mt-5 pt-3 text-sm text-ink/60">
+      <p className="mt-6 font-mono text-xs leading-relaxed text-ink/55">
         Tip: say you&apos;re a {search.insurer} {PLAN_LABEL[search.plan_type]} member and ask for the {shortDate(provider.earliest_date)} new-patient slot.
       </p>
-    </section>
+    </Verdict>
   );
 }
 
@@ -193,33 +276,54 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
   const confirmed = providers.filter(isConfirmedGhost).length;
   const listedGhosts = n("ghost") - confirmed;
   const selfFunded = search.plan_type === "ppo" || search.plan_type === "unknown";
+  const packet = ["Evidence log of every call", `Grievance letter to ${search.insurer}`, "Member-services phone script", "Next steps with the DMHC"];
   return (
-    <section className="rise card border-signal/50 p-6 ring-4 ring-signal/10 sm:p-8">
+    <Verdict
+      tone="signal"
+      rule="FINDING · NO TIMELY APPOINTMENT"
+      aside={
+        <>
+          <Stamp tone="signal" top="Past deadline" bottom={`limit ${deadlineText(search)}`} />
+          <Ledger
+            rows={[
+              { k: "offices reached", v: checked },
+              { k: "past legal deadline", v: n("violation"), tone: "text-signal" },
+              ...(confirmed > 0 ? [{ k: "not taking plan / new patients", v: confirmed, tone: "text-signal" }] : []),
+              { k: "no answer", v: n("no_answer") },
+              { k: "other listings unavailable", v: listedGhosts, tone: "text-ink/60" },
+              { k: "legal limit", v: deadlineText(search) },
+            ]}
+          />
+        </>
+      }
+    >
       <p className="label text-signal">Timely access grievance ready</p>
-      <h2 className="display mt-2 text-4xl sm:text-5xl">
-        No provider we reached could offer a timely appointment.
+      <h2 className="display mt-3 text-4xl sm:text-5xl">
+        No provider we reached could offer a <span className="italic text-signal">timely</span> appointment.
       </h2>
-      <p className="mt-4 text-xl font-semibold leading-snug text-ink">
-        Under California law, your plan must now arrange timely care, including out-of-network at in-network cost.
+      <p className="mt-4 text-xl leading-snug text-ink/85">
+        You can now ask your plan to arrange timely care, including out-of-network at in-network cost.
       </p>
-      <p className="mt-4 text-lg leading-relaxed text-ink/80">
-        Legal limit: {deadlineText(search)}. Of {checked} offices we reached, <b>{n("violation")}</b> were past the legal
-        deadline{confirmed > 0 && <>, <b>{confirmed}</b> said they aren&apos;t taking this plan or new patients</>}, and{" "}
-        <b>{n("no_answer")}</b> didn&apos;t answer. <b>{listedGhosts}</b> more listings appear unavailable.
-      </p>
-      <p className="mt-2 text-lg text-ink/65">
-        Your packet has the evidence log, a grievance letter to {search.insurer}, a phone script, and next steps with the DMHC.
-      </p>
+      <p className="label mt-8 text-ink/55">Your packet</p>
+      <ul className="mt-3 space-y-1.5 font-mono text-sm text-ink/85">
+        {packet.map((x) => (
+          <li key={x}>
+            <span className="text-accent">[x]</span> {x}
+          </li>
+        ))}
+      </ul>
       {selfFunded && (
-        <p className="notice mt-4 p-3 text-base">
+        <p className="notice mt-5 p-3 text-sm">
           If your PPO is a self-funded employer plan, these California rules may not apply — the call log is still useful evidence.
         </p>
       )}
-      <Link href={`/packet/${id}`} className="btn btn-solid btn-lg mt-6">
-        Download grievance packet <span aria-hidden>↓</span>
-      </Link>
-      <p className="mt-4 text-sm text-ink/55">Evidence log + template, not legal advice.</p>
-    </section>
+      <div className="mt-7 flex flex-wrap items-center gap-5">
+        <Link href={`/packet/${id}`} className="btn btn-solid btn-lg">
+          Open grievance packet <span aria-hidden>→</span>
+        </Link>
+        <span className="text-sm text-ink/55">Evidence log + template, not legal advice.</span>
+      </div>
+    </Verdict>
   );
 }
 
@@ -227,8 +331,8 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
 function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
-    case "ghost": return <span className="text-ink/55">{maskPhonesIn(p.ghost_reason ?? "")}</span>;
-    case "unverified": return <span className="text-ink/60">{maskPhonesIn(p.ghost_reason ?? "Looks real — not called yet")}</span>;
+    case "ghost": return <span className="text-ink/55">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "")}</span>;
+    case "unverified": return <span className="text-ink/60">{maskPhonesIn(profileCheck(p)?.text ?? p.ghost_reason ?? "Looks real — not called yet")}</span>;
     case "calling": return <span className="text-cobalt">AI assistant is on the line…</span>;
     case "no_answer": return <span className="text-ink/80">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
     default:
@@ -255,9 +359,9 @@ export function DemoDataTag({ providers }: { providers: Provider[] }) {
 /** Jai's legal caveats — always visible on results. */
 export function LegalNote() {
   return (
-    <p className="rounded-lg border border-line bg-paper px-4 py-2.5 text-sm text-ink/70">
-      <span className="font-semibold text-ink">Note:</span> A provider can lawfully set a longer wait if they note
-      in your record that it won&apos;t harm your health. Telehealth appointments count.
+    <p className="border-l-2 border-accent/70 pl-4 text-sm leading-relaxed text-ink/70">
+      <span className="mr-2 font-mono text-xs font-semibold uppercase tracking-wider text-accent-deep">Note</span>A provider can lawfully
+      set a longer wait if they note in your record that it won&apos;t harm your health. Telehealth appointments count.
     </p>
   );
 }
@@ -294,6 +398,21 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
                 <StatusBadge status={p.ghost_status} confirmed={confirmed} />
               </div>
             </button>
+            {(() => {
+              // Real ghost from the public-profile check: show where it came from (link sits outside the button).
+              const pc = profileCheck(p);
+              const url = pc?.url ?? (p.ghost_status === "ghost" ? p.source_url : null);
+              if (!url) return null;
+              const when = checkedDate(p.checked_at);
+              return (
+                <span className="mt-1 ml-5 inline-flex flex-wrap items-center gap-1.5 font-mono text-xs">
+                  <a href={url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">
+                    {pc ? `✓ Profile checked · ${pc.host ?? "source"} ↗` : "Source ↗"}
+                  </a>
+                  {when && <span className="text-ink/55">· checked {when}</span>}
+                </span>
+              );
+            })()}
           </li>
         );
       })}
@@ -310,7 +429,8 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
       </div>
     );
   const w = waitVsDeadline(search, provider);
-  const lines = (provider.call_transcript ?? "").split("\n").filter(Boolean);
+  // Skip empty turns (e.g. "Agent: " left after TTS tags are stripped).
+  const lines = (provider.call_transcript ?? "").split("\n").filter((l) => l.replace(/^(Agent|Office):\s*/, "").trim());
   return (
     <div className="window">
       <div className="window-bar"><span>Call transcript</span></div>
@@ -326,7 +446,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
       </div>
 
       {w && provider.earliest_date && (
-        <div className={`mt-4 grid grid-cols-2 gap-3 rounded-lg border p-3 ${provider.violation ? "border-signal/40 bg-[#fdf3f1]" : "border-moss/50 bg-[#f0f8f3]"}`}>
+        <div className={`mt-4 grid grid-cols-2 gap-3 rounded-lg border p-3 ${provider.violation ? "border-signal/40 bg-signal/10" : "border-moss/50 bg-moss/10"}`}>
           <div>
             <div className="label text-ink/60">Wait</div>
             <div className={`display text-2xl ${provider.violation ? "text-signal" : "text-moss"}`}>{w.wait}</div>
@@ -340,26 +460,42 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
 
       <div className="scroll-dark mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">
         {provider.ghost_status === "calling" && (
-          <div className="flex items-center gap-4 rounded-lg border border-cobalt/40 bg-[#f1f4fd] p-4 text-cobalt">
+          <div className="flex items-center gap-4 rounded-lg border border-cobalt/40 bg-cobalt/10 p-4 text-cobalt">
             <span className="eq" aria-hidden><span /><span /><span /><span /><span /></span>
             <span className="text-base font-semibold">Live call in progress — transcript arrives when the call ends.</span>
           </div>
         )}
         {provider.ghost_status === "ghost" && wasCalled(provider) && (
-          <p className="rounded-lg border border-signal/40 bg-[#fdf3f1] p-3 text-base text-ink">
+          <p className="rounded-lg border border-signal/40 bg-signal/10 p-3 text-base text-ink">
             Confirmed on the call: <b>listed, but not accepting this plan/new patients.</b>
           </p>
         )}
         {provider.ghost_status === "ghost" && !wasCalled(provider) && (
           <p className="text-base text-ink/80">
-            Not called — this listing is a ghost: <b>{maskPhonesIn(provider.ghost_reason ?? "")}</b>.{" "}
-            {provider.source_url && (
-              <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">Source</a>
+            Not called — this listing is a ghost:{" "}
+            <b>{maskPhonesIn(profileCheck(provider)?.text ?? provider.ghost_reason ?? "")}</b>.{" "}
+            {profileCheck(provider)?.url ? (
+              <a href={profileCheck(provider)!.url!} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">
+                Profile checked · {profileCheck(provider)!.host ?? "source"} ↗
+              </a>
+            ) : (
+              provider.source_url && (
+                <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">Source</a>
+              )
             )}
+            {checkedDate(provider.checked_at) && <span className="text-ink/55"> · checked {checkedDate(provider.checked_at)}</span>}
           </p>
         )}
         {provider.ghost_status === "unverified" && <p className="text-base text-ink/55">Not called yet.</p>}
         {lines.map((l, i) => {
+          if (l.startsWith("Result:")) {
+            return (
+              <div key={i} className="slide-in border-l-4 border-cobalt bg-cobalt/5 px-4 py-2.5 font-mono text-sm leading-snug text-ink" style={{ animationDelay: `${i * 80}ms` }}>
+                <div className="mb-1 text-[0.62rem] font-semibold uppercase tracking-widest text-cobalt">Extracted from the call</div>
+                {maskPhonesIn(l.replace(/^Result:\s*/, ""))}
+              </div>
+            );
+          }
           const text = maskPhonesIn(l.replace(/^(Agent|Office):\s*/, ""));
           const system = text.startsWith("("); // e.g. "(no answer — voicemail box full)"
           const office = !system && l.startsWith("Office:");

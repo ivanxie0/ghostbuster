@@ -15,9 +15,12 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 | `provider.ghost_status` | `ghost`, `unverified`, `calling`, `available`, `violation`, `no_answer` |
 
 `ghost_status` meanings:
-- `ghost` — listed by insurer, but public profile/registry shows not accepting / moved / disconnected. Not called.
+- `ghost` — listed by insurer, but not really available. Two ways to get here:
+  - **flagged before calling**: public profile/registry shows not accepting / moved / disconnected. Not called, `call_transcript` null.
+  - **confirmed on the call**: the office said it isn't taking new patients or doesn't take the plan. `ghost_reason` starts with
+    `Confirmed on call:` and `call_transcript` holds the call (it belongs in the packet's call log).
 - `unverified` — looks real, not called yet.
-- `calling` — AI call in progress (set by `/verify`). Lifecycle: `unverified → calling → available | violation | no_answer`.
+- `calling` — AI call in progress (set by `/verify`). Lifecycle: `unverified → calling → available | violation | no_answer | ghost`.
 - `available` — called; earliest opening is **within** the legal deadline.
 - `violation` — called; earliest opening is **past** the legal deadline.
 - `no_answer` — called; no answer / voicemail / no usable date.

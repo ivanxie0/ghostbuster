@@ -1,0 +1,46 @@
+PLANTILLA - NO ES ASESORÍA LEGAL. Léala, complete los espacios y cambie todo lo que no sea cierto en su caso antes de enviarla.
+
+{today}
+
+Para: {insurer} - Quejas y Apelaciones / Servicios para Miembros
+
+De: ______________________________ (nombre del miembro)
+Número de miembro: ____________________   Fecha de nacimiento: ____________
+Teléfono / correo electrónico: ______________________________
+
+ASUNTO: QUEJA DE ACCESO OPORTUNO - solicitud de {a_appointment_label} con {specialty_label}
+Referencia: búsqueda GhostBuster {search_id}
+
+Presento esta queja porque no puedo conseguir una cita a tiempo dentro de su red.
+
+1. LO QUE NECESITO
+Soy miembro de {insurer} ({plan_label}). Necesito {a_appointment_label} con {specialty_label} cerca del código postal {zip}. Pedí esta cita por primera vez el ____________ (si queda en blanco, use {today}).
+
+2. LO QUE PASÓ
+El {today}, con mi permiso, un asistente de IA que actuó como mi representante autorizado revisó los proveedores que aparecen en su directorio para este servicio cerca de mí y llamó a sus consultorios para pedir la cita más próxima, en persona o por telesalud. El asistente se identificó como una IA que llamaba en nombre de un paciente. Adjunto el registro completo de llamadas.
+- Proveedores en su directorio cerca de mí: {n_listed}
+- Listados que no parecen estar disponibles para mí: {n_ghosts}
+- Consultorios a los que se llamó: {n_called}
+- Consultorios cuya cita más próxima estaba fuera del plazo legal: {n_violations}
+- Consultorios que no contestaron o no pudieron dar una fecha: {n_no_answer}
+Ningún proveedor con el que nos comunicamos pudo ofrecer una cita a tiempo.
+
+3. LA NORMA
+La Sección 1367.03(a)(5) del Código de Salud y Seguridad de California y la Sección 1300.67.2.2(c)(5) del Título 28 del Código de Regulaciones de California exigen que la red del plan ofrezca este tipo de cita en un plazo de {deadline_text}. Ningún proveedor me ha dicho que se haya determinado y anotado en mi expediente que una espera más larga es segura para mí (Sección 1367.03(a)(5)(H)). No estoy eligiendo esperar a un proveedor en particular.
+
+4. LO QUE LES PIDO
+a) Que me consigan una cita dentro del plazo legal y me informen el nombre del proveedor, la fecha y la hora.
+b) Si ningún proveedor de la red puede atenderme a tiempo, que coordinen y cubran la cita con un proveedor fuera de la red. Según la Sección 1367.03(a)(7)(C), mi costo no puede ser mayor que mi copago, coaseguro y deducible dentro de la red.
+c) Que confirmen por escrito que recibieron esta queja y me envíen su decisión por escrito.
+d) Que corrijan los listados del directorio señalados en el registro adjunto.
+
+5. PLAZOS
+Consideren esta carta como mi queja formal y como mi solicitud de cita a partir de hoy. Entiendo que tienen hasta 30 días para resolver una queja estándar. Si no se resuelve o no recibo respuesta en 30 días, presentaré una queja ante el Centro de Ayuda del Departamento de Atención Médica Administrada de California (DMHC), 1-888-466-2219.
+
+[ ] MARQUE SI ES URGENTE: Mi condición es urgente. Esperar es una amenaza grave para mi salud. Solicito una revisión acelerada y una decisión en 3 días.
+
+Adjunto: registro de llamadas de GhostBuster (proveedor, número de teléfono, fecha y hora de la llamada, cita más próxima ofrecida, días hábiles de espera).
+
+Firma: ______________________________   Fecha: ____________
+
+Nota sobre esta plantilla: el registro de llamadas es evidencia de lo que dijeron los consultorios el día en que se les llamó. No es una conclusión legal. Estas normas se aplican a los planes con licencia del DMHC de California, incluidos los planes de atención administrada de Medi-Cal. Es posible que no se apliquen a planes autofinanciados de empleadores ni a Medicare. Si su cobertura es una póliza de seguro médico regulada por el Departamento de Seguros de California y no un plan con licencia del DMHC, la ley correspondiente es la Sección 10133.54 del Código de Seguros de California.

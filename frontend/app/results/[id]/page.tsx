@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityLog, ConsentCard, Counters, DemoDataTag, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
+  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostRate, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
@@ -137,21 +137,25 @@ export default function ResultsPage() {
     <main className="mx-auto max-w-7xl space-y-6 px-6 pb-20 pt-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-ink/60">
-            {search.insurer} · {PLAN_LABEL[search.plan_type]} · ZIP {search.zip}
+          <p className="font-mono text-xs uppercase tracking-wider text-ink/55">
+            <span className="text-accent-deep">File GB-{id.slice(0, 6).toUpperCase()}</span> · {search.insurer} · {PLAN_LABEL[search.plan_type]} · ZIP {search.zip}
           </p>
-          <h1 className="display mt-1 text-4xl sm:text-5xl">
-            {SPECIALTY_LABEL[search.specialty]} · legal limit {deadlineText(search)}
+          <h1 className="display mt-2 text-4xl sm:text-5xl">
+            {SPECIALTY_LABEL[search.specialty]}s, <span className="italic text-ink/60">legal limit {deadlineText(search)}</span>
           </h1>
         </div>
         <div className="flex flex-col items-end gap-2">
           <PhasePill detail={data} />
           <DemoDataTag providers={providers} />
+          <Link href="/map" className="label text-ink/60 underline underline-offset-4 hover:text-accent print:hidden">
+            San Diego Ghost Map →
+          </Link>
         </div>
       </div>
 
-      {error && <p className="rounded-lg border border-signal/40 bg-[#fdf3f1] p-3 text-sm text-signal">Connection issue: {error} — retrying…</p>}
+      {error && <p className="rounded-lg border border-signal/40 bg-signal/10 p-3 text-sm text-signal">Connection issue: {error} — retrying…</p>}
 
+      <GhostRate providers={providers} />
       <Counters providers={providers} />
       <LegalNote />
 

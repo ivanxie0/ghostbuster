@@ -37,6 +37,14 @@ def set_demo(body: DemoSettingsUpdate):
     return _demo_settings()
 
 
+@router.get("/stats/ghosts")
+def stats_ghosts():
+    """Ghost Map data: {by_insurer, by_zip}, real (registry) and demo (seed) providers counted separately."""
+    from app.pipeline import with_timeout
+    from app.stats import ghost_stats
+    return with_timeout(ghost_stats, 15, lambda: {"error_fallback": True, "by_insurer": [], "by_zip": []})
+
+
 @router.post("/search", response_model=SearchCreated)
 def create_search(req: SearchCreate):
     return SearchCreated(search_id=store.create_search(req))
@@ -75,7 +83,7 @@ async def call_complete(request: Request):
 
 
 @router.get("/search/{search_id}/packet", response_class=HTMLResponse)
-def packet(search_id: str):
+def packet(search_id: str, lang: str = "en"):
     if not store.get(search_id):
         raise HTTPException(404, "search not found")
-    return HTMLResponse(render_packet(search_id))
+    return HTMLResponse(render_packet(search_id, lang=lang))

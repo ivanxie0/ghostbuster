@@ -191,11 +191,11 @@ export default function Home() {
               ))}
               <Reveal delay={240}>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="rounded-xl border border-moss/40 bg-[#f0f8f3] p-6">
+                  <div className="rounded-xl border border-moss/40 bg-moss/10 p-6">
                     <p className="label text-moss">If someone can see you</p>
                     <p className="mt-2 text-lg leading-snug">We show you who, when, and the number to call to book.</p>
                   </div>
-                  <div className="rounded-xl border border-signal/35 bg-[#fdf3f1] p-6">
+                  <div className="rounded-xl border border-signal/35 bg-signal/10 p-6">
                     <p className="label text-signal">If nobody can in time</p>
                     <p className="mt-2 text-lg leading-snug">You get the call log, a letter to your plan, a phone script, and how to reach the regulator.</p>
                   </div>
@@ -225,34 +225,38 @@ export default function Home() {
       </div>
 
       {/* Revealed footer: pinned to the bottom of the viewport, uncovered as the page above scrolls away. */}
-      <footer className="sticky bottom-0 z-0 flex h-[100svh] flex-col justify-end overflow-hidden bg-accent px-6 pb-8 pt-16 text-ink">
+      <footer className="sticky bottom-0 z-0 flex h-[100svh] flex-col justify-end overflow-hidden bg-accent px-6 pb-8 pt-16 text-char">
         <div className="mx-auto grid w-full max-w-7xl items-end gap-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <h2 className="display text-6xl text-paper sm:text-8xl">Find out who&apos;s really there.</h2>
-            <div aria-hidden className="mt-8 overflow-hidden whitespace-nowrap font-mono text-sm text-ink/70">+-- START HERE {BOX_RULE}</div>
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 border-l border-ink/40 py-6 pl-5">
-              <Link href="/search" className="btn btn-solid btn-lg">
+            <h2 className="display text-6xl text-cream sm:text-8xl">Find out who&apos;s really there.</h2>
+            <div aria-hidden className="mt-8 overflow-hidden whitespace-nowrap font-mono text-sm text-char/70">+-- START HERE {BOX_RULE}</div>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 border-l border-char/40 py-6 pl-5">
+              <Link href="/search" className="btn btn-char btn-lg">
                 Find care <span aria-hidden>→</span>
               </Link>
-              <span className="font-mono text-sm text-ink/80">about a minute · no account · free</span>
+              <span className="font-mono text-sm text-char/80">about a minute · no account · free</span>
             </div>
-            <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-sm text-ink/70">+-- IN CRISIS? {BOX_RULE}</div>
-            <p className="border-l border-ink/40 py-5 pl-5 font-mono text-sm text-ink/85">
+            <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-sm text-char/70">+-- IN CRISIS? {BOX_RULE}</div>
+            <p className="border-l border-char/40 py-5 pl-5 font-mono text-sm text-char/85">
               Call or text{" "}
               <a href="tel:988" className="font-bold underline underline-offset-2">
                 988
               </a>{" "}
               — Suicide &amp; Crisis Lifeline, 24/7
             </p>
-            <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-sm text-ink/70">+{BOX_RULE}</div>
+            <div aria-hidden className="overflow-hidden whitespace-nowrap font-mono text-sm text-char/70">+{BOX_RULE}</div>
           </div>
           <div className="hidden justify-end lg:col-span-5 lg:flex">
-            <AsciiGhost className="text-[17px] font-bold text-ink/85" />
+            <AsciiGhost className="text-[17px] font-bold text-char/85" />
           </div>
         </div>
-        <p className="label mx-auto mt-8 w-full max-w-7xl text-ink/70">
-          © 2026 GhostBuster · Evidence log + templates, not legal advice
-        </p>
+        <div className="mx-auto mt-8 flex w-full max-w-7xl flex-wrap items-baseline justify-between gap-4">
+          <p className="label text-char/70">© 2026 GhostBuster · Evidence log + templates, not legal advice</p>
+          <nav className="label flex gap-5 text-char/85">
+            <Link href="/map" className="underline underline-offset-4 hover:text-cream">San Diego Ghost Map →</Link>
+            <Link href="/how" className="underline underline-offset-4 hover:text-cream">How it works →</Link>
+          </nav>
+        </div>
       </footer>
     </>
   );

@@ -103,7 +103,10 @@ def test_not_accepting_reason_in_rules():
                created_at=datetime(2026, 11, 14, 14, tzinfo=TZ), status="verifying")
     p = Provider(name="T", specialty="therapist", call_transcript="Office: no\nResult: not accepting new patients")
     out = check_violation(p, s)
-    assert out.ghost_status == "no_answer" and "not accepting" in out.ghost_reason
+    assert out.ghost_status == "ghost" and out.ghost_reason.startswith("Confirmed on call:")
+    assert out.call_transcript  # transcript kept as evidence
+    plain = check_violation(Provider(name="T", specialty="therapist", call_transcript="Agent: (voicemail)"), s)
+    assert plain.ghost_status == "no_answer"
 
 
 def test_weekday_plus_date_prefers_date():
@@ -122,3 +125,34 @@ def test_fake_mode_transcript_still_parses():
         assert (r.earliest_date is None) == (days is None)
         if days:
             assert (r.earliest_date - datetime.now(TZ).date()).days in (days, days - 1, days + 1)
+
+
+def test_voice_tags_stripped():
+    from calls.webhook import transcript_to_text
+    t = transcript_to_text([{"role": "agent", "message": "[happy] Great, thank you."},
+                            {"role": "user", "message": "We open [sic] Monday"}])
+    assert t == "Agent: Great, thank you.\nOffice: We open [sic] Monday"
+
+
+def test_real_call_fixture_parses():
+    import json
+    from pathlib import Path
+    payload = json.loads((Path(__file__).parent / "fixtures" / "real_call_2026-11-14.json").read_text())
+    r = handle_call_complete(payload)
+    assert r.search_id == "dial-test" and r.provider_id == "dial-test"
+    assert r.transcript.startswith("Agent: Hi, I'm an AI assistant calling on behalf of a patient")
+    assert "[happy]" not in r.transcript and "Office: I don't have any." in r.transcript
+    assert r.earliest_date is None  # "I don't have any" -> no date offered
+
+
+def test_empty_agent_turns_skipped():
+    from calls.webhook import transcript_to_text
+    t = transcript_to_text([{"role": "agent", "message": "Hi."}, {"role": "agent", "message": "[slow] "},
+                            {"role": "agent", "message": None}, {"role": "user", "message": "Hello"}])
+    assert t == "Agent: Hi.\nOffice: Hello"
+
+
+def test_opening_says_recorded_and_transcribed():
+    from calls.agent import FIRST_MESSAGE
+    from calls.setup_agent import SYSTEM_PROMPT
+    assert "recorded and transcribed" in FIRST_MESSAGE and "recorded and transcribed" in SYSTEM_PROMPT

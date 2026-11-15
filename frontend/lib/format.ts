@@ -37,36 +37,36 @@ export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; tex
     // (confirmed-on-call ghosts add CONFIRMED_GHOST_STYLE on top of this)
     row: "border-line bg-page text-ink/55",
     text: "text-ink/50",
-    flash: "rgba(20,20,15,.3)",
+    flash: "rgba(250,249,245,.25)",
   },
   unverified: {
     badge: "bg-paper text-ink/70 ring-1 ring-ink/25",
     row: "border-line bg-paper",
     text: "text-ink/70",
-    flash: "rgba(20,20,15,.3)",
+    flash: "rgba(250,249,245,.25)",
   },
   calling: {
-    badge: "bg-cobalt text-paper animate-pulse",
-    row: "border-cobalt/60 bg-[#f1f4fd] ring-2 ring-cobalt/20",
+    badge: "bg-cobalt text-char animate-pulse",
+    row: "border-cobalt/60 bg-cobalt/10 ring-2 ring-cobalt/20",
     text: "text-cobalt",
     flash: "rgba(30,64,201,.5)",
   },
   available: {
-    badge: "bg-moss text-paper",
-    row: "border-moss/50 bg-[#f0f8f3]",
+    badge: "bg-moss text-char",
+    row: "border-moss/50 bg-moss/10",
     text: "text-moss",
     flash: "rgba(29,122,70,.55)",
   },
   violation: {
-    badge: "bg-signal text-paper",
-    row: "border-signal/40 bg-[#fdf3f1]",
+    badge: "bg-signal text-char",
+    row: "border-signal/40 bg-signal/10",
     text: "text-signal",
     flash: "rgba(212,53,31,.55)",
   },
   no_answer: {
-    badge: "bg-[#f7e7bd] text-[#6b4e0a]",
-    row: "border-[#ecd9a4] bg-[#fdf8ea]",
-    text: "text-[#6b4e0a]",
+    badge: "bg-sun/20 text-sun",
+    row: "border-sun/35 bg-sun/10",
+    text: "text-sun",
     flash: "rgba(183,121,31,.45)",
   },
 };
@@ -76,6 +76,33 @@ export const CONFIRMED_GHOST_STYLE = {
   badge: "bg-ink/8 text-ink ring-1 ring-signal",
   row: "border-signal/50 bg-page text-ink/70",
 };
+
+/** Real ghost flag from Ivan's public-profile check. Matches reasons that start with "Profile checked:" or
+ *  real (non-seed) ghost reasons ending in "(https://source)". Returns clean text + the source link. */
+export function profileCheck(p: Provider): { text: string; url: string | null; host: string | null } | null {
+  const r = p.ghost_reason?.trim();
+  if (!r) return null;
+  const prefixed = r.startsWith("Profile checked:");
+  const m = r.match(/\((https?:\/\/[^\s)]+)\)\s*$/);
+  if (!prefixed && !(p.ghost_status === "ghost" && !isDemoProvider(p) && m)) return null;
+  let text = r.replace(/^Profile checked:\s*/, "");
+  if (m) text = text.slice(0, text.lastIndexOf(m[0])).trim();
+  const url = m?.[1] ?? p.source_url ?? null;
+  let host: string | null = null;
+  try {
+    host = url ? new URL(url).hostname.replace(/^www\./, "") : null;
+  } catch {
+    host = null;
+  }
+  return { text: text || "public profile says unavailable", url, host };
+}
+
+/** "Nov 14, 2026" in Pacific time, from a provider's checked_at. */
+export function checkedDate(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" });
+}
 
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
 export function maskPhone(phone: string | null | undefined): string {
@@ -134,7 +161,11 @@ export function waitVsDeadline(search: Search, p: Provider): { wait: string; lim
     return { wait: h == null ? "—" : `${h} hrs`, limit: `${p.deadline_days * 24} hrs` };
   }
   return {
-    wait: p.business_days_wait == null ? "—" : `${p.business_days_wait} business days`,
+    wait:
+      p.business_days_wait == null ? "—"
+      : p.business_days_wait === 0 ? "under 1 business day"
+      : p.business_days_wait === 1 ? "1 business day"
+      : `${p.business_days_wait} business days`,
     limit: `${p.deadline_days} business days`,
   };
 }
