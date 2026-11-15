@@ -8,7 +8,7 @@ import {
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
 import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, wasCalled } from "@/lib/format";
-import type { DemoSettings, SearchDetail } from "@/lib/types";
+import type { SearchDetail } from "@/lib/types";
 
 export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +18,6 @@ export default function ResultsPage() {
   const [pinned, setPinned] = useState<string | null>(null); // user-clicked provider
   const [focus, setFocus] = useState<string | null>(null); // auto-follow: latest thing that happened
   const [approving, setApproving] = useState(false);
-  const [demo, setDemo] = useState<DemoSettings | null>(null); // from /api/demo + the Shift+D panel
   const prev = useRef<SearchDetail | null>(null);
   const seq = useRef(0);
   const endingRef = useRef<HTMLDivElement>(null);
@@ -35,13 +34,6 @@ export default function ResultsPage() {
     setEvents((ev) => [...ev, ...items.map((e) => ({ ...e, id: seq.current++, at }))]);
   }, []);
 
-  // Demo settings decide who will really be called (consent card count).
-  useEffect(() => {
-    api.getDemo().then(setDemo).catch(() => {});
-    const onDemo = (e: Event) => setDemo((e as CustomEvent<DemoSettings>).detail);
-    window.addEventListener("gb-demo", onDemo);
-    return () => window.removeEventListener("gb-demo", onDemo);
-  }, []);
 
   // Tell the corner indicator which stages fell back for this search.
   const fallbackStages = [...new Set((data?.fallbacks ?? []).map((f) => f.stage))].join("|");
@@ -111,9 +103,9 @@ export default function ResultsPage() {
   const callable = providers.filter((p) => p.ghost_status === "unverified");
   // "Started" = any row is being or has been called. Directory ghosts don't count (they exist before consent).
   const started = approving || providers.some((p) => p.ghost_status === "calling" || wasCalled(p));
-  // Only demo (seed) providers get calls unless live calling is on; real offices are never simulated.
-  const live = !!demo?.real_calls && !demo?.force_fallback;
-  const willCall = live ? callable : callable.filter(isDemoProvider);
+  // Only demo offices (the teammate test phones) are ever dialed. Real registry providers are never called,
+  // in live mode or not, so they're neither counted nor sent to /verify.
+  const willCall = callable.filter(isDemoProvider);
   const showConsent = search.status === "verifying" && !started && willCall.length > 0;
   const done = search.status === "done";
   const available = providers
@@ -126,7 +118,7 @@ export default function ResultsPage() {
     setApproving(true);
     log([{ tone: "user", text: `You approved AI calls to ${willCall.length} offices.` }]);
     try {
-      await api.verify(id, callable.map((p) => p.id));
+      await api.verify(id, willCall.map((p) => p.id));
     } catch (e) {
       setError((e as Error).message);
       setApproving(false);

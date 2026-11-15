@@ -145,14 +145,19 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
     <section className="rise card border-cobalt/40 p-6 ring-4 ring-cobalt/10 sm:p-8">
       <p className="label text-cobalt">Your permission needed</p>
       <h2 className="display mt-2 text-3xl sm:text-4xl">
-        Want us to call {skipped > 0 ? `the ${count} demo offices` : `the ${count} remaining offices`}?
+        Want us to call {skipped > 0 ? `the ${count} demo ${count === 1 ? "office" : "offices"}` : `the ${count} remaining ${count === 1 ? "office" : "offices"}`}?
       </h2>
+      {skipped > 0 && (
+        <p className="mt-2 text-lg text-ink/80">
+          The other {skipped} {skipped === 1 ? "is a public-registry provider" : "are public-registry providers"} and won&apos;t be called during this demo.
+        </p>
+      )}
       <p className="mt-4 text-lg text-ink/80">
         With your permission, our AI assistant will act as your <b>authorized representative</b> and phone each office
         below. It will:
       </p>
       <ul className="mt-3 space-y-1.5 text-lg text-ink/80">
-        <li>✓ say at the start of the call that it&apos;s an <b>AI assistant calling on behalf of a patient</b> and that the call is being transcribed</li>
+        <li>✓ say at the start of the call that it&apos;s an <b>AI assistant calling on behalf of a patient</b> and that the call is being recorded and transcribed</li>
         <li>✓ ask only for the <b>earliest opening, in person or by telehealth</b>, with {search.insurer} {PLAN_LABEL[search.plan_type]}</li>
         <li>✓ <b>not</b> share your name, contact info, or health details</li>
       </ul>
@@ -160,12 +165,6 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
         Calls are <b>recorded and transcribed</b> so the transcript can go in your evidence log.
       </p>
       <p className="rule-dotted mt-4 pt-3 text-sm text-ink/60">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
-      {skipped > 0 && (
-        <p className="mt-1 text-sm text-ink/60">
-          The other {skipped} listed offices are real providers from the public registry. They won&apos;t be called and
-          won&apos;t get a result.
-        </p>
-      )}
       <button
         onClick={onApprove}
         disabled={busy}

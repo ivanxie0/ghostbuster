@@ -31,7 +31,7 @@ make tunnel
 - [ ] **Force fallback: OFF** (check this last, after building the backup tab below)
 
 ### 4. Warm-up search
-- [ ] Shift+D → **Reset: preset demo search** (Blue Shield of CA · HMO · 92122 · therapist · new). Do **not** press
+- [ ] Shift+D → **Reset: preset demo search** (Blue Shield of CA · HMO · 92103 · therapist · new). Do **not** press
       consent. Confirm providers load and ghost flags show with "Profile checked" links.
       The first search after a backend restart has once come back without its cached ghosts; the warm-up absorbs that.
 

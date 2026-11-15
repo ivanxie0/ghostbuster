@@ -11,7 +11,7 @@ import type { DemoSettings, SearchCreate } from "@/lib/types";
 export const DEMO_PRESET: SearchCreate = {
   insurer: "Blue Shield of California",
   plan_type: "hmo",
-  zip: "92122",
+  zip: "92103",
   specialty: "therapist",
   appointment_type: "new",
   prior_appointment_date: null,
@@ -141,7 +141,7 @@ export default function DemoPanel() {
           >
             {busy === "reset" ? "Starting…" : "↺ Reset: preset demo search"}
             <span className="block text-xs font-normal text-paper/75">
-              Blue Shield of CA · HMO · 92122 · therapist · new
+              Blue Shield of CA · HMO · 92103 · therapist · new
             </span>
           </button>
 
