@@ -1,9 +1,18 @@
 # Pitch + Devpost (Jai)
 
 ## One-liner
-GhostBuster calls every provider in your insurance directory for you, finds the "ghost" listings, and
-when no one can see you within California's legal deadline it hands you a ready-to-file grievance with
-the evidence attached.
+GhostBuster finds licensed providers near you, flags the "ghosts" who aren't really available, calls
+the rest for you, and when no one can see you within California's legal deadline it hands you a
+ready-to-file grievance with the evidence attached.
+
+## Data-source wording (approved by the team, use exactly)
+> "We pull licensed providers near you from the national provider registry, then use Bright Data to
+> check each one's public profile."
+
+- NPI Registry supplies the providers. Bright Data finds and checks their public profiles. Gemini reads
+  those profiles and the call transcripts.
+- **Do not say we read insurer directories** until Ivan confirms a real insurer directory works. The
+  agent asks each office on the call whether it takes the member's plan.
 
 ## Team wording (use everywhere)
 - Per provider: **"Past legal deadline"**. Never "violation" about a single office.
@@ -52,8 +61,8 @@ already struggling. We wanted to take the phone calls off the patient.
 
 ### What it does
 1. You enter your insurer, plan type, ZIP code and the kind of care you need.
-2. GhostBuster pulls the providers your insurer lists and cross-checks them against public profiles.
-   Listings that are not really available are flagged as ghosts.
+2. GhostBuster pulls licensed providers near you from the national provider registry, then uses Bright
+   Data to check each one's public profile. Providers who are not really available are flagged as ghosts.
 3. With your permission, an AI voice agent calls the remaining offices. It says up front that it is an
    AI assistant calling on behalf of a patient, and asks for the earliest opening, in person or by telehealth.
 4. It converts each answer to business days and compares it with the legal deadline for that type of
@@ -71,8 +80,9 @@ template, not legal advice.
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind. Search form, live results view that polls
   as calls finish, printable packet.
 - **Backend:** Python FastAPI with a small pipeline: scrape, ghost check, call, deadline check, packet.
-- **Directory data:** Bright Data to read insurer directory pages and public provider profiles, with
-  the free NPI Registry as a fallback and a Neon Postgres cache.
+- **Provider data:** the national NPI Registry supplies licensed providers near the member. Bright Data
+  (Web Unlocker and SERP) finds and reads each one's public profile, Gemini classifies what the profile
+  says about availability, and results are cached in Neon Postgres.
 - **Voice:** an ElevenLabs conversational agent placing outbound calls through Twilio. A post-call
   webhook returns the transcript.
 - **Extraction:** Gemini reads the transcript and pulls out the earliest appointment date.
@@ -116,8 +126,8 @@ template, not legal advice.
 FastAPI, Next.js, Tailwind, Neon Postgres, Bright Data, NPI Registry, ElevenLabs, Twilio, Gemini
 
 ## Prize tracks / sponsor angles
-- **Bright Data:** it is how we read insurer directories and public profiles that have no API. Without
-  it there is no list to check and no ghost detection.
+- **Bright Data:** it is how we find and read each provider's public profile, pages that have no API
+  and block simple scrapers. Without it there is no ghost detection.
 - **ElevenLabs:** the live call is the demo. The agent discloses that it is an AI in its first sentence.
 - **Gemini:** turns a messy receptionist answer into a date the rules engine can use.
 - **Social good / health:** mental health access, built on an existing legal right.
