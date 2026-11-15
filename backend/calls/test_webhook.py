@@ -125,3 +125,10 @@ def test_fake_mode_transcript_still_parses():
         assert (r.earliest_date is None) == (days is None)
         if days:
             assert (r.earliest_date - datetime.now(TZ).date()).days in (days, days - 1, days + 1)
+
+
+def test_voice_tags_stripped():
+    from calls.webhook import transcript_to_text
+    t = transcript_to_text([{"role": "agent", "message": "[happy] Great, thank you."},
+                            {"role": "user", "message": "We open [sic] Monday"}])
+    assert t == "Agent: Great, thank you.\nOffice: We open [sic] Monday"

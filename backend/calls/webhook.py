@@ -44,9 +44,15 @@ class CallResult:
     raw_quote: str | None = None     # the office's own words the date/answer came from
 
 
+VOICE_TAG = re.compile(r"\[[a-z][a-z ]{0,20}\]\s*")  # ElevenLabs expressive tags like "[happy] " -> not evidence
+
+
 def transcript_to_text(turns: list[dict]) -> str:
     who = {"agent": "Agent", "user": "Office"}
-    return "\n".join(f"{who.get(t.get('role'), t.get('role'))}: {t.get('message') or ''}" for t in turns or [])
+    def msg(t):  # tags only ever come from the agent's TTS; never alter what the office said
+        m = t.get("message") or ""
+        return VOICE_TAG.sub("", m).strip() if t.get("role") == "agent" else m
+    return "\n".join(f"{who.get(t.get('role'), t.get('role'))}: {msg(t)}" for t in turns or [])
 
 
 def call_day(data: dict) -> date:

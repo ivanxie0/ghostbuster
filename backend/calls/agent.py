@@ -26,8 +26,8 @@ from app.models import Provider, Search
 
 API = "https://api.elevenlabs.io/v1/convai"
 CALL_TIMEOUT_S = 90      # task 4: no result after this -> no_answer
-RINGING_TIMEOUT_S = 20   # + ~10s Twilio trial preamble + 55s max conversation < 90s
-MAX_CALL_S = 55
+RINGING_TIMEOUT_S = 20   # 20s ring + 60s max conversation < 90s watchdog
+MAX_CALL_S = 60          # ElevenLabs minimum is 60
 
 # conversation_id -> (search_id, provider_id). call_initiation_failure webhooks carry no dynamic
 # variables, so webhook.py resolves them through this map (same process).

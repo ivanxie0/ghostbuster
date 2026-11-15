@@ -21,7 +21,7 @@ Voicemail → agent hangs up, no date → `no_answer`. Nothing back after 90 s �
 1. Go to **API key → Developers → API Keys → Create**. Give it access to *ElevenLabs Agents* (write) → `ELEVENLABS_API_KEY`.
 2. **Agents → Phone Numbers → Import number → Twilio**: enter the Twilio number, Account SID and Auth Token.
    Copy the phone number id (`phnum_…`) → `ELEVENLABS_PHONE_NUMBER_ID`.
-3. Create the agent from code (prompt, end_call + voicemail_detection tools, 55 s cap):
+3. Create the agent from code (prompt, end_call + voicemail_detection tools, 60 s cap):
    `cd backend && .venv/bin/python -m calls.setup_agent` → copy the printed `ELEVENLABS_AGENT_ID` into `.env`.
    Re-run it after any prompt change; it updates the same agent.
 4. **Agents → Settings → Post-call webhook → Create webhook**:
