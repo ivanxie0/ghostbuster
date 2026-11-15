@@ -104,6 +104,10 @@ export function checkedDate(iso: string | null | undefined): string {
   return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Los_Angeles" });
 }
 
+/** Funnel: did this provider get a public-profile verdict? (real "Profile checked:" / sourced ghost, or a ghost flagged
+ *  before any call — demo ghosts stand in for profile flags). */
+export const hadProfileCheck = (p: Provider) => !!profileCheck(p) || (p.ghost_status === "ghost" && !wasCalled(p));
+
 /** Display text for a stored ghost_reason: no claim the provider is listed in the plan's directory
  *  (rules/deadlines.py stores "Confirmed on call: listed, but not accepting ..."; providers come from the NPI registry). */
 export const honestReason = (reason: string | null | undefined): string =>

@@ -70,6 +70,8 @@ T = {
             "<b>DMHC Help Center</b> (free): 1-888-466-2219 · www.dmhc.ca.gov/FileaComplaint.aspx — attach this packet when you file.",
         ],
         "script_h": "Member services phone script", "dmhc_h": "Taking it to the DMHC", "appendix": "Appendix: call transcripts",
+        "funnel_h": "The funnel",
+        "funnel": ["providers found", "profiles found online", "appear unavailable", "offices reached", "timely appointment"],
         "standard": "<b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {appt} with a {spec} within <b>{deadline}</b>{since}. Business days exclude weekends and federal/California holidays. A provider can lawfully set a longer wait if they note in the enrollee&#39;s record that it won&#39;t harm the enrollee&#39;s health. Telehealth appointments count.",
         "since": " from the prior appointment on {d}",
         "calls_note": "Each office was asked for the earliest available appointment with this plan, in person or by telehealth. \"Past legal deadline\" describes one office&#39;s answer; the legal duty to offer a timely appointment is the plan&#39;s.",
@@ -90,6 +92,8 @@ T = {
             "<b>Centro de Ayuda del DMHC</b> (gratis): 1-888-466-2219 · www.dmhc.ca.gov/FileaComplaint.aspx — adjunte este paquete al presentar la queja.",
         ],
         "script_h": "Guion telefónico para servicios para miembros", "dmhc_h": "Pasos con el DMHC", "appendix": "Anexo: transcripciones de las llamadas",
+        "funnel_h": "El embudo",
+        "funnel": ["proveedores encontrados", "perfiles encontrados en línea", "no parecen disponibles", "consultorios contactados", "cita a tiempo"],
         "standard": "<b>Norma:</b> Sección 1367.03(a)(5) del Código de Salud y Seguridad de California — {appt} con {spec} en un plazo de <b>{deadline}</b>{since}. Los días hábiles excluyen fines de semana y feriados federales y de California. Un proveedor puede fijar legalmente una espera más larga si anota en el expediente del miembro que no perjudicará su salud. Las citas por telesalud cuentan.",
         "since": " desde la cita anterior del {d}",
         "calls_note": "A cada consultorio se le pidió la cita más próxima con este plan, en persona o por telesalud. \"Fuera del plazo legal\" describe la respuesta de un consultorio; la obligación legal de ofrecer una cita a tiempo es del plan.",
@@ -126,6 +130,8 @@ pre { white-space: pre-wrap; font-family: Georgia, "Times New Roman", serif; fon
 .tx p { margin: 2px 0; } .tx .who { font-weight: 700; }
 .demo { border: 2px dashed #a16207; background: #fef9c3; padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; }
 .finding { font-size: 15px; font-weight: 700; margin: 10px 0; }
+.funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 14px; }
+.funnel div { border: 1px solid #ccc; border-radius: 6px; padding: 8px 10px; } .funnel b { display: block; font-size: 22px; }
 .steps { border: 2px solid #111; border-radius: 6px; padding: 4px 14px; } .steps li { margin: 6px 0; }
 """
 
@@ -241,6 +247,17 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     ) if demo else ""
     any_available = any(p.ghost_status == "available" for p in called)
     finding = tr["f_avail"] if any_available else tr["f_none"] if called else tr["f_zero"]
+    called_ids = {p.id for p in called}
+    funnel_vals = [
+        len(providers),
+        sum(1 for p in providers if (p.ghost_reason or "").startswith("Profile checked:")
+            or (p.ghost_status == "ghost" and p.id not in called_ids)),
+        len(ghosts),
+        len(called),
+        sum(p.ghost_status == "available" for p in called),
+    ]
+    funnel = "".join(f"<div><span class='muted small'>{lab}</span><b>{v}</b></div>"
+                     for lab, v in zip(tr["funnel"], funnel_vals))
     draft_banner = f"<div class='demo'><b>{DRAFT_BANNER_ES}</b></div>" if lang == "es" else ""
     steps = "".join(f"<li>{x}</li>" for x in tr["steps"])
 
@@ -260,6 +277,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
   <div class="card red"><span class="muted small">{tr['c_past']}</span><b>{ctx['n_violations']}</b></div>
 </div>
 <p class="finding">{finding}</p>
+<h3>{tr['funnel_h']}</h3><div class="funnel">{funnel}</div>
 <p>{tr['standard'].format(appt=ctx['a_appointment_label'], spec=ctx['specialty_label'], deadline=ctx['deadline_text'], since=_e(since))}</p>
 
 <h2>{tr['part1']}</h2>

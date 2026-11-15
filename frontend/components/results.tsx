@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason, hadProfileCheck,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -117,6 +117,37 @@ export function GhostRate({ providers }: { providers: Provider[] }) {
 }
 
 /** Tally sheet: one ruled strip, big numerals, ASCII bars scaled to the number listed. */
+/** Ghost funnel, from existing data: found → profiles found online → appear unavailable → reached → timely. */
+export function GhostFunnel({ providers }: { providers: Provider[] }) {
+  const steps = [
+    { label: "providers found", value: providers.length, tone: "bg-ink/70" },
+    { label: "profiles found online", value: providers.filter(hadProfileCheck).length, tone: "bg-cobalt/80" },
+    { label: "appear unavailable", value: providers.filter((p) => p.ghost_status === "ghost").length, tone: "bg-ink/40" },
+    { label: "offices reached", value: providers.filter(wasCalled).length, tone: "bg-cobalt" },
+    { label: "timely appointment", value: providers.filter((p) => p.ghost_status === "available").length, tone: "bg-moss" },
+  ];
+  const max = Math.max(1, steps[0].value);
+  return (
+    <section aria-label="Ghost funnel" className="card mt-6 p-5 sm:p-6">
+      <p className="label text-ink/60">The funnel</p>
+      <ol className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-5">
+        {steps.map((s, i) => (
+          <li key={s.label} className="min-w-0">
+            <div className="flex items-baseline gap-2">
+              <span className="display text-5xl tabular-nums sm:text-6xl">{s.value}</span>
+              {i < steps.length - 1 && <span aria-hidden className="hidden text-2xl text-ink/30 sm:inline">→</span>}
+            </div>
+            <div className="mt-1 text-base text-ink/75">{s.label}</div>
+            <div className="mt-2 h-2 w-full rounded-full bg-ink/10" aria-hidden>
+              <div className={`h-2 rounded-full ${s.tone}`} style={{ width: `${(100 * s.value) / max}%` }} />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 export function Counters({ providers }: { providers: Provider[] }) {
   const n = (s: GhostStatus) => providers.filter((p) => p.ghost_status === s).length;
   const total = providers.length;

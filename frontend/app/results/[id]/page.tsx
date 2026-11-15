@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostRate, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
+  ActivityLog, ConsentCard, Counters, DemoDataTag, GhostFunnel, GhostRate, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
@@ -171,6 +171,7 @@ export default function ResultsPage() {
         ) : (
           <EndingB detail={data} id={id} />
         ))}
+        {done && <GhostFunnel providers={providers} />}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
