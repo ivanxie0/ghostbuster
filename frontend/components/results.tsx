@@ -200,7 +200,7 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
         No provider we reached could offer a timely appointment.
       </h2>
       <p className="mt-4 text-2xl font-semibold leading-snug text-ink">
-        Under California law, your plan must now arrange timely care, including out-of-network at in-network cost.
+        You can now ask your plan to arrange timely care, including out-of-network at in-network cost.
       </p>
       <p className="mt-4 text-xl leading-snug text-ink/85">
         Legal limit: {deadlineText(search)}. Of {checked} offices we reached, <b>{n("violation")}</b> were past the legal
