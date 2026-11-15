@@ -89,7 +89,7 @@ def check_violation(provider: Provider, search: Search, asked_at: datetime | Non
         if "\nResult: not accepting" in (provider.call_transcript or ""):
             return provider.model_copy(update={
                 "ghost_status": "ghost", "deadline_days": deadline, "violation": False, "business_days_wait": None,
-                "ghost_reason": "Confirmed on call: listed, but not accepting new patients with this plan",
+                "ghost_reason": "Confirmed on call: not accepting new patients with this plan",
             })
         return provider.model_copy(update={
             "ghost_status": "no_answer", "deadline_days": deadline, "violation": False,

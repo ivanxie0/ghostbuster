@@ -68,7 +68,7 @@ def test_05_insurance_rejection_confirmed_on_call():
     r, final = run(payload(said))
     assert r.accepting is False and r.raw_quote == said
     assert final.ghost_status == "ghost"
-    assert final.ghost_reason == "Confirmed on call: listed, but not accepting new patients with this plan"
+    assert final.ghost_reason == "Confirmed on call: not accepting new patients with this plan"
     assert r.transcript.splitlines()[-1] == f'Result: not accepting new patients with this plan ("{said}")'
 
 
