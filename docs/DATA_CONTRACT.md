@@ -193,3 +193,10 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
   "status": "done"
 }
 ```
+
+## App records (additive, Aryan) — deleted with their search (`ON DELETE CASCADE`)
+| Table | Columns | Written by |
+|---|---|---|
+| `authorizations` | `search_id` uuid PK → searches, `authorized_at` timestamptz, `provider_count` int | `POST /api/search/{id}/verify` (the patient's consent click; first one kept) |
+
+`GET /api/search/{id}` adds optional `authorized_at` (ISO timestamp or null). The packet shows it near the top.

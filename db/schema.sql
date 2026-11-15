@@ -43,6 +43,13 @@ CREATE TABLE IF NOT EXISTS scrape_cache (
     fetched_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- App records beside the contract tables (Aryan). Additive; deleted with the search.
+CREATE TABLE IF NOT EXISTS authorizations (
+    search_id      uuid PRIMARY KEY REFERENCES searches(id) ON DELETE CASCADE,
+    authorized_at  timestamptz NOT NULL DEFAULT now(),   -- the patient's consent click (first one kept)
+    provider_count integer NOT NULL DEFAULT 0
+);
+
 -- Migrations for DBs created from an older version of this file (safe to re-run).
 ALTER TABLE searches ADD COLUMN IF NOT EXISTS prior_appointment_date date;
 ALTER TABLE providers DROP CONSTRAINT IF EXISTS providers_ghost_status_check;

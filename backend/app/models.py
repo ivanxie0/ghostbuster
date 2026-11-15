@@ -62,6 +62,7 @@ class SearchDetail(BaseModel):
     search: Search
     providers: list[Provider]
     fallbacks: list[FallbackEvent] = []  # additive, optional: empty in FAKE_MODE
+    authorized_at: Optional[datetime] = None  # patient's consent click (POST /verify), if any
 
 
 class DemoSettings(BaseModel):

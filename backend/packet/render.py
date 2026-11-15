@@ -16,6 +16,7 @@ from pathlib import Path
 
 from app import store
 from app.solutions import oon_candidates
+from app import records
 from rules.deadlines import DEADLINES, TZ, URGENT_HOURS
 
 TEMPLATES = Path(__file__).parent / "templates"
@@ -77,6 +78,7 @@ T = {
         "oon_none": "No provider near this ZIP has a public profile saying it accepts new clients yet.",
         "oon_cols": ["Provider", "Phone", "Public profile", "Checked", "Profile text matched"],
         "oon_line": "- {name}, {address} (public profile: {url}, checked {date})",
+        "auth": "<b>Calls authorized by the patient on {date}, {time} PT.</b> The AI assistant disclosed it was an AI and that calls were recorded and transcribed.",
         "funnel_h": "The funnel",
         "funnel": ["providers found", "profiles found online", "appear unavailable", "offices reached", "timely appointment"],
         "standard": "<b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {appt} with a {spec} within <b>{deadline}</b>{since}. Business days exclude weekends and federal/California holidays. A provider can lawfully set a longer wait if they note in the enrollee&#39;s record that it won&#39;t harm the enrollee&#39;s health. Telehealth appointments count.",
@@ -105,6 +107,7 @@ T = {
         "oon_none": "Aún no hay proveedores cerca de este código postal cuyo perfil público diga que aceptan clientes nuevos.",
         "oon_cols": ["Proveedor", "Teléfono", "Perfil público", "Revisado", "Texto encontrado en el perfil"],
         "oon_line": "- {name}, {address} (perfil público: {url}, revisado el {date})",
+        "auth": "<b>Llamadas autorizadas por el paciente el {date}, a las {time} (hora del Pacífico).</b> El asistente de IA indicó que era una IA y que las llamadas se grababan y transcribían.",
         "funnel_h": "El embudo",
         "funnel": ["proveedores encontrados", "perfiles encontrados en línea", "no parecen disponibles", "consultorios contactados", "cita a tiempo"],
         "standard": "<b>Norma:</b> Sección 1367.03(a)(5) del Código de Salud y Seguridad de California — {appt} con {spec} en un plazo de <b>{deadline}</b>{since}. Los días hábiles excluyen fines de semana y feriados federales y de California. Un proveedor puede fijar legalmente una espera más larga si anota en el expediente del miembro que no perjudicará su salud. Las citas por telesalud cuentan.",
@@ -143,6 +146,7 @@ pre { white-space: pre-wrap; font-family: Georgia, "Times New Roman", serif; fon
 .tx p { margin: 2px 0; } .tx .who { font-weight: 700; }
 .demo { border: 2px dashed #a16207; background: #fef9c3; padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; }
 .finding { font-size: 15px; font-weight: 700; margin: 10px 0; }
+.auth { border-left: 4px solid #1e40c9; background: #eef2ff; padding: 6px 10px; }
 .funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 14px; }
 .funnel div { border: 1px solid #ccc; border-radius: 6px; padding: 8px 10px; } .funnel b { display: block; font-size: 22px; }
 .steps { border: 2px solid #111; border-radius: 6px; padding: 4px 14px; } .steps li { margin: 6px 0; }
@@ -269,6 +273,14 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     any_available = any(p.ghost_status == "available" for p in called)
     finding = tr["f_avail"] if any_available else tr["f_none"] if called else tr["f_zero"]
     called_ids = {p.id for p in called}
+    auth_dt = records.authorized_at(s.id)
+    if auth_dt:
+        a = auth_dt.astimezone(TZ)
+        auth_line = "<p class='auth'>" + tr["auth"].format(
+            date=fecha_larga(a) if lang == "es" else long_date(a),
+            time=f"{a.hour}:{a:%M}" if lang == "es" else f"{a.hour % 12 or 12}:{a:%M} {a:%p}") + "</p>"
+    else:
+        auth_line = ""
     if ending_b:
         oon_rows = "".join(
             f"<tr><td><b>{_e(c['name'])}</b><br><span class='muted small'>{_e(c['address'])}</span></td>"
@@ -301,6 +313,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
 <div class="muted">{_e(s.insurer)} · {ctx['plan_label']} · {ctx['specialty_label']} ({APPT[s.appointment_type]}) · ZIP {_e(s.zip)} ·
 {tr['generated']} {ctx['today']} · {tr['ref']} {s.id[:8]}</div>
 <p>{tr['reps'].format(today=ctx['today'])}</p>
+{auth_line}
 <div class="meta">
   <div class="card"><span class="muted small">{tr['c_listed']}</span><b>{ctx['n_listed']}</b></div>
   <div class="card"><span class="muted small">{tr['c_ghosts']}</span><b>{ctx['n_ghosts']}</b></div>

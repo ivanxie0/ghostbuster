@@ -70,3 +70,15 @@ def update_provider(p: Provider) -> None:
 def set_status(search_id: str, status: str) -> None:
     with connect() as c:
         c.execute("UPDATE searches SET status=%s WHERE id=%s", (status, search_id))
+
+
+def insert_authorization(search_id: str, provider_count: int) -> None:
+    with connect() as c:
+        c.execute("INSERT INTO authorizations (search_id, provider_count) VALUES (%s, %s) ON CONFLICT (search_id) DO NOTHING",
+                  (search_id, provider_count))
+
+
+def get_authorization(search_id: str):
+    with connect() as c:
+        row = c.execute("SELECT authorized_at FROM authorizations WHERE search_id = %s", (search_id,)).fetchone()
+        return row["authorized_at"] if row else None

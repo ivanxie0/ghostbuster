@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 
 from app import store
 from app.config import FAKE_MODE
-from app import demo
+from app import demo, records
 from app.models import (DemoSettings, DemoSettingsUpdate, SearchCreate, SearchCreated, SearchDetail,
                         VerifyRequest, VerifyResponse)
 from packet.render import render_packet
@@ -55,7 +55,7 @@ def get_search(search_id: str):
     detail = store.get(search_id)
     if not detail:
         raise HTTPException(404, "search not found")
-    return detail
+    return records.annotate(detail)
 
 
 @router.post("/search/{search_id}/verify", response_model=VerifyResponse)
@@ -66,6 +66,7 @@ def verify(search_id: str, body: VerifyRequest):
         ids = store.verify(search_id, body.provider_ids)
     except ValueError as e:
         raise HTTPException(400, str(e))
+    records.record_authorization(search_id, len(ids))  # authorization record for the packet
     return VerifyResponse(started=len(ids), provider_ids=ids)
 
 
