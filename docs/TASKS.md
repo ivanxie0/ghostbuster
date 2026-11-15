@@ -29,7 +29,7 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 
 ## Jai — rules, content, demo
 - [x] Verify `docs/RULES.md` against DMHC; send Hardik any changes
-- [ ] Coverage warning text (PPO / unknown / self-funded)
+- [x] Coverage warning text (PPO / unknown / self-funded)
 - [x] Letter-to-insurer template + member-services script + DMHC complaint info (`backend/packet/templates/`)
 - [x] `docs/DEMO.md` 3-min script + Q&A answers
 - [x] `docs/PITCH.md` Devpost draft

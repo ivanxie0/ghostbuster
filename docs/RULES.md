@@ -11,6 +11,34 @@ products, most Covered California plans, and Medi-Cal managed care plans (§1367
 apply to self-funded employer (ERISA) plans or Medicare. The app warns for `ppo` and `unknown` because
 that is where self-funded plans usually hide.
 
+### Coverage warning for the app (3 sentences, verified 2026-11-14)
+Show on the search form, always for `ppo` and `unknown`, and as a short note for everyone:
+
+> **Who this covers:** California's appointment deadlines apply to state-regulated coverage: plans
+> licensed by the Department of Managed Health Care (most HMOs, many PPOs, most Covered California
+> plans, Medi-Cal managed care) and health insurance policies regulated by the California Department of
+> Insurance. They do **not** apply to self-funded employer or union plans, which are under federal law
+> even if an insurer's name is on your card, or to Medicare. Not sure which you have? Ask HR or member
+> services "Is my plan self-funded?" before relying on these deadlines.
+
+Shorter version for a tooltip or badge: "Covers state-regulated California plans. Self-funded employer
+plans and Medicare are not covered. Ask HR: 'Is my plan self-funded?'"
+
+Regulator by plan, for the packet and the pitch:
+
+| Coverage | Same deadlines? | Law | Complaints go to |
+|---|---|---|---|
+| DMHC-licensed plan (most HMOs, many PPOs, most Covered California) | Yes | Health & Safety Code §1367.03 | DMHC Help Center, 1-888-466-2219 |
+| Medi-Cal managed care plan | Yes | §1367.03(k) applies it | DMHC Help Center; State Fair Hearing also available |
+| Insurance policy regulated by the Dept. of Insurance (some PPO/EPO) | Yes, identical numbers | Insurance Code §10133.54(b)(5) | CDI, 1-800-927-4357 |
+| Self-funded employer / union plan (ERISA) | **No** | federal law | U.S. Dept. of Labor, EBSA |
+| Medicare / Medicare Advantage | **No** | federal law | Medicare |
+| Medi-Cal fee-for-service, county mental health plans | Not under these sections | different rules, not checked | — |
+
+Known gap: the grievance letter cites §1367.03. For a Department of Insurance policy the matching cite
+is Insurance Code §10133.54(b)(5). The app cannot tell the two apart from `plan_type`, so the letter's
+footer tells the member the rules depend on their plan.
+
 ## Deadlines table
 
 All from Health & Safety Code §1367.03(a)(5), mirrored word for word in 28 CCR §1300.67.2.2(c)(5).
@@ -159,4 +187,6 @@ is 2027-09-09.
 - [ ] DMHC Timely Access fact sheet PDF (the wait-time table on the DMHC page is an image/PDF, not read):
   https://www.dmhc.ca.gov/Portals/0/Docs/DO/TAC_accessible.pdf
 - [ ] SB 221 All Plan Letters (APL 22-007 and later): not opened. The statute text above is controlling.
-- [ ] CDI-regulated insurance equivalent (Insurance Code §10133.54, 10 CCR §2240.15): to verify in task 2.
+- [x] Insurance Code §10133.54 (CDI-regulated insurance, same deadlines; amended effective Jan 1, 2023):
+  https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=INS&sectionNum=10133.54
+- [ ] 10 CCR §2240.15 (CDI regulation): located on Westlaw, text not read.
