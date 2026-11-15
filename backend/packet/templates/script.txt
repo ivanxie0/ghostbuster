@@ -1,5 +1,37 @@
-[PLACEHOLDER — Jai to write the member-services phone script.]
+TEMPLATE - NOT LEGAL ADVICE. A script to read when you call the member services number on your insurance card.
 
-"Hi, I'm a {insurer} member. I need a {appointment_type} {specialty_label} appointment and I can't get one within {deadline_text}. I contacted {n_called} in-network providers on {today} and none could see me in time. I'm asking the plan to arrange timely care for me, including out-of-network if needed. Can you open a timely access request and give me a reference number?"
+BEFORE YOU CALL
+Have ready: your member ID card, this packet, and a pen. Write down the date, the time, and the name of everyone you speak to.
 
-Write down: date/time, rep name, reference number, what they promised.
+OPENING
+"Hi, my name is ____________ and I'm a {insurer} member. My member ID is ____________. I'm calling to file a timely access grievance and to get an appointment arranged."
+
+THE FACTS
+"I need a {appointment_type} appointment with a {specialty_label} near ZIP code {zip}. California law says your network has to offer that within {deadline_text}. On {today}, {n_called} offices from your directory were called on my behalf, and no provider we reached could offer a timely appointment. {n_ghosts} more of your listings appear not to be available to me at all. I have a written log of every call."
+
+THE ASK
+"I'm asking for two things. First, please find me an appointment within the legal timeframe, in network or out of network. If it has to be out of network, I understand my cost can't be more than my in-network cost sharing. Second, please open this as a formal grievance today and give me the reference number."
+
+IF THEY SAY "JUST KEEP CALLING THE PROVIDERS ON THE LIST"
+"I already did, and I have the log. Under Health and Safety Code Section 1367.03, it's the plan's job to arrange the appointment when the network can't offer one in time. Can you arrange it, or transfer me to someone who can?"
+
+IF THEY OFFER A TELEHEALTH APPOINTMENT
+A telehealth visit within the timeframe can meet the standard. If telehealth is not right for your situation, say so and ask for an in-person option.
+
+IF THEY SAY A LONGER WAIT IS FINE
+"Has a provider who is treating me decided that a longer wait won't harm my health and written that in my record? If not, the standard timeframe applies."
+
+IF IT IS URGENT
+"My condition is urgent and waiting is a serious threat to my health. I'm asking for an expedited grievance, which means a decision within 3 days."
+
+BEFORE YOU HANG UP, GET THESE
+- Grievance or reference number: ____________________
+- Representative's name: ____________________
+- What they promised, and by what date: ____________________
+- Date and time of this call: ____________________
+"Please send me written confirmation of this grievance."
+
+WHAT HAPPENS NEXT
+The plan has up to 30 days to resolve a standard grievance. If it is not resolved, or you disagree with the answer, go to the DMHC steps on the next page. If your situation is urgent you do not have to wait the 30 days.
+
+If you are in crisis, call or text 988 now. Do not wait for your plan.

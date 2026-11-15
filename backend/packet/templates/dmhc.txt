@@ -1,6 +1,38 @@
-[PLACEHOLDER — Jai to verify and fill in official DMHC complaint info.]
+TEMPLATE - NOT LEGAL ADVICE. How to take this to the state if {insurer} does not fix it.
 
-If your plan does not resolve this, you can contact the California Department of Managed Health Care (DMHC) Help Center.
-- Website: ____________
-- Phone: ____________
-- Usually you first file a grievance with your plan; DMHC can help if it is not resolved or for urgent cases.
+WHO THIS IS FOR
+The California Department of Managed Health Care (DMHC) regulates most HMOs, many PPO plans, most Covered California plans, and Medi-Cal managed care plans. Its Help Center is free.
+
+STEP 1 - FILE A GRIEVANCE WITH YOUR PLAN FIRST
+Send the letter in this packet or use the phone script. Keep a copy and write down the date. DMHC normally requires you to go through your plan's grievance process for 30 days before it will take your complaint.
+
+STEP 2 - WAIT UP TO 30 DAYS, UNLESS IT IS URGENT
+You can go to DMHC when any one of these is true:
+- 30 days have passed since you filed the grievance and it is not resolved.
+- Your plan answered and you are not satisfied.
+- Your health problem is urgent (a serious threat to your health). You can ask DMHC for help right away. Your plan must also decide an urgent grievance within 3 days.
+
+STEP 3 - CONTACT THE DMHC HELP CENTER
+- Phone: 1-888-466-2219
+- Online form (English and Spanish): https://www.dmhc.ca.gov/FileaComplaint.aspx
+- One form covers both a Consumer Complaint and an Independent Medical Review.
+Attach this packet when you first submit: the call log, your grievance letter, and anything your plan sent you. DMHC says it will not review extra materials sent after a complete form is submitted, so include everything the first time.
+
+COMPLAINT OR INDEPENDENT MEDICAL REVIEW (IMR)?
+- Use a CONSUMER COMPLAINT for this packet. DMHC lists "delays in getting an appointment" and "finding an in-network doctor" as complaint issues. A complaint is generally decided within about 30 days.
+- Use an IMR when your plan denied, changed, or delayed a service because it said the service is not medically necessary, refused an experimental or investigational treatment, or would not pay for emergency or urgent care you already received. Independent doctors review the case. It is free and is generally decided within about 45 days, faster if urgent.
+- Not sure? File the one form. DMHC decides which process applies.
+
+IF DMHC IS NOT YOUR REGULATOR
+DMHC will tell you if it does not regulate your plan. In general:
+- Self-funded employer or union plan: these are under federal law. Contact the U.S. Department of Labor, Employee Benefits Security Administration, 1-866-444-3272. California's appointment deadlines may not apply.
+- Health insurance policy regulated by the California Department of Insurance: 1-800-927-4357.
+- Medicare or Medicare Advantage: 1-800-633-4227 (1-800-MEDICARE).
+- Medi-Cal managed care members can use DMHC and can also ask for a State Fair Hearing.
+
+FREE ONE-ON-ONE HELP
+Health Consumer Alliance, DMHC's consumer assistance partner: 1-888-804-3536. They can help you file the grievance and the DMHC form.
+
+Summary of this search: {n_listed} providers listed, {n_ghosts} unavailable listings, {n_called} offices called, {n_violations} past the legal deadline of {deadline_text}, {n_no_answer} no answer. Search reference {search_id}, generated {today}.
+
+If you are in crisis, call or text 988.
