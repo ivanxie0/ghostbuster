@@ -132,3 +132,14 @@ def test_voice_tags_stripped():
     t = transcript_to_text([{"role": "agent", "message": "[happy] Great, thank you."},
                             {"role": "user", "message": "We open [sic] Monday"}])
     assert t == "Agent: Great, thank you.\nOffice: We open [sic] Monday"
+
+
+def test_real_call_fixture_parses():
+    import json
+    from pathlib import Path
+    payload = json.loads((Path(__file__).parent / "fixtures" / "real_call_2026-11-14.json").read_text())
+    r = handle_call_complete(payload)
+    assert r.search_id == "dial-test" and r.provider_id == "dial-test"
+    assert r.transcript.startswith("Agent: Hi, I'm an AI assistant calling on behalf of a patient")
+    assert "[happy]" not in r.transcript and "Office: I don't have any." in r.transcript
+    assert r.earliest_date is None  # "I don't have any" -> no date offered
