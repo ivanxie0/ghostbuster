@@ -26,7 +26,7 @@ export const STATUS_LABEL: Record<GhostStatus, string> = {
   unverified: "Not checked",
   calling: "Calling…",
   available: "Available",
-  violation: "Too late",
+  violation: "Past legal deadline",
   no_answer: "No answer",
 };
 

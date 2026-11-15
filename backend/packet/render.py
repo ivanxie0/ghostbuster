@@ -17,7 +17,7 @@ TEMPLATES = Path(__file__).parent / "templates"
 PLAN = {"hmo": "HMO", "ppo": "PPO", "medi_cal": "Medi-Cal", "unknown": "plan type unknown"}
 SPEC = {"therapist": "therapist", "psychiatrist": "psychiatrist", "primary_care": "primary care", "specialist": "specialist"}
 APPT = {"new": "new-patient", "follow_up": "follow-up", "urgent": "urgent"}
-LABEL = {"available": "Available in time", "violation": "Past deadline", "no_answer": "No answer",
+LABEL = {"available": "Available in time", "violation": "Past legal deadline", "no_answer": "No answer",
          "ghost": "Ghost listing", "unverified": "Not called", "calling": "Call in progress"}
 
 CSS = """

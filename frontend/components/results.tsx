@@ -88,7 +88,7 @@ export function Counters({ providers }: { providers: Provider[] }) {
       <Counter label="Listed" value={providers.length} tone="text-white" />
       <Counter label="Ghosts" value={n("ghost")} tone="text-zinc-300" />
       <Counter label="Checked" value={providers.filter(isResolved).length} tone="text-sky-300" />
-      <Counter label="Violations" value={n("violation")} tone="text-red-400" />
+      <Counter label="Past deadline" value={n("violation")} tone="text-red-400" />
     </div>
   );
 }
