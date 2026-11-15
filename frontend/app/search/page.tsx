@@ -211,7 +211,7 @@ export default function SearchPage() {
           disabled={busy || !zipOk}
           className="btn btn-solid btn-lg w-full sm:w-auto"
         >
-          {busy ? "Starting…" : "Check my directory →"}
+          {busy ? "Starting…" : "Check providers near me →"}
         </button>
       </form>
     </main>

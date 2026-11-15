@@ -116,6 +116,9 @@ export function maskPhone(phone: string | null | undefined): string {
 const PHONE_IN_TEXT = /(?<![\w/])(?:\+1\d{10}|(?:\+?1[\s.-]?)?(?:\(\d{3}\)\s?|\d{3}[\s.-])\d{3}[\s.-]\d{4})(?!\d)/g;
 export const maskPhonesIn = (text: string): string => text.replace(PHONE_IN_TEXT, (m) => maskPhone(m));
 
+/** Pipeline log entries that report a real call result (not a fallback), e.g. "Elena Marsh, LCSW: updated from real call". */
+export const isRealCallUpdate = (detail: string) => /updated from real call/i.test(detail);
+
 /** Seed/fake providers all have example.com source URLs (db/seed_providers.json); real scraped ones never do. */
 export const isDemoProvider = (p: Provider) => !!p.source_url?.startsWith("https://example.com/");
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -30,10 +30,10 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
   const out: Omit<LogEvent, "id" | "at">[] = [];
   const s = next.search;
   if (!prev) {
-    out.push({ tone: "info", text: `Searching the ${s.insurer} directory for ${SPECIALTY_LABEL[s.specialty].toLowerCase()}s near ${s.zip}` });
+    out.push({ tone: "info", text: `Looking up ${SPECIALTY_LABEL[s.specialty].toLowerCase()}s near ${s.zip} for your ${s.insurer} plan` });
   }
   if ((prev?.providers.length ?? 0) === 0 && next.providers.length > 0) {
-    out.push({ tone: "info", text: `Found ${next.providers.length} listed providers. Cross-checking public profiles…` });
+    out.push({ tone: "info", text: `Found ${next.providers.length} providers. Checking their public profiles…` });
   }
   const before = new Map(prev?.providers.map((p) => [p.id, p.ghost_status]) ?? []);
   for (const p of next.providers) {
@@ -49,7 +49,7 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
       case "ghost":
         out.push(isConfirmedGhost(p) || wasCalled(p)
           ? { tone: "ghost", pid: p.id, focus: true, text: `${name}: ${reason ?? "listed, but not accepting this plan/new patients"}` }
-          : { tone: "ghost", pid: p.id, text: `Ghost listing: ${name} — ${reason ?? "not accepting"}` });
+          : { tone: "ghost", pid: p.id, text: `Ghost: ${name} — ${reason ?? "not accepting"}` });
         break;
       case "available":
         out.push({ tone: "available", pid: p.id, focus: true, text: `${name}: ${reason ?? `earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit})`}. Within the deadline ✓` });
@@ -69,6 +69,10 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
   }
   // Pipeline stages that fell back to cached/seed data (real mode), in order, once each.
   for (const f of (next.fallbacks ?? []).slice(prev?.fallbacks?.length ?? 0)) {
+    if (isRealCallUpdate(f.detail)) {  // a late real-call result, logged by the pipeline: normal line, not a fallback
+      out.push({ tone: "info", text: f.detail.replace(/updated from real call/i, "Updated from real call") });
+      continue;
+    }
     out.push({ tone: "fallback", text: `Fallback · ${f.stage}: ${f.detail}` });
   }
   if (prev && prev.search.status !== "done" && s.status === "done") out.push({ tone: "info", text: "All calls complete." });
@@ -80,7 +84,7 @@ export function PhasePill({ detail }: { detail: SearchDetail }) {
   const { status } = detail.search;
   const calling = detail.providers.some((p) => p.ghost_status === "calling");
   const [label, cls] =
-    status === "scraping" ? ["Scanning directory", "border-line bg-paper text-ink"]
+    status === "scraping" ? ["Finding providers", "border-line bg-paper text-ink"]
     : status === "done" ? ["Complete", "border-ink bg-ink text-paper"]
     : calling ? ["Calling offices", "border-cobalt bg-cobalt text-char"]
     : ["Ready to call", "border-sun/35 bg-sun/10 text-sun"];
@@ -289,7 +293,7 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
               { k: "past legal deadline", v: n("violation"), tone: "text-signal" },
               ...(confirmed > 0 ? [{ k: "not taking plan / new patients", v: confirmed, tone: "text-signal" }] : []),
               { k: "no answer", v: n("no_answer") },
-              { k: "other listings unavailable", v: listedGhosts, tone: "text-ink/60" },
+              { k: "others appear unavailable", v: listedGhosts, tone: "text-ink/60" },
               { k: "legal limit", v: deadlineText(search) },
             ]}
           />
@@ -400,7 +404,7 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
             {(() => {
               // Real ghost from the public-profile check: show where it came from (link sits outside the button).
               const pc = profileCheck(p);
-              const url = pc?.url ?? (p.ghost_status === "ghost" ? p.source_url : null);
+              const url = isDemoProvider(p) ? null : pc?.url ?? (p.ghost_status === "ghost" ? p.source_url : null);
               if (!url) return null;
               const when = checkedDate(p.checked_at);
               return (
@@ -471,14 +475,14 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         )}
         {provider.ghost_status === "ghost" && !wasCalled(provider) && (
           <p className="text-base text-ink/80">
-            Not called — this listing is a ghost:{" "}
+            Not called — flagged as a ghost:{" "}
             <b>{maskPhonesIn(profileCheck(provider)?.text ?? provider.ghost_reason ?? "")}</b>.{" "}
             {profileCheck(provider)?.url ? (
               <a href={profileCheck(provider)!.url!} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">
                 Profile checked · {profileCheck(provider)!.host ?? "source"} ↗
               </a>
             ) : (
-              provider.source_url && (
+              provider.source_url && !isDemoProvider(provider) && (
                 <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-cobalt underline underline-offset-2">Source</a>
               )
             )}

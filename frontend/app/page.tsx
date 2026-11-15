@@ -87,7 +87,7 @@ const STORY = [
 ];
 
 const STEPS = [
-  { n: "1", title: "Check the directory", body: "We pull your plan's listed providers and flag the ghosts — listed, but not really taking patients." },
+  { n: "1", title: "Check public profiles", body: "We pull licensed providers near you from the national provider registry, then use Bright Data to check each one's public profile and flag the ghosts." },
   { n: "2", title: "Call the rest for you", body: "With your OK, an AI assistant calls each office and asks for the earliest new-patient opening." },
   { n: "3", title: "Hold the plan to the law", body: "California sets appointment deadlines. If nobody meets them, you get an evidence packet." },
 ];

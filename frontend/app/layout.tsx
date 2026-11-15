@@ -10,7 +10,7 @@ const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] }
 
 export const metadata: Metadata = {
   title: "GhostBuster",
-  description: "Find ghost listings in your insurance directory and document timely-access failures.",
+  description: "Find providers who aren't really taking patients, call the rest for you, and document timely-access failures.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

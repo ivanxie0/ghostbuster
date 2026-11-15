@@ -7,8 +7,10 @@ import {
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
-import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, wasCalled } from "@/lib/format";
+import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, isRealCallUpdate, wasCalled } from "@/lib/format";
 import type { SearchDetail } from "@/lib/types";
+
+const POLL_AFTER_DONE_MS = 45_000;
 
 export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +38,7 @@ export default function ResultsPage() {
 
 
   // Tell the corner indicator which stages fell back for this search.
-  const fallbackStages = [...new Set((data?.fallbacks ?? []).map((f) => f.stage))].join("|");
+  const fallbackStages = [...new Set((data?.fallbacks ?? []).filter((f) => !isRealCallUpdate(f.detail)).map((f) => f.stage))].join("|");
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("gb-fallbacks", { detail: fallbackStages ? fallbackStages.split("|") : [] }));
   }, [fallbackStages]);
@@ -53,6 +55,7 @@ export default function ResultsPage() {
     setApproving(false);
     setError(null);
     let timer: ReturnType<typeof setTimeout>;
+    let doneSince: number | null = null; // keep polling a while after done: late real-call webhooks
     const tick = async () => {
       try {
         const d = await api.getSearch(id);
@@ -68,7 +71,9 @@ export default function ResultsPage() {
         prev.current = d;
         setData(d);
         setError(null);
-        if (d.search.status !== "done") timer = setTimeout(tick, POLL_MS);
+        if (d.search.status === "done") doneSince ??= Date.now();
+        else doneSince = null;
+        if (doneSince === null || Date.now() - doneSince < POLL_AFTER_DONE_MS) timer = setTimeout(tick, POLL_MS);
       } catch (e) {
         if (stop) return;
         setError((e as Error).message);
@@ -171,7 +176,7 @@ export default function ResultsPage() {
       <div className="grid gap-6 lg:grid-cols-12">
         <section className="lg:col-span-7">
           <h2 className="label mb-3 text-ink/60">
-            Listed in the {search.insurer} directory
+            {providers.length && providers.every(isDemoProvider) ? "Demo providers (fictional)" : "Licensed providers near you (national registry)"}
           </h2>
           {providers.length === 0 ? (
             <div className="space-y-3">
