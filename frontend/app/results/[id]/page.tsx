@@ -147,6 +147,9 @@ export default function ResultsPage() {
         <div className="flex flex-col items-end gap-2">
           <PhasePill detail={data} />
           <DemoDataTag providers={providers} />
+          <Link href="/map" className="label text-ink/60 underline underline-offset-4 hover:text-cobalt print:hidden">
+            San Diego Ghost Map →
+          </Link>
         </div>
       </div>
 

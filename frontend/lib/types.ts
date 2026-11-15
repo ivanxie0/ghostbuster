@@ -56,6 +56,25 @@ export interface SearchDetail {
   fallbacks?: FallbackEvent[]; // real mode only; empty/absent in FAKE_MODE
 }
 
+/** One group in the Ghost Map: real registry providers or demo (seed) providers. */
+export interface GroupStats {
+  providers: number;
+  checked: number;
+  unavailable: number;
+  called: number;
+  past_deadline: number;
+  unavailable_pct: number | null; // unavailable / checked
+  past_deadline_pct: number | null; // past_deadline / called
+}
+
+export interface GhostStats {
+  fake_mode?: boolean;
+  generated_at?: string;
+  zips?: string[];
+  by_insurer: { insurer: string; real: GroupStats; demo: GroupStats }[];
+  by_zip: { zip: string; real: GroupStats; demo: GroupStats }[];
+}
+
 export interface DemoSettings {
   fake_mode: boolean;
   force_fallback: boolean;

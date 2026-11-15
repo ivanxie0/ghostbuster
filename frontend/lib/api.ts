@@ -1,5 +1,5 @@
 // Typed client for every endpoint in docs/API.md.
-import type { DemoSettings, SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
+import type { DemoSettings, GhostStats, SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -24,6 +24,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ provider_ids }),
     }),
+  /** Ghost Map stats (real registry vs demo providers). */
+  ghostStats: () => req<GhostStats>("/api/stats/ghosts"),
   /** Demo control panel (Shift+D). */
   getDemo: () => req<DemoSettings>("/api/demo"),
   setDemo: (force_fallback: boolean) =>

@@ -54,9 +54,12 @@ export default function Home() {
         </div>
       </section>
 
-      <p className="rule-dotted label mt-16 pt-4 text-ink/60">
-        GhostBuster produces an evidence log and letter templates. It is not legal advice.
-      </p>
+      <footer className="rule-dotted mt-16 flex flex-wrap items-baseline justify-between gap-4 pt-4">
+        <p className="label text-ink/60">GhostBuster produces an evidence log and letter templates. It is not legal advice.</p>
+        <nav className="label flex gap-5">
+          <Link href="/map" className="underline underline-offset-4 hover:text-cobalt">San Diego Ghost Map →</Link>
+        </nav>
+      </footer>
     </main>
   );
 }
