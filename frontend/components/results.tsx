@@ -324,7 +324,8 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
       </div>
     );
   const w = waitVsDeadline(search, provider);
-  const lines = (provider.call_transcript ?? "").split("\n").filter(Boolean);
+  // Skip empty turns (e.g. "Agent: " left after TTS tags are stripped).
+  const lines = (provider.call_transcript ?? "").split("\n").filter((l) => l.replace(/^(Agent|Office):\s*/, "").trim());
   return (
     <div className="window">
       <div className="window-bar"><span>call-transcript.txt</span><span className="text-ink/50">{maskPhone(provider.phone) || "no phone listed"}</span></div>
@@ -381,6 +382,14 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         )}
         {provider.ghost_status === "unverified" && <p className="font-mono text-sm text-ink/55">Not called yet.</p>}
         {lines.map((l, i) => {
+          if (l.startsWith("Result:")) {
+            return (
+              <div key={i} className="slide-in border-l-4 border-cobalt bg-cobalt/5 px-4 py-2.5 font-mono text-sm leading-snug text-ink" style={{ animationDelay: `${i * 80}ms` }}>
+                <div className="mb-1 text-[0.62rem] font-semibold uppercase tracking-widest text-cobalt">Extracted from the call</div>
+                {maskPhonesIn(l.replace(/^Result:\s*/, ""))}
+              </div>
+            );
+          }
           const text = maskPhonesIn(l.replace(/^(Agent|Office):\s*/, ""));
           const system = text.startsWith("("); // e.g. "(no answer — voicemail box full)"
           const office = !system && l.startsWith("Office:");

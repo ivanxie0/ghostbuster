@@ -154,7 +154,11 @@ export function waitVsDeadline(search: Search, p: Provider): { wait: string; lim
     return { wait: h == null ? "—" : `${h} hrs`, limit: `${p.deadline_days * 24} hrs` };
   }
   return {
-    wait: p.business_days_wait == null ? "—" : `${p.business_days_wait} business days`,
+    wait:
+      p.business_days_wait == null ? "—"
+      : p.business_days_wait === 0 ? "under 1 business day"
+      : p.business_days_wait === 1 ? "1 business day"
+      : `${p.business_days_wait} business days`,
     limit: `${p.deadline_days} business days`,
   };
 }

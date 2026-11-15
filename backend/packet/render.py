@@ -122,7 +122,7 @@ def render_packet(search_id: str) -> str:
     def wait(p) -> str:
         if p.business_days_wait is None:
             return "—"
-        return f"{p.business_days_wait} bus. days"
+        return "<1 bus. day" if p.business_days_wait == 0 else f"{p.business_days_wait} bus. day{'' if p.business_days_wait == 1 else 's'}"
 
     log_rows = "".join(
         f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(mask_phone(p.phone))}</td>"
@@ -142,6 +142,7 @@ def render_packet(search_id: str) -> str:
         + "".join(
             f"<p><span class='who'>{_e(line.split(':', 1)[0])}:</span>{_e(line.split(':', 1)[1]) if ':' in line else ''}</p>"
             for line in mask_phones_in(p.call_transcript or "(no transcript)").splitlines()
+            if re.sub(r"^(Agent|Office):\s*", "", line).strip()  # skip empty turns
         )
         + "</div>"
         for p in called
