@@ -219,6 +219,13 @@ def get_providers(insurer: str, zip: str, specialty: Specialty, *, timeout: floa
             cache.put(key, source, [p.model_dump(include={"name", "specialty", "phone", "address", "source_url"})
                                     for p in real])
 
+    # Prefer providers whose public profile we have already checked (pre-warm), ghosts first, so the
+    # short demo list shows real verified results instead of the first 8 names alphabetically.
+    if len(real) > MAX_REAL_PROVIDERS:
+        verdicts = cache.profile_verdicts()
+        rank = {"ghost": 0, "ok": 1}
+        real = sorted(real, key=lambda p: rank.get(
+            (verdicts.get(cache.profile_key(p.name, p.address)) or {}).get("verdict"), 2))
     real = real[:MAX_REAL_PROVIDERS]
     if not real:
         return load_seed_providers(specialty)

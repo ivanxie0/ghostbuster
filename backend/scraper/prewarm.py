@@ -9,12 +9,30 @@ import argparse
 import time
 
 from scraper import cache
-from scraper.ghosts import run_ghost_check
 from scraper.providers import scrape_live
 
 ZIPS = ["92122", "92037", "92101", "92173", "91932"]
 INSURERS = ["Blue Shield of California", "Anthem Blue Cross", "Molina Healthcare"]
 SPECIALTIES = ["therapist", "psychiatrist", "primary_care"]
+
+
+def _check_many(provs, timeout: float) -> int:
+    """Profile-check providers with a long per-step timeout and cache every verdict. Returns ghost count."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from scraper import ghosts
+
+    ghosts.STEP_TIMEOUT_S = min(timeout, 30.0)
+
+    def one(p) -> bool:
+        try:
+            return ghosts._check_cached(p)[0] == "ghost"
+        except Exception as e:
+            print(f"[prewarm] {p.name}: {e!r}"[:160])
+            return False
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        return sum(ex.map(one, provs))
 
 
 def main() -> None:
@@ -24,6 +42,7 @@ def main() -> None:
     ap.add_argument("--specialties", nargs="+", default=SPECIALTIES)
     ap.add_argument("--timeout", type=float, default=60.0)
     ap.add_argument("--skip-ghosts", action="store_true")
+    ap.add_argument("--ghost-limit", type=int, default=60, help="providers per search to profile-check")
     a = ap.parse_args()
 
     if not cache._enabled():
@@ -40,7 +59,7 @@ def main() -> None:
                                for p in provs])
                 ghosts = 0
                 if provs and not a.skip_ghosts:
-                    ghosts = sum(p.ghost_status == "ghost" for p in run_ghost_check(provs[:8]))
+                    ghosts = _check_many(provs[:a.ghost_limit], a.timeout)
                 print(f"{spec:13} {zip_} {ins[:28]:28} -> {len(provs):3} via {source:17} "
                       f"ghosts={ghosts} ({time.time() - t:.1f}s)")
 

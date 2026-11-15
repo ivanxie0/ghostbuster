@@ -26,6 +26,29 @@ def providers_key(insurer: str, zip: str, specialty: str) -> str:
     return f"providers:{insurer.strip().lower()}|{zip}|{specialty}"
 
 
+def profile_key(name: str, address: str | None) -> str:
+    import re
+
+    zip_ = re.findall(r"\b\d{5}\b", address or "")
+    return f"profile:{name.lower()}|{zip_[-1] if zip_ else ''}"
+
+
+def profile_verdicts(max_age_days: int = MAX_AGE_DAYS) -> dict[str, dict]:
+    """All cached ghost-check verdicts in one query: {profile key: {"verdict", "reason"}}."""
+    if not _enabled():
+        return {}
+    try:
+        with _connect() as c:
+            rows = c.execute(
+                "SELECT key, payload FROM scrape_cache WHERE key LIKE 'profile:%%' "
+                "AND fetched_at > now() - make_interval(days => %s)", (max_age_days,)
+            ).fetchall()
+            return {k: v for k, v in rows}
+    except Exception as e:
+        print(f"[cache] profile_verdicts failed: {e!r}")
+        return {}
+
+
 def get(key: str, max_age_days: int = MAX_AGE_DAYS):
     if not _enabled():
         return None

@@ -67,8 +67,7 @@ def classify_text(text: str) -> tuple[str | None, str | None]:
 
 
 def _profile_key(p: Provider) -> str:
-    zip_ = re.findall(r"\b\d{5}\b", p.address or "")
-    return f"profile:{p.name.lower()}|{zip_[-1] if zip_ else ''}"
+    return cache.profile_key(p.name, p.address)
 
 
 def _is_profile_url(url: str | None) -> bool:

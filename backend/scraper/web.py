@@ -12,7 +12,7 @@ import httpx
 
 BRIGHTDATA_URL = "https://api.brightdata.com/request"
 NPI_URL = "https://npiregistry.cms.hhs.gov/api/"
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL") or "gemini-3.5-flash-lite"  # same default as calls/webhook.py
 
 
 class FetchError(Exception):
@@ -58,7 +58,7 @@ def gemini_json(prompt: str, timeout: float):
         raise FetchError("GEMINI_API_KEY not set")
     r = httpx.post(
         f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent",
-        params={"key": key},
+        headers={"x-goog-api-key": key},  # header, not ?key=, so the key never shows up in error messages/logs
         json={
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"responseMimeType": "application/json", "temperature": 0},

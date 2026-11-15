@@ -17,7 +17,7 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 - [ ] Seed data reviewed (`db/seed_providers.json`)
 - [ ] `scraper/providers.py`: Bright Data scrape of an insurer directory (pick one insurer for demo)
 - [x] NPI Registry fallback
-- [ ] `scraper/ghosts.py`: cross-check profiles → ghost flags + reasons
+- [x] `scraper/ghosts.py`: cross-check profiles → ghost flags + reasons
 - [x] Cache scraped results in Neon; timeout → cache/seed fallback
 
 ## Hardik — rules, calls
