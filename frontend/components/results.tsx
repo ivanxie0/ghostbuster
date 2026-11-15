@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate,
+  CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn,
   shortDate, waitVsDeadline, wasCalled,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
@@ -170,7 +170,7 @@ export function EndingA({ search, provider, id, violations }: { search: Search; 
           rel="noreferrer"
           className="rounded-2xl bg-emerald-400 px-8 py-4 text-2xl font-bold text-emerald-950 shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-300"
         >
-          {provider.phone ? `📞 Call to book · ${provider.phone}` : "📅 Book this appointment →"}
+          {provider.phone ? `📞 Call to book · ${maskPhone(provider.phone)}` : "📅 Book this appointment →"}
         </a>
         {violations > 0 && (
           <Link href={`/packet/${id}`} className="rounded-2xl border-2 border-emerald-300/50 px-6 py-4 text-lg font-semibold text-emerald-100 hover:bg-emerald-900/50">
@@ -226,10 +226,10 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
 function rowDetail(search: Search, p: Provider) {
   const w = waitVsDeadline(search, p);
   switch (p.ghost_status) {
-    case "ghost": return <span className="text-zinc-400">{p.ghost_reason}</span>;
-    case "unverified": return <span className="text-zinc-400">{p.ghost_reason ?? "Looks real — not called yet"}</span>;
+    case "ghost": return <span className="text-zinc-400">{maskPhonesIn(p.ghost_reason ?? "")}</span>;
+    case "unverified": return <span className="text-zinc-400">{maskPhonesIn(p.ghost_reason ?? "Looks real — not called yet")}</span>;
     case "calling": return <span className="text-indigo-200">AI assistant is on the line…</span>;
-    case "no_answer": return <span className="text-amber-200">{p.ghost_reason ?? "No answer"}</span>;
+    case "no_answer": return <span className="text-amber-200">{maskPhonesIn(p.ghost_reason ?? "No answer")}</span>;
     default:
       return (
         <span className={STATUS_STYLE[p.ghost_status].text}>
@@ -316,7 +316,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         <div className="min-w-0">
           <h3 className="text-2xl font-bold leading-tight">{provider.name}</h3>
           <p className="mt-1 text-base text-zinc-400">
-            {[provider.phone, provider.address].filter(Boolean).join(" · ")}
+            {[maskPhone(provider.phone), provider.address].filter(Boolean).join(" · ")}
           </p>
         </div>
         <StatusBadge status={provider.ghost_status} big confirmed={isConfirmedGhost(provider)} />
@@ -349,7 +349,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         )}
         {provider.ghost_status === "ghost" && !wasCalled(provider) && (
           <p className="text-lg text-zinc-300">
-            Not called — this listing is a ghost: <b>{provider.ghost_reason}</b>.{" "}
+            Not called — this listing is a ghost: <b>{maskPhonesIn(provider.ghost_reason ?? "")}</b>.{" "}
             {provider.source_url && (
               <a href={provider.source_url} target="_blank" rel="noreferrer" className="text-indigo-300 underline">Source</a>
             )}
@@ -357,7 +357,7 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
         )}
         {provider.ghost_status === "unverified" && <p className="text-lg text-zinc-400">Not called yet.</p>}
         {lines.map((l, i) => {
-          const text = l.replace(/^(Agent|Office):\s*/, "");
+          const text = maskPhonesIn(l.replace(/^(Agent|Office):\s*/, ""));
           const system = text.startsWith("("); // e.g. "(no answer — voicemail box full)"
           const office = !system && l.startsWith("Office:");
           const agent = !system && l.startsWith("Agent:");
@@ -391,9 +391,9 @@ export function ActivityLog({ events, onPick }: { events: LogEvent[]; onPick: (p
             <span className="shrink-0 tabular-nums text-zinc-500">{e.at}</span>
             <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${TONE_DOT[e.tone]}`} />
             {e.pid ? (
-              <button onClick={() => onPick(e.pid!)} className="text-left text-zinc-100 hover:underline">{e.text}</button>
+              <button onClick={() => onPick(e.pid!)} className="text-left text-zinc-100 hover:underline">{maskPhonesIn(e.text)}</button>
             ) : (
-              <span className={e.tone === "user" ? "font-bold text-white" : "text-zinc-300"}>{e.text}</span>
+              <span className={e.tone === "user" ? "font-bold text-white" : "text-zinc-300"}>{maskPhonesIn(e.text)}</span>
             )}
           </li>
         ))}

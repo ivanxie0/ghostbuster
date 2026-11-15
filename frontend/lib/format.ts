@@ -77,6 +77,18 @@ export const CONFIRMED_GHOST_STYLE = {
   row: "border-red-500/70 bg-zinc-900/60",
 };
 
+/** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
+export function maskPhone(phone: string | null | undefined): string {
+  if (!phone) return "";
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 4 ? `(•••) •••-${digits.slice(-4)}` : "•••";
+}
+
+// Formatted US phone numbers inside free text (transcripts, reasons, log). Requires +1 or separators,
+// so bare 10-digit IDs (NPI numbers in URLs) are left alone.
+const PHONE_IN_TEXT = /(?<![\w/])(?:\+1\d{10}|(?:\+?1[\s.-]?)?(?:\(\d{3}\)\s?|\d{3}[\s.-])\d{3}[\s.-]\d{4})(?!\d)/g;
+export const maskPhonesIn = (text: string): string => text.replace(PHONE_IN_TEXT, (m) => maskPhone(m));
+
 /** Seed/fake providers all have example.com source URLs (db/seed_providers.json); real scraped ones never do. */
 export const isDemoProvider = (p: Provider) => !!p.source_url?.startsWith("https://example.com/");
 

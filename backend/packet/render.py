@@ -7,6 +7,7 @@ a_appointment_label ("an urgent appointment"), deadline_text ("10 business days"
 n_violations, n_ghosts, n_no_answer, search_id. Unknown placeholders render as "____".
 """
 import html
+import re
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -73,6 +74,22 @@ def _tpl(name: str, ctx: dict) -> str:
     return html.escape(text.format_map(defaultdict(lambda: "____", ctx)))
 
 
+# Display-only phone masking: "(•••) •••-4529". The packet never prints a full phone number.
+_PHONE_IN_TEXT = re.compile(r"(?<![\w/])(?:\+1\d{10}|(?:\+?1[\s.-]?)?(?:\(\d{3}\)\s?|\d{3}[\s.-])\d{3}[\s.-]\d{4})(?!\d)")
+
+
+def mask_phone(phone: str | None) -> str:
+    if not phone:
+        return ""
+    digits = re.sub(r"\D", "", phone)
+    return f"(•••) •••-{digits[-4:]}" if len(digits) >= 4 else "•••"
+
+
+def mask_phones_in(text: str | None) -> str:
+    """Mask formatted phone numbers inside free text. Bare 10-digit IDs (NPI numbers in URLs) are left alone."""
+    return _PHONE_IN_TEXT.sub(lambda m: mask_phone(m.group(0)), text or "")
+
+
 def _e(v) -> str:
     return html.escape("" if v is None else str(v))
 
@@ -108,23 +125,23 @@ def render_packet(search_id: str) -> str:
         return f"{p.business_days_wait} bus. days"
 
     log_rows = "".join(
-        f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(p.phone)}</td>"
+        f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(mask_phone(p.phone))}</td>"
         f"<td>{short_datetime(p.checked_at.astimezone(TZ)) if p.checked_at else ''}</td>"
         f"<td><span class='pill {p.ghost_status}'>{CALLED_GHOST_LABEL if p.ghost_status == 'ghost' else LABEL[p.ghost_status]}</span></td>"
         f"<td>{short_date(p.earliest_date) if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
-        f"<td>{_e(p.ghost_reason)}</td></tr>"
+        f"<td>{_e(mask_phones_in(p.ghost_reason))}</td></tr>"
         for p in called
     ) or "<tr><td colspan='7' class='muted'>No offices were called.</td></tr>"
     ghost_rows = "".join(
-        f"<tr><td><b>{_e(p.name)}</b></td><td>{_e(p.phone)}</td><td>{_e(p.ghost_reason)}</td>"
+        f"<tr><td><b>{_e(p.name)}</b></td><td>{_e(mask_phone(p.phone))}</td><td>{_e(mask_phones_in(p.ghost_reason))}</td>"
         f"<td class='small'>{_e(p.source_url)}</td></tr>"
         for p in ghosts
     ) or "<tr><td colspan='4' class='muted'>None.</td></tr>"
     transcripts = "".join(
-        f"<div class='tx'><h3>{_e(p.name)}{' — ' + _e(p.phone) if p.phone else ''}</h3>"
+        f"<div class='tx'><h3>{_e(p.name)}{' — ' + _e(mask_phone(p.phone)) if p.phone else ''}</h3>"
         + "".join(
             f"<p><span class='who'>{_e(line.split(':', 1)[0])}:</span>{_e(line.split(':', 1)[1]) if ':' in line else ''}</p>"
-            for line in (p.call_transcript or "(no transcript)").splitlines()
+            for line in mask_phones_in(p.call_transcript or "(no transcript)").splitlines()
         )
         + "</div>"
         for p in called
