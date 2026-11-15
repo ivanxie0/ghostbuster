@@ -64,3 +64,27 @@ def test_therapist_follow_up_counts_from_prior_appointment():
     # Without a prior date, the clock starts at the request -> 11/18 is only 3 business days
     s2 = _search(appointment_type="follow_up")
     assert check_violation(_p(date(2026, 11, 18)), s2).ghost_status == "available"
+
+
+def test_deadline_boundary_inclusive():
+    # Sat 11/14 request; 10 business days lands on Tue 12/1 (Thanksgiving Thu+Fri skipped)
+    assert business_days_between(date(2026, 11, 14), date(2026, 12, 1)) == 10
+    assert check_violation(_p(date(2026, 12, 1)), _search()).ghost_status == "available"
+    assert check_violation(_p(date(2026, 12, 2)), _search()).ghost_status == "violation"
+
+
+def test_christmas_and_new_year_skipped():
+    # Thu 12/24 -> Mon 1/4/2027: 12/25 + 1/1 holidays, weekends -> 12/28,29,30,31, 1/4 = 5
+    assert business_days_between(date(2026, 12, 24), date(2027, 1, 4)) == 5
+
+
+def test_non_therapist_follow_up_is_worded_as_standard_not_violation():
+    s = _search(specialty="psychiatrist", appointment_type="follow_up")
+    out = check_violation(Provider(name="P", specialty="psychiatrist", earliest_date=date(2026, 12, 23)), s)
+    assert out.ghost_status == "violation" and out.deadline_days == 15
+    assert "standard" in out.ghost_reason and "can be exempt" in out.ghost_reason
+
+
+def test_therapist_follow_up_reason_says_prior_appointment():
+    s = _search(appointment_type="follow_up", prior_appointment_date=date(2026, 11, 2))
+    assert "prior appointment" in check_violation(_p(date(2026, 11, 18)), s).ghost_reason
