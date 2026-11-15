@@ -77,6 +77,26 @@ export const CONFIRMED_GHOST_STYLE = {
   row: "border-signal bg-paper text-ink/70",
 };
 
+/** Real ghost flag from Ivan's public-profile check. Matches reasons that start with "Profile checked:" or
+ *  real (non-seed) ghost reasons ending in "(https://source)". Returns clean text + the source link. */
+export function profileCheck(p: Provider): { text: string; url: string | null; host: string | null } | null {
+  const r = p.ghost_reason?.trim();
+  if (!r) return null;
+  const prefixed = r.startsWith("Profile checked:");
+  const m = r.match(/\((https?:\/\/[^\s)]+)\)\s*$/);
+  if (!prefixed && !(p.ghost_status === "ghost" && !isDemoProvider(p) && m)) return null;
+  let text = r.replace(/^Profile checked:\s*/, "");
+  if (m) text = text.slice(0, text.lastIndexOf(m[0])).trim();
+  const url = m?.[1] ?? p.source_url ?? null;
+  let host: string | null = null;
+  try {
+    host = url ? new URL(url).hostname.replace(/^www\./, "") : null;
+  } catch {
+    host = null;
+  }
+  return { text: text || "public profile says unavailable", url, host };
+}
+
 /** Display-only phone mask: "(•••) •••-4529". The real number stays in the data and in tel: links. */
 export function maskPhone(phone: string | null | undefined): string {
   if (!phone) return "";
