@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isResolved, longDate, shortDate, waitVsDeadline,
+  PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isDemoProvider, isResolved, longDate, shortDate, waitVsDeadline,
 } from "@/lib/format";
 import type { GhostStatus, Provider, Search, SearchDetail } from "@/lib/types";
 
@@ -43,7 +43,7 @@ export function diffEvents(prev: SearchDetail | null, next: SearchDetail): Omit<
     if (p.ghost_status === "available")
       out.push({ tone: "available", pid: p.id, text: `${name}: earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit}). Within the deadline ✓` });
     if (p.ghost_status === "violation")
-      out.push({ tone: "violation", pid: p.id, text: `${name}: earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit}). Deadline missed` });
+      out.push({ tone: "violation", pid: p.id, text: `${name}: earliest ${shortDate(p.earliest_date)} — ${w?.wait} (limit ${w?.limit}). Past legal deadline` });
     if (p.ghost_status === "no_answer") out.push({ tone: "no_answer", pid: p.id, text: `${name}: no answer` });
   }
   const callable = next.providers.filter((p) => p.ghost_status === "unverified").length;
@@ -98,10 +98,13 @@ export function ConsentCard({ search, count, onApprove, busy }: { search: Search
   return (
     <section className="rise rounded-3xl border-2 border-indigo-400 bg-indigo-950/50 p-6 sm:p-8">
       <h2 className="text-3xl font-extrabold">Want us to call the {count} remaining offices?</h2>
-      <p className="mt-3 text-xl text-zinc-200">With your permission, our AI assistant will phone each office below. It will:</p>
+      <p className="mt-3 text-xl text-zinc-200">
+        With your permission, our AI assistant will act as your <b>authorized representative</b> and phone each office
+        below. It will:
+      </p>
       <ul className="mt-3 space-y-1.5 text-lg text-zinc-200">
         <li>✓ say up front that it&apos;s an <b>AI assistant calling on behalf of a patient</b></li>
-        <li>✓ ask only for the <b>earliest new-patient opening</b> with {search.insurer} {PLAN_LABEL[search.plan_type]}</li>
+        <li>✓ ask only for the <b>earliest opening, in person or by telehealth</b>, with {search.insurer} {PLAN_LABEL[search.plan_type]}</li>
         <li>✓ <b>not</b> share your name, contact info, or health details</li>
       </ul>
       <p className="mt-3 text-base text-indigo-200/80">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
@@ -158,15 +161,19 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
   const selfFunded = search.plan_type === "ppo" || search.plan_type === "unknown";
   return (
     <section className="rise rounded-3xl border-2 border-red-500 bg-red-950/60 p-6 sm:p-8">
-      <p className="text-lg font-bold uppercase tracking-widest text-red-300">Deadline missed</p>
-      <h2 className="mt-1 text-4xl font-extrabold leading-tight sm:text-5xl">No one could see you within {deadlineText(search)}.</h2>
-      <p className="mt-4 text-2xl leading-snug text-red-100">
-        <b>{n("violation")}</b> of {checked} offices we reached are past the legal deadline, <b>{n("ghost")}</b> listings
-        were ghosts, and <b>{n("no_answer")}</b> didn&apos;t answer.
+      <p className="text-lg font-bold uppercase tracking-widest text-red-300">Timely access grievance ready</p>
+      <h2 className="mt-1 text-4xl font-extrabold leading-tight sm:text-5xl">
+        No provider we reached could offer a timely appointment.
+      </h2>
+      <p className="mt-3 text-2xl font-semibold leading-snug text-white">
+        Under California law, your plan must now arrange timely care, including out-of-network at in-network cost.
       </p>
-      <p className="mt-3 text-xl text-red-100/90">
-        Under California&apos;s timely access rules, {search.insurer} has to arrange care for you in time — including
-        out-of-network if needed. Your packet has the call log, a letter to send, a phone script, and how to file with the DMHC.
+      <p className="mt-4 text-xl leading-snug text-red-100">
+        Legal limit: {deadlineText(search)}. <b>{n("violation")}</b> of {checked} offices we reached were past the legal
+        deadline, <b>{n("ghost")}</b> listings appear unavailable, and <b>{n("no_answer")}</b> didn&apos;t answer.
+      </p>
+      <p className="mt-2 text-lg text-red-100/80">
+        Your packet has the evidence log, a grievance letter to {search.insurer}, a phone script, and next steps with the DMHC.
       </p>
       {selfFunded && (
         <p className="mt-3 rounded-xl border border-amber-500/70 bg-amber-950/50 p-3 text-lg text-amber-100">
@@ -174,9 +181,9 @@ export function EndingB({ detail, id }: { detail: SearchDetail; id: string }) {
         </p>
       )}
       <Link href={`/packet/${id}`} className="mt-6 inline-block rounded-2xl bg-white px-8 py-4 text-2xl font-bold text-red-700 shadow-lg transition hover:bg-red-50">
-        ⬇ Download evidence packet
+        ⬇ Download grievance packet
       </Link>
-      <p className="mt-3 text-base text-red-200/70">Evidence log + templates, not legal advice.</p>
+      <p className="mt-3 text-base text-red-200/70">Evidence log + template, not legal advice.</p>
     </section>
   );
 }
@@ -198,7 +205,30 @@ function rowDetail(search: Search, p: Provider) {
   }
 }
 
+/** "Demo data — fictional providers" tag so realistic seed names can't be mistaken for real offices. */
+export function DemoDataTag({ providers }: { providers: Provider[] }) {
+  const demo = providers.filter(isDemoProvider).length;
+  if (!demo) return null;
+  const all = demo === providers.length;
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-yellow-400/70 bg-yellow-400/10 px-3 py-1 text-sm font-bold uppercase tracking-wider text-yellow-200">
+      ⚑ {all ? "Demo data — fictional providers" : `Includes ${demo} fictional demo providers (marked)`}
+    </span>
+  );
+}
+
+/** Jai's legal caveats — always visible on results. */
+export function LegalNote() {
+  return (
+    <p className="rounded-xl border border-zinc-700 bg-zinc-900/60 px-4 py-2.5 text-base text-zinc-300">
+      <span className="font-semibold text-zinc-100">Note:</span> A provider may lawfully offer a later date if they
+      document it won&apos;t harm your health. Telehealth appointments count.
+    </p>
+  );
+}
+
 export function ProviderList({ search, providers, selected, onSelect }: { search: Search; providers: Provider[]; selected: string | null; onSelect: (id: string) => void }) {
+  const mixed = providers.some(isDemoProvider) && !providers.every(isDemoProvider);
   return (
     <ul className="space-y-3">
       {providers.map((p) => {
@@ -217,7 +247,12 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
               )}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className={`truncate text-xl font-bold ${p.ghost_status === "ghost" ? "line-through decoration-zinc-500" : ""}`}>{p.name}</div>
+                  <div className={`truncate text-xl font-bold ${p.ghost_status === "ghost" ? "line-through decoration-zinc-500" : ""}`}>
+                    {p.name}
+                    {mixed && isDemoProvider(p) && (
+                      <span className="ml-2 align-middle rounded border border-yellow-400/60 px-1.5 py-0.5 text-xs font-bold uppercase text-yellow-200 no-underline">Demo</span>
+                    )}
+                  </div>
                   <div className="mt-1 text-lg leading-snug">{rowDetail(search, p)}</div>
                 </div>
                 <StatusBadge status={p.ghost_status} />

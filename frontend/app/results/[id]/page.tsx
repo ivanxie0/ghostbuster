@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityLog, ConsentCard, Counters, EndingA, EndingB, PhasePill, ProviderList, TranscriptPanel, diffEvents,
+  ActivityLog, ConsentCard, Counters, DemoDataTag, EndingA, EndingB, LegalNote, PhasePill, ProviderList, TranscriptPanel, diffEvents,
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
@@ -117,12 +117,16 @@ export default function ResultsPage() {
             {SPECIALTY_LABEL[search.specialty]} · legal limit {deadlineText(search)}
           </h1>
         </div>
-        <PhasePill detail={data} />
+        <div className="flex flex-col items-end gap-2">
+          <PhasePill detail={data} />
+          <DemoDataTag providers={providers} />
+        </div>
       </div>
 
       {error && <p className="rounded-xl bg-red-950 p-3 text-lg text-red-200">Connection issue: {error} — retrying…</p>}
 
       <Counters providers={providers} />
+      <LegalNote />
 
       {search.status === "scraping" && (
         <div className="relative h-2 overflow-hidden rounded-full bg-zinc-800">

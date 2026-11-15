@@ -70,6 +70,9 @@ export const STATUS_STYLE: Record<GhostStatus, { badge: string; row: string; tex
   },
 };
 
+/** Seed/fake providers all have example.com source URLs (db/seed_providers.json); real scraped ones never do. */
+export const isDemoProvider = (p: Provider) => !!p.source_url?.startsWith("https://example.com/");
+
 export const RESOLVED: GhostStatus[] = ["available", "violation", "no_answer"];
 export const isResolved = (p: Provider) => RESOLVED.includes(p.ghost_status);
 

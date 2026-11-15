@@ -145,7 +145,15 @@ export default function SearchPage() {
             value={form.specialty}
             options={["therapist", "psychiatrist", "primary_care", "specialist"]}
             labels={SPECIALTY_LABEL}
-            onChange={(specialty) => patch({ specialty })}
+            onChange={(specialty) =>
+              // Follow-up has a fixed legal deadline only for therapists (Jai, RULES.md); reset it otherwise.
+              patch({
+                specialty,
+                ...(specialty !== "therapist" && form.appointment_type === "follow_up"
+                  ? { appointment_type: "new" as AppointmentType, prior_appointment_date: null }
+                  : {}),
+              })
+            }
           />
         </Field>
 
@@ -153,7 +161,7 @@ export default function SearchPage() {
           <Segmented<AppointmentType>
             name="Appointment type"
             value={form.appointment_type}
-            options={["new", "follow_up", "urgent"]}
+            options={form.specialty === "therapist" ? ["new", "follow_up", "urgent"] : ["new", "urgent"]}
             labels={APPT_LABEL}
             onChange={(appointment_type) => patch({ appointment_type })}
           />

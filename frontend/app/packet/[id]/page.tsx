@@ -30,7 +30,7 @@ export default function PacketPage() {
   function download() {
     if (!html) return;
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
-    const a = Object.assign(document.createElement("a"), { href: url, download: `ghostbuster-evidence-${id.slice(0, 8)}.html` });
+    const a = Object.assign(document.createElement("a"), { href: url, download: `ghostbuster-grievance-${id.slice(0, 8)}.html` });
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -40,8 +40,8 @@ export default function PacketPage() {
       <div className="sticky top-10 z-40 -mx-6 mb-6 flex flex-wrap items-center justify-between gap-4 bg-[var(--background)]/95 px-6 py-4 backdrop-blur print:hidden">
         <div>
           <Link href={`/results/${id}`} className="text-base text-zinc-400 hover:text-white">← Back to results</Link>
-          <h1 className="text-4xl font-extrabold tracking-tight">Your evidence packet</h1>
-          <p className="text-lg text-zinc-400">Call log · ghost listings · letter · phone script · DMHC info · transcripts</p>
+          <h1 className="text-4xl font-extrabold tracking-tight">Your timely access grievance</h1>
+          <p className="text-lg text-zinc-400">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -72,7 +72,7 @@ export default function PacketPage() {
         <div className="rise overflow-hidden rounded-xl bg-white shadow-2xl shadow-black/60 ring-1 ring-white/10">
           <iframe
             ref={frame}
-            title="Evidence packet"
+            title="Timely access grievance"
             srcDoc={html}
             onLoad={fit}
             style={{ height }}
