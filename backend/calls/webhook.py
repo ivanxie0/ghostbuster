@@ -44,11 +44,23 @@ def extract_earliest_date(transcript: str, today: date | None = None) -> date | 
 
 
 def handle_call_complete(payload: dict) -> CallResult | None:
-    data = (payload or {}).get("data") or {}
+    from calls.agent import CONVERSATIONS  # conversation_id -> ids, for payloads without dynamic vars
+
+    payload = payload or {}
+    kind = payload.get("type") or "post_call_transcription"
+    if kind not in ("post_call_transcription", "call_initiation_failure"):
+        return None  # e.g. post_call_audio: ignore
+    data = payload.get("data") or {}
     dv = ((data.get("conversation_initiation_client_data") or {}).get("dynamic_variables")) or {}
     search_id, provider_id = dv.get("search_id"), dv.get("provider_id")
+    if (not search_id or not provider_id) and data.get("conversation_id") in CONVERSATIONS:
+        search_id, provider_id = CONVERSATIONS[data["conversation_id"]]
     if not search_id or not provider_id:
         return None
+    if kind == "call_initiation_failure":  # busy / no-answer / failed: no conversation happened
+        reason = data.get("failure_reason") or "unknown"
+        return CallResult(search_id=search_id, provider_id=provider_id,
+                          transcript=f"(call did not connect: {reason})", earliest_date=None)
     text = transcript_to_text(data.get("transcript") or [])
     return CallResult(search_id=search_id, provider_id=provider_id, transcript=text,
                       earliest_date=extract_earliest_date(text))
