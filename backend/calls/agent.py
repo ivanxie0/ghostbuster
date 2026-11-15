@@ -93,6 +93,21 @@ def place_call(to_number: str, dynamic_variables: dict) -> str | None:
     return body.get("conversation_id")
 
 
+SIM_PREFIX = "sim_"
+SIMULATED_NOTE = "(simulated call: demo data, no phone call was placed)"
+
+
+def is_real_call_payload(payload: dict) -> bool:
+    """True for a webhook from an actual ElevenLabs call (has a conversation id that isn't ours/simulated).
+    Watchdog / could-not-place payloads (conversation_id None) and simulations (sim_...) are not real calls."""
+    conv = ((payload or {}).get("data") or {}).get("conversation_id")
+    return bool(conv) and not str(conv).startswith(SIM_PREFIX)
+
+
+def no_answer_payload(search_id: str, provider_id: str, note: str) -> dict:
+    return _no_answer_payload(search_id, provider_id, note)
+
+
 def _no_answer_payload(search_id: str, provider_id: str, note: str) -> dict:
     """Same shape as a real post-call webhook, with no date -> rules mark it no_answer."""
     return {
@@ -135,8 +150,10 @@ def _call_one(provider: Provider, search: Search) -> None:
 def start_verification(search_id: str, provider_ids: list[str]) -> dict[str, str]:
     """Start one outbound AI call per provider (in background threads). Returns immediately.
 
-    Real mode (ElevenLabs env set): teammate numbers get a real call; any other number is NOT dialed and
-    resolves as no_answer with an honest note (we never fabricate a transcript for a real provider).
+    Real mode (ElevenLabs env set): teammate numbers get a real call (one thread each, so calls go out in
+    parallel). Any other number is NOT dialed and returns "blocked" with NO call result: the caller
+    (app.pipeline.verify) leaves that row unverified, so a real office never gets a call-result line.
+    This function does no per-provider DB work, so it returns in well under a second.
     Without ElevenLabs env: simulated calls, so FAKE_MODE=false + Neon still works end to end.
     """
     from app import store  # lazy: avoid import cycle
@@ -154,9 +171,7 @@ def start_verification(search_id: str, provider_ids: list[str]) -> dict[str, str
             status[pid] = "calling"
             threading.Thread(target=_call_one, args=(p, search), daemon=True).start()
         elif real:
-            status[pid] = "blocked"
-            store.call_complete(_no_answer_payload(
-                search_id, pid, "(not called: this hackathon build only dials the team's verified test phones)"))
+            status[pid] = "blocked"  # never dialed, never resolved here; see docstring
         else:
             status[pid] = "simulated"
 
@@ -180,10 +195,12 @@ def simulate_call(provider: Provider, search: Search, index: int) -> dict:
     days = outcomes[index % len(outcomes)]
     first = fill(FIRST_MESSAGE, call_vars(provider, search))
     if days is None:
-        transcript = [{"role": "agent", "message": "(no answer — voicemail box full)"}]
+        transcript = [{"role": "agent", "message": SIMULATED_NOTE},
+                      {"role": "agent", "message": "(no answer — voicemail box full)"}]
     else:
         d = date.today() + timedelta(days=days)
         transcript = [
+            {"role": "agent", "message": SIMULATED_NOTE},
             {"role": "agent", "message": first},
             {"role": "user", "message": f"Let me check... our earliest new-patient opening is {d:%A, %B} {d.day}."},
             {"role": "agent", "message": f"Thank you. Just to confirm, that's {d:%B} {d.day} for a new patient with that plan?"},
@@ -192,7 +209,7 @@ def simulate_call(provider: Provider, search: Search, index: int) -> dict:
     return {
         "type": "post_call_transcription",
         "data": {
-            "conversation_id": f"sim_{provider.id[:8]}",
+            "conversation_id": f"{SIM_PREFIX}{provider.id[:8]}",
             "transcript": transcript,
             "conversation_initiation_client_data": {
                 "dynamic_variables": {"search_id": provider.search_id, "provider_id": provider.id},

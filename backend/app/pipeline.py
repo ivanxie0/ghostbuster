@@ -6,7 +6,9 @@ Each fallback is logged per search (app.demo) and shown in the results activity 
   stage            live call                          fallback
   directory        scraper.get_providers              seed providers (db/seed_providers.json)
   ghost check      scraper.run_ghost_check            seed ghost flags
-  calls            calls.start_verification           simulated calls, demo (seed) providers only
+  calls            calls.start_verification           live: NO simulation ever (rows wait for webhooks; 90s watchdog
+                                                       -> no answer). Simulated (seed only) only when live calling
+                                                       is off or force-fallback is on, and logged as "simulated".
   extraction       calls.webhook.handle_call_complete regex date extraction (no Gemini)
 
 Honesty guard: a real provider (not seed data) is never given a simulated call. If live calling is off,
@@ -28,11 +30,12 @@ _pool = ThreadPoolExecutor(max_workers=16)
 
 SCRAPE_TIMEOUT_S = 10       # Ivan's live sources use ~4s each, cache is instant
 GHOST_TIMEOUT_S = 12
-CALL_START_TIMEOUT_S = 8    # start_verification only kicks off threads; it should return in <1s
+CALL_START_TIMEOUT_S = 45   # start_verification spawns one thread per call (parallel); generous for Neon latency
 EXTRACT_TIMEOUT_S = 12      # Gemini has its own 8s timeout inside
 SIM_CALL_SPACING_S = 3
 
 NOT_CALLED_REASON = "Not called — live calling is off, and we never simulate calls to real offices"
+LIVE_NOT_CALLED_REASON = "Not called — this demo only dials the team's test phones, never real offices"
 
 
 # ---------------------------------------------------------------- timeout helpers
@@ -173,18 +176,49 @@ def verify(search_id: str, provider_ids: list[str]) -> list[str]:
         raise ValueError(f"provider_ids not in this search: {bad}")
 
     live = agent.real_calls_enabled() and not demo.force_fallback()
-    to_call = [pid for pid in provider_ids if live or _is_seed(providers[pid])]
+    if live:  # only the team's test phones are ever dialed; everyone else stays unverified (no call result)
+        to_call = [pid for pid in provider_ids if agent.is_allowed_number(providers[pid].phone)]
+        skip_reason = LIVE_NOT_CALLED_REASON
+    else:     # simulation is only ever for demo (seed) providers
+        to_call = [pid for pid in provider_ids if _is_seed(providers[pid])]
+        skip_reason = NOT_CALLED_REASON
     for pid in provider_ids:
         if pid in to_call:
             db.update_provider(providers[pid].model_copy(update={"ghost_status": "calling", "ghost_reason": None}))
-        else:  # real office, no live calling: leave it unchecked, say why
-            db.update_provider(providers[pid].model_copy(update={"ghost_reason": NOT_CALLED_REASON}))
-    if to_call:
-        _stage(search_id, "calls", agent.start_verification, CALL_START_TIMEOUT_S,
-               lambda: _simulate_calls(search_id, to_call), "simulated calls (demo providers only)",
-               search_id, to_call)
+        else:  # leave it unchecked, say why
+            db.update_provider(providers[pid].model_copy(update={"ghost_reason": skip_reason}))
+    if to_call and live:
+        _start_real_calls(search_id, to_call, providers)
+    elif to_call:
+        why = "forced fallback" if demo.force_fallback() else "live calling is off"
+        demo.log(search_id, "calls", f"{why} → simulated calls (demo providers only, labeled simulated)")
+        _simulate_calls(search_id, to_call)
     _maybe_finish(search_id)
     return to_call
+
+
+def _start_real_calls(search_id: str, to_call: list[str], providers: dict[str, Provider]) -> None:
+    """Real calls. Once any real call may have been placed we NEVER simulate: on a slow/failed start the rows
+    stay "calling" and wait for webhooks; a backup watchdog marks anything still calling as no answer."""
+    ok, val, why = _attempt(agent.start_verification, CALL_START_TIMEOUT_S, search_id, to_call)
+    if ok:
+        for pid, st in (val or {}).items():
+            if st == "blocked":  # safety net (verify already filters): never dialed -> back to unverified
+                db.update_provider(providers[pid].model_copy(
+                    update={"ghost_status": "unverified", "ghost_reason": LIVE_NOT_CALLED_REASON}))
+        return
+    demo.log(search_id, "calls", f"call start {why} → no simulation: waiting for real call results "
+                                 f"(no result in {agent.CALL_TIMEOUT_S}s = no answer)")
+    threading.Thread(target=_backup_watchdog, args=(search_id, to_call), daemon=True).start()
+
+
+def _backup_watchdog(search_id: str, provider_ids: list[str], wait_s: float | None = None) -> None:
+    import time
+    time.sleep(agent.CALL_TIMEOUT_S if wait_s is None else wait_s)
+    for p in db.get_providers(search_id):
+        if p.id in provider_ids and p.ghost_status == "calling":
+            call_complete(agent.no_answer_payload(
+                search_id, p.id, f"(no answer / no result within {agent.CALL_TIMEOUT_S} seconds)"))
 
 
 def call_complete(payload: dict) -> dict:
@@ -200,6 +234,13 @@ def call_complete(payload: dict) -> dict:
     search = db.get_search(result.search_id)
     if not p or not search:
         return {"ok": False, "error": "unknown provider"}
+    if p.ghost_status != "calling":
+        # Row already resolved (watchdog, earlier result) or never called. Only a REAL call may change it:
+        # a watchdog / simulated payload must never overwrite what an actual call said.
+        if not agent.is_real_call_payload(payload):
+            return {"ok": True, "provider_id": p.id, "ghost_status": p.ghost_status, "ignored": "already resolved"}
+        if p.call_transcript != result.transcript:
+            demo.log(result.search_id, "calls", f"{p.name}: updated from real call")
     upd = check_violation(
         p.model_copy(update={"earliest_date": result.earliest_date, "call_transcript": result.transcript}),
         search,

@@ -40,11 +40,11 @@ def test_place_call_refuses_non_teammate(env):
         agent.place_call("+16195550105", {})
 
 
-def test_non_teammate_resolves_no_answer_without_dialing(env, monkeypatch):
+def test_non_teammate_is_blocked_without_dialing_or_a_call_result(env, monkeypatch):
     monkeypatch.setattr(store, "get", lambda sid: _detail("+16195550105"))
     monkeypatch.setattr(agent, "place_call", lambda *a: pytest.fail("must not dial"))
     assert agent.start_verification("s1", ["p1"]) == {"p1": "blocked"}
-    assert env[0].earliest_date is None and "not called" in env[0].transcript
+    assert env == []  # an undialed office never gets a call result (pipeline leaves it unverified)
 
 
 def test_api_failure_resolves_no_answer(env, monkeypatch):
