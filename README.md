@@ -60,11 +60,15 @@ curl -s -XPOST localhost:8000/api/search -H 'content-type: application/json' -d 
 3. `make dev-backend` and `make dev-frontend` as above. `/api/health` should show `"fake_mode": false`.
 
 ## Exposing the backend for ElevenLabs webhooks
+Uses your free, fixed ngrok domain, so the webhook URL never changes.
+1. `brew install ngrok`, then `ngrok config add-authtoken <token>` once (or put `NGROK_AUTHTOKEN=` in `.env`).
+2. Put your domain in `.env`: `NGROK_DOMAIN=name.ngrok-free.dev` (dashboard.ngrok.com → Domains).
+3. Run it (keep it running while calls happen):
 ```bash
-ngrok http 8000
+make tunnel
 ```
-Put the `https://….ngrok-free.app` URL in `.env` as `PUBLIC_BASE_URL`, restart the backend, and set the
-ElevenLabs agent's post-call webhook to `<PUBLIC_BASE_URL>/api/webhooks/call-complete`.
+It writes `PUBLIC_BASE_URL` into `.env`, prints the webhook URL, and runs ngrok. Restart the backend once after
+the first run. Set the ElevenLabs agent's post-call webhook to `<PUBLIC_BASE_URL>/api/webhooks/call-complete`.
 
 ## Tests
 ```bash
