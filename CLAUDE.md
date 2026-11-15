@@ -104,7 +104,7 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 ## Current status (update this list as you land things — one line each)
 - [x] Base scaffold: contracts, docs, FAKE_MODE backend, stub modules, frontend shells (Aryan)
 - [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
-- [ ] Neon schema applied + seeded (Ivan)
+- [x] Neon schema applied + seeded (Ivan)
 - [ ] Real scraper / ghost check (Ivan) — code landed (cache → Bright Data → NPI → seed), but every
       `DIRECTORY_URLS` entry is empty, so real providers currently come from NPI only, not an insurer directory
 - [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)

@@ -13,7 +13,7 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 - [ ] Integration: switch to FAKE_MODE=false end to end with Neon
 
 ## Ivan — db, scraper
-- [ ] Apply `db/schema.sql` to Neon (`make seed` does it)
+- [x] Apply `db/schema.sql` to Neon (`make seed` does it)
 - [ ] Seed data reviewed (`db/seed_providers.json`)
 - [ ] `scraper/providers.py`: Bright Data scrape of an insurer directory (pick one insurer for demo)
 - [ ] NPI Registry fallback
