@@ -83,7 +83,7 @@ async def call_complete(request: Request):
 
 
 @router.get("/search/{search_id}/packet", response_class=HTMLResponse)
-def packet(search_id: str):
+def packet(search_id: str, lang: str = "en"):
     if not store.get(search_id):
         raise HTTPException(404, "search not found")
-    return HTMLResponse(render_packet(search_id))
+    return HTMLResponse(render_packet(search_id, lang=lang))

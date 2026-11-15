@@ -1,0 +1,21 @@
+PLANTILLA - NO ES ASESORÍA LEGAL. Un guion para leer cuando llame al número de servicios para miembros que aparece en su tarjeta.
+
+INICIO
+"Hola, me llamo ____________ y soy miembro de {insurer}. Mi número de miembro es ____________. Llamo para presentar una queja de acceso oportuno y para que me consigan una cita."
+
+LOS HECHOS
+"Necesito {a_appointment_label} con {specialty_label} cerca del código postal {zip}. La ley de California dice que su red debe ofrecerla en un plazo de {deadline_text}. El {today} se llamó en mi nombre a {n_called} consultorios de su directorio y ningún proveedor con el que nos comunicamos pudo ofrecer una cita a tiempo. Tengo un registro escrito de cada llamada."
+
+LO QUE PIDO
+"Pido dos cosas. Primero, que me consigan una cita dentro del plazo legal, dentro o fuera de la red. Si es fuera de la red, entiendo que mi costo no puede ser mayor que dentro de la red. Segundo, que abran hoy una queja formal y me den el número de referencia."
+
+SI LE DICEN QUE SIGA LLAMANDO A LA LISTA
+"Ya lo hice y tengo el registro. Según la Sección 1367.03 del Código de Salud y Seguridad, le corresponde al plan coordinar la cita cuando la red no puede ofrecerla a tiempo. ¿Puede coordinarla o transferirme con alguien que pueda?"
+
+SI ES URGENTE
+"Mi condición es urgente y esperar es una amenaza grave para mi salud. Pido una queja acelerada, con decisión en 3 días."
+
+ANTES DE COLGAR, ANOTE
+Número de queja o referencia, nombre del representante, qué prometieron y para cuándo, fecha y hora de la llamada. Pida confirmación por escrito.
+
+Si está en crisis, llame o envíe un mensaje de texto al 988 ahora. No espere a su plan.

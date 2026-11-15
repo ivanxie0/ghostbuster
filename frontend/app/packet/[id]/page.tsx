@@ -11,11 +11,14 @@ export default function PacketPage() {
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [height, setHeight] = useState(1200);
+  const [lang, setLang] = useState<"en" | "es">("en"); // Spanish = draft translation
   const frame = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    api.getPacketHtml(id).then(setHtml).catch((e) => setError((e as Error).message));
-  }, [id]);
+    setHtml(null);
+    setError(null);
+    api.getPacketHtml(id, lang).then(setHtml).catch((e) => setError((e as Error).message));
+  }, [id, lang]);
 
   function fit() {
     const doc = frame.current?.contentDocument;
@@ -30,7 +33,7 @@ export default function PacketPage() {
   function download() {
     if (!html) return;
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
-    const a = Object.assign(document.createElement("a"), { href: url, download: `ghostbuster-grievance-${id.slice(0, 8)}.html` });
+    const a = Object.assign(document.createElement("a"), { href: url, download: `ghostbuster-grievance-${id.slice(0, 8)}${lang === "es" ? "-es" : ""}.html` });
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -43,7 +46,20 @@ export default function PacketPage() {
           <h1 className="display mt-2 text-5xl">Your timely access grievance</h1>
           <p className="mt-2 font-mono text-xs text-ink/60">Evidence log · grievance letter · next steps (phone script, DMHC) · transcripts</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div role="radiogroup" aria-label="Packet language" className="flex border border-ink font-mono text-sm">
+            {(["en", "es"] as const).map((l) => (
+              <button
+                key={l}
+                role="radio"
+                aria-checked={lang === l}
+                onClick={() => setLang(l)}
+                className={`px-3 py-2 ${lang === l ? "bg-ink text-paper" : "hover:bg-ink/5"}`}
+              >
+                {l === "en" ? "English" : "Español"}
+              </button>
+            ))}
+          </div>
           <button
             onClick={savePdf}
             disabled={!html}
@@ -61,6 +77,11 @@ export default function PacketPage() {
         </div>
       </div>
 
+      {lang === "es" && (
+        <p role="note" className="mb-4 border-2 border-dashed border-ink bg-sun/40 px-4 py-3 font-mono text-sm print:hidden">
+          Borrador de traducción — revise con un hablante fluido / Draft translation.
+        </p>
+      )}
       {error && (
         <div className="rounded-[2px] border border-signal bg-[#fdf0ee] p-6 text-xl">
           Couldn&apos;t load the packet: {error}.{" "}
