@@ -23,6 +23,10 @@ The engine supports ALL specialties via the rules table; **the demo shows the th
 
 ## Hackathon constraints (non-negotiable)
 - Final submission **Sunday 12:00 PM PT. NO git commits after that — disqualification.**
+- **Initial Devpost submission (placeholder OK) due Sunday 11:00 AM.** Final needs a public 3-min video,
+  write-up and repo link. Hacker Guide says to keep 2 hours for the video and write-up.
+- Judging is Sunday 12:30–2:30 PM at our table. **If any teammate is missing, the judge gives a zero.**
+- Hacking room closes Saturday 9:00 PM and reopens Sunday 7:00 AM.
 - Judged on Idea, Demo, Technical Complexity, Completion (3-min live demo + 2-min Q&A).
 - **Code quality is NOT judged. Working demo path > everything.** Don't over-engineer, don't refactor
   other people's code, don't add abstractions "for later".
@@ -87,14 +91,22 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - `docs/API.md` — endpoints, request/response JSON, errors, polling
 - `docs/RULES.md` — legal deadlines table (Jai verifying)
 - `docs/DEMO.md`, `docs/PITCH.md` — demo script, Q&A, Devpost
+- `docs/RESEARCH_NOTES.md` — what to trust / not trust from the background research PDFs
 - `docs/TASKS.md` — per-person checklist + checkpoints (4:00 PM, 6:00 PM Sat)
 - `README.md` — setup and run commands
+
+## Background research PDFs (not in the repo) — details in `docs/RESEARCH_NOTES.md`
+- AI-generated reports; **where they disagree with `docs/RULES.md`, RULES.md wins.**
+- Never use from them: UC SHIP as a covered plan, AB 298 / SB 1280 / AB 280 benchmarks, the 55% / 82%
+  stats as California numbers, "3–5 calls legally triggers out-of-network", Mastra / Basement prize tracks.
+- Blueprint extras (entity resolution, license checks, out-of-network matching, call recording) are out of scope.
 
 ## Current status (update this list as you land things — one line each)
 - [x] Base scaffold: contracts, docs, FAKE_MODE backend, stub modules, frontend shells (Aryan)
 - [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
 - [ ] Neon schema applied + seeded (Ivan)
-- [ ] Real scraper / ghost check (Ivan)
+- [ ] Real scraper / ghost check (Ivan) — code landed (cache → Bright Data → NPI → seed), but every
+      `DIRECTORY_URLS` entry is empty, so real providers currently come from NPI only, not an insurer directory
 - [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)
 - [ ] ElevenLabs/Twilio agent calling teammate phones (Hardik)
 - [ ] Webhook + Gemini extraction (Hardik)
