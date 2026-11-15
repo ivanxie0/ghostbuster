@@ -95,7 +95,7 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
 - [ ] Neon schema applied + seeded (Ivan)
 - [ ] Real scraper / ghost check (Ivan)
-- [ ] Rules verified against DMHC (Jai) + business-day tests (Hardik)
+- [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)
 - [ ] ElevenLabs/Twilio agent calling teammate phones (Hardik)
 - [ ] Webhook + Gemini extraction (Hardik)
 - [ ] Frontend screens wired to API (Aryan)

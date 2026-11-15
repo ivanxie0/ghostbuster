@@ -21,8 +21,8 @@ Final submission **Sun 12:00 PM PT** — no commits after.
 - [ ] Cache scraped results in Neon; timeout → cache/seed fallback
 
 ## Hardik — rules, calls
-- [ ] `rules/deadlines.py`: DEADLINES + holidays + `business_days_between` + `check_violation` + tests
-- [ ] ElevenLabs agent prompt (discloses AI, asks earliest new-patient opening for plan)
+- [x] `rules/deadlines.py`: DEADLINES + holidays + `business_days_between` + `check_violation` + tests
+- [x] ElevenLabs agent prompt (discloses AI, asks earliest new-patient opening for plan)
 - [ ] Twilio outbound via ElevenLabs to TEAMMATE_PHONE_* only (allowlist enforced)
 - [ ] `calls/webhook.py`: parse post-call payload, Gemini date extraction, update provider
 - [ ] Timeouts + fallbacks on every external call
