@@ -107,6 +107,18 @@ def _search_profile_url(p: Provider) -> str | None:
     return None
 
 
+def _same_place(p: Provider, page: str) -> bool:
+    """A searched-for page only counts if it mentions the provider's own city or ZIP. The listing's own
+    URL (not found by search) is always trusted."""
+    if _is_profile_url(p.source_url):
+        return True
+    parts = [x.strip() for x in (p.address or "").split(",")]
+    city = parts[-2].lower() if len(parts) >= 2 else ""
+    zips = re.findall(r"\b\d{5}\b", p.address or "")
+    t = page.lower()
+    return bool((city and city in t) or (zips and zips[-1] in t))
+
+
 def check_one(p: Provider) -> tuple[str, str | None, str]:
     """Returns (verdict, reason, source). verdict: "ghost" | "ok" | "unknown"."""
     url = p.source_url if _is_profile_url(p.source_url) else _search_profile_url(p)
@@ -115,9 +127,13 @@ def check_one(p: Provider) -> tuple[str, str | None, str]:
     status, page = web.unlock(url, timeout=STEP_TIMEOUT_S)
     if status in (404, 410):
         return "ghost", f"practice/profile page is gone (HTTP {status})", "brightdata"
+    if not _same_place(p, page):  # same name, different person/place (e.g. an MD in another county): don't use it
+        return "unknown", None, "mismatch"
     verdict, reason = classify_text(page)
+    if verdict == "ok":  # the page itself says "accepting new clients/patients": worth showing, with the source
+        return "ok", f"Profile checked: page says accepting new clients ({url})", "keyword"
     if verdict:
-        return verdict, (f"{reason} ({url})" if reason else None), "keyword"
+        return verdict, f"{reason} ({url})", "keyword"
     if os.getenv("GEMINI_API_KEY"):
         try:
             ans = web.gemini_json(CLASSIFY_PROMPT.format(name=p.name, page=page[:20000]), timeout=STEP_TIMEOUT_S)
@@ -166,5 +182,8 @@ def run_ghost_check(providers: list[Provider]) -> list[Provider]:
         verdict, reason = verdicts.get(i, ("unknown", None))
         if verdict == "ghost":
             p = p.model_copy(update={"ghost_status": "ghost", "ghost_reason": reason})
+        elif verdict == "ok" and reason and p.name not in seed:
+            # Stays "unverified" (not called yet); the note only records what the public profile says.
+            p = p.model_copy(update={"ghost_reason": reason})
         out.append(p)
     return out

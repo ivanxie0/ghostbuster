@@ -89,3 +89,12 @@ def test_ghost_check_profile_and_seed(live, monkeypatch):
     expected = {r["name"] for r in json.loads(providers.SEED_FILE.read_text()) if r["ghost_status"] == "ghost"}
     seed_ghosts = {p.name for p in out[3:] if p.ghost_status == "ghost"}
     assert seed_ghosts == expected & {p.name for p in seed}
+
+
+def test_profile_checked_note_on_available(live, monkeypatch):
+    monkeypatch.setattr(web, "unlock", lambda url, timeout, markdown=True: (200, "Currently accepting new clients!"))
+    monkeypatch.setattr(web, "brightdata_configured", lambda: True)
+    p = providers.Provider(name="Ann Open, LMFT", specialty="therapist", source_url="https://annopen.example.org")
+    out = ghosts.run_ghost_check([p])[0]
+    assert out.ghost_status == "unverified"
+    assert out.ghost_reason.startswith("Profile checked:") and "annopen.example.org" in out.ghost_reason

@@ -106,9 +106,10 @@ Shared (coordinate before editing): `CLAUDE.md`, `README.md`, `docs/API.md`, `do
 - [x] Contract v2: urgent = calendar hours, `calling` status, `prior_appointment_date` (Aryan)
 - [x] Neon schema applied + seeded (Ivan)
 - [x] Real scraper / ghost check (Ivan) — providers from NPI (`DIRECTORY_URLS` still empty, no insurer
-      directory); ghost check = Bright Data SERP + Web Unlocker + Gemini on public profiles. Pre-warmed for
-      Blue Shield / 92103 / therapist: 60 checked, 1 real ghost cached. Needs `BRIGHTDATA_*` (incl.
-      `BRIGHTDATA_SERP_ZONE`) + `GEMINI_API_KEY` in `.env`; re-run `python -m scraper.prewarm` for other searches
+      directory); ghost check = Bright Data SERP + Web Unlocker + Gemini on public profiles (page must mention the
+      provider's city/ZIP). Pre-warmed Blue Shield / 92103 / therapist: 90 checked, 5 real ghosts, 19 with a
+      "Profile checked: page says accepting new clients (url)" note in `ghost_reason` on `unverified` rows.
+      Needs `BRIGHTDATA_*` (incl. `BRIGHTDATA_SERP_ZONE`) + `GEMINI_API_KEY`; other searches: `python -m scraper.prewarm`
 - [x] Rules verified against DMHC (Jai) + business-day tests (Hardik)
 - [ ] ElevenLabs/Twilio agent calling teammate phones (Hardik)
 - [ ] Webhook + Gemini extraction (Hardik)

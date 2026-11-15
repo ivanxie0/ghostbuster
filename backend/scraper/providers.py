@@ -223,9 +223,11 @@ def get_providers(insurer: str, zip: str, specialty: Specialty, *, timeout: floa
     # short demo list shows real verified results instead of the first 8 names alphabetically.
     if len(real) > MAX_REAL_PROVIDERS:
         verdicts = cache.profile_verdicts()
-        rank = {"ghost": 0, "ok": 1}
-        real = sorted(real, key=lambda p: rank.get(
-            (verdicts.get(cache.profile_key(p.name, p.address)) or {}).get("verdict"), 2))
+        def rank(p: Provider) -> int:
+            v = verdicts.get(cache.profile_key(p.name, p.address)) or {}
+            return 0 if v.get("verdict") == "ghost" else 1 if v.get("reason") else 2
+
+        real = sorted(real, key=rank)
     real = real[:MAX_REAL_PROVIDERS]
     if not real:
         return load_seed_providers(specialty)
