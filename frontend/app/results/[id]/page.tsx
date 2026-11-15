@@ -20,6 +20,8 @@ export default function ResultsPage() {
   const [pinned, setPinned] = useState<string | null>(null); // user-clicked provider
   const [focus, setFocus] = useState<string | null>(null); // auto-follow: latest thing that happened
   const [approving, setApproving] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  const deletedRef = useRef(false); // stops polling once the search is deleted
   const prev = useRef<SearchDetail | null>(null);
   const seq = useRef(0);
   const endingRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,7 @@ export default function ResultsPage() {
     let timer: ReturnType<typeof setTimeout>;
     let doneSince: number | null = null; // keep polling a while after done: late real-call webhooks
     const tick = async () => {
+      if (deletedRef.current) return;
       try {
         const d = await api.getSearch(id);
         if (stop) return;
@@ -86,6 +89,27 @@ export default function ResultsPage() {
       clearTimeout(timer);
     };
   }, [id, log]);
+
+  async function deleteSearch() {
+    if (!window.confirm("Delete this search? This removes its providers, call transcripts and records. It can't be undone.")) return;
+    try {
+      await api.deleteSearch(id);
+      deletedRef.current = true;
+      setDeleted(true);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  if (deleted) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-16 text-center">
+        <h1 className="display text-4xl">Search deleted</h1>
+        <p className="mt-3 text-lg text-ink/70">Its providers, call transcripts and records were removed.</p>
+        <Link href="/search" className="btn btn-solid mt-6 inline-block">New search</Link>
+      </main>
+    );
+  }
 
   if (!data) {
     const expired = error === "search not found";
@@ -213,6 +237,13 @@ export default function ResultsPage() {
             onCorrect={selected ? (date) => correctDate(selected.id, date) : undefined} />
           <ActivityLog events={events} onPick={setPinned} />
         </aside>
+      </div>
+
+      <div className="rule-dotted flex flex-wrap items-center justify-between gap-3 pt-4 print:hidden">
+        <p className="text-sm text-ink/60">We don&apos;t store your name or health details; delete your search anytime.</p>
+        <button onClick={deleteSearch} className="rounded border border-signal/60 px-3 py-1.5 text-sm text-signal hover:bg-signal/10">
+          Delete this search
+        </button>
       </div>
     </main>
   );

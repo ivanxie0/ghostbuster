@@ -33,6 +33,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ what, contact: contact || null }),
     }),
+  /** Privacy: delete this search, its provider rows, transcripts and app records. */
+  deleteSearch: (id: string) => req<{ ok: boolean }>(`/api/search/${id}`, { method: "DELETE" }),
   /** Ghost Map stats (real registry vs demo providers). */
   ghostStats: () => req<GhostStats>("/api/stats/ghosts"),
   /** Demo control panel (Shift+D). */

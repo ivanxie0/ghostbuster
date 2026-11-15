@@ -96,6 +96,20 @@ def under_review(search_id: str) -> list[str]:
         return []
 
 
+def delete_search(search_id: str) -> bool:
+    """Privacy: delete the search, its provider rows for that search, transcripts and every app record."""
+    from app import demo
+    for d in (_auth, _corrections, _reports):
+        d.pop(search_id, None)
+    with demo._lock:
+        demo._events.pop(search_id, None)
+    if FAKE_MODE:
+        from app import fake
+        return fake._S.pop(search_id, None) is not None
+    from app import db
+    return db.delete_search(search_id)
+
+
 def annotate(detail: SearchDetail) -> SearchDetail:
     """Add the app records to a search response (optional fields)."""
     sid = detail.search.id

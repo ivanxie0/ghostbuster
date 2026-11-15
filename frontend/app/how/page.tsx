@@ -142,6 +142,9 @@ export default function HowPage() {
         Providers can correct their status: every real provider on the results page has a &ldquo;Report an error&rdquo; link,
         and a reported provider is marked &ldquo;under review&rdquo;.
       </p>
+      <p className="mt-3 text-lg text-ink/80">
+        Privacy: we don&apos;t store your name or health details; delete your search anytime from its results page.
+      </p>
 
       <p className="rule-dotted label mt-16 pt-4 text-ink/60">
         Evidence log + templates · not legal advice ·{" "}

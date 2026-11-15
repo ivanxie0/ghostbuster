@@ -108,3 +108,10 @@ def get_reported_providers(search_id: str) -> list[str]:
     with connect() as c:
         rows = c.execute("SELECT DISTINCT provider_id::text FROM error_reports WHERE search_id = %s", (search_id,)).fetchall()
         return [r["provider_id"] for r in rows]
+
+
+def delete_search(search_id: str) -> bool:
+    """Delete a search; ON DELETE CASCADE removes its providers (incl. transcripts), authorization,
+    date corrections and error reports."""
+    with connect() as c:
+        return c.execute("DELETE FROM searches WHERE id = %s RETURNING id", (search_id,)).fetchone() is not None

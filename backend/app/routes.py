@@ -81,6 +81,14 @@ def correct_date(search_id: str, provider_id: str, body: DateCorrection):
         raise HTTPException(400, str(e))
 
 
+@router.delete("/search/{search_id}")
+def delete_search(search_id: str):
+    """Privacy: delete this search, its provider rows, transcripts and app records."""
+    if not records.delete_search(search_id):
+        raise HTTPException(404, "search not found")
+    return {"ok": True, "deleted": search_id}
+
+
 @router.post("/search/{search_id}/providers/{provider_id}/report")
 def report_error(search_id: str, provider_id: str, body: ErrorReport):
     """'Report an error' on a provider row (e.g. the provider correcting their status). Stored; row shows 'under review'."""

@@ -200,6 +200,7 @@ export function ConsentCard({ search, count, skipped = 0, onApprove, busy }: { s
         Calls are <b>recorded and transcribed</b> so the transcript can go in your evidence log.
       </p>
       <p className="rule-dotted mt-4 pt-3 text-sm text-ink/60">Hackathon demo: calls only go to our own team&apos;s test phones.</p>
+      <p className="mt-1 text-sm text-ink/60">We don&apos;t store your name or health details; delete your search anytime.</p>
       <button
         onClick={onApprove}
         disabled={busy}
