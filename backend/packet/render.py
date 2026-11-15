@@ -79,6 +79,7 @@ T = {
         "oon_cols": ["Provider", "Phone", "Public profile", "Checked", "Profile text matched"],
         "oon_line": "- {name}, {address} (public profile: {url}, checked {date})",
         "auth": "<b>Calls authorized by the patient on {date}, {time} PT.</b> The AI assistant disclosed it was an AI and that calls were recorded and transcribed.",
+        "date_patient": "date confirmed by patient", "date_extracted": "extracted from call",
         "funnel_h": "The funnel",
         "funnel": ["providers found", "profiles found online", "appear unavailable", "offices reached", "timely appointment"],
         "standard": "<b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {appt} with a {spec} within <b>{deadline}</b>{since}. Business days exclude weekends and federal/California holidays. A provider can lawfully set a longer wait if they note in the enrollee&#39;s record that it won&#39;t harm the enrollee&#39;s health. Telehealth appointments count.",
@@ -108,6 +109,7 @@ T = {
         "oon_cols": ["Proveedor", "Teléfono", "Perfil público", "Revisado", "Texto encontrado en el perfil"],
         "oon_line": "- {name}, {address} (perfil público: {url}, revisado el {date})",
         "auth": "<b>Llamadas autorizadas por el paciente el {date}, a las {time} (hora del Pacífico).</b> El asistente de IA indicó que era una IA y que las llamadas se grababan y transcribían.",
+        "date_patient": "fecha confirmada por el paciente", "date_extracted": "extraída de la llamada",
         "funnel_h": "El embudo",
         "funnel": ["proveedores encontrados", "perfiles encontrados en línea", "no parecen disponibles", "consultorios contactados", "cita a tiempo"],
         "standard": "<b>Norma:</b> Sección 1367.03(a)(5) del Código de Salud y Seguridad de California — {appt} con {spec} en un plazo de <b>{deadline}</b>{since}. Los días hábiles excluyen fines de semana y feriados federales y de California. Un proveedor puede fijar legalmente una espera más larga si anota en el expediente del miembro que no perjudicará su salud. Las citas por telesalud cuentan.",
@@ -233,6 +235,14 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     ctx["oon_request"] = ("\n".join([tr["oon_intro"]] + [tr["oon_line"].format(name=c["name"], address=c["address"] or "",
                           url=c["source_url"], date=_d(c["checked_at"])) for c in oon] + [tr["oon_label"]]) if oon else "")
 
+    confirmed = set(records.patient_confirmed(s.id))
+
+    def date_cell(p) -> str:
+        if not p.earliest_date:
+            return "—"
+        note = tr["date_patient"] if p.id in confirmed else tr["date_extracted"]
+        return f"{short_date(p.earliest_date)}<br><span class='muted small'>{note}</span>"
+
     def wait(p) -> str:
         if p.business_days_wait is None:
             return "—"
@@ -242,7 +252,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
         f"<tr><td><b>{_e(p.name)}</b><br><span class='muted small'>{_e(p.address)}</span></td><td>{_e(mask_phone(p.phone))}</td>"
         f"<td>{short_datetime(p.checked_at.astimezone(TZ)) if p.checked_at else ''}</td>"
         f"<td><span class='pill {p.ghost_status}'>{CALLED_GHOST_LABEL if p.ghost_status == 'ghost' else LABEL[p.ghost_status]}</span></td>"
-        f"<td>{short_date(p.earliest_date) if p.earliest_date else '—'}</td><td>{wait(p)}</td>"
+        f"<td>{date_cell(p)}</td><td>{wait(p)}</td>"
         f"<td>{_e(_reason(p))}</td></tr>"
         for p in called
     ) or "<tr><td colspan='7' class='muted'>No offices were called.</td></tr>"

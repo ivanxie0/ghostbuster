@@ -1,7 +1,7 @@
 "use client";
 // Results "mission control" pieces. Pure presentation — data comes in via props from app/results/[id].
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
   CONFIRMED_GHOST_STYLE, PLAN_LABEL, SPECIALTY_LABEL, STATUS_STYLE, deadlineText, isConfirmedGhost, isDemoProvider, longDate, maskPhone, maskPhonesIn, profileCheck, checkedDate, isRealCallUpdate, honestReason, hadProfileCheck,
@@ -400,7 +400,7 @@ export function LegalNote() {
   );
 }
 
-export function ProviderList({ search, providers, selected, onSelect }: { search: Search; providers: Provider[]; selected: string | null; onSelect: (id: string) => void }) {
+export function ProviderList({ search, providers, selected, onSelect, confirmedIds = [] }: { search: Search; providers: Provider[]; selected: string | null; onSelect: (id: string) => void; confirmedIds?: string[] }) {
   const mixed = providers.some(isDemoProvider) && !providers.every(isDemoProvider);
   return (
     <ul className="space-y-3">
@@ -427,7 +427,10 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
                       <span className="notice ml-2 inline-block align-middle !rounded px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide no-underline">Demo</span>
                     )}
                   </div>
-                  <div className="mt-0.5 text-base leading-snug">{rowDetail(search, p)}</div>
+                  <div className="mt-0.5 text-base leading-snug">
+                    {rowDetail(search, p)}
+                    {confirmedIds.includes(p.id) && <span className="ml-2 text-moss">· date confirmed by patient</span>}
+                  </div>
                 </div>
                 <StatusBadge status={p.ghost_status} confirmed={confirmed} />
               </div>
@@ -455,7 +458,53 @@ export function ProviderList({ search, providers, selected, onSelect }: { search
 }
 
 // ---------------------------------------------------------------- right pane
-export function TranscriptPanel({ search, provider }: { search: Search; provider: Provider | null }) {
+/** "Is this right? Edit": the patient confirms or corrects an extracted date. The transcript is never changed. */
+function DateCheck({ provider, confirmed, onCorrect }: { provider: Provider; confirmed: boolean; onCorrect: (date: string) => Promise<void> }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(provider.earliest_date ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function save() {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return setError("Pick a date.");
+    setSaving(true);
+    setError(null);
+    try {
+      await onCorrect(value);
+      setEditing(false);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-sm">
+      {!editing ? (
+        <>
+          <span className={confirmed ? "text-moss" : "text-ink/65"}>
+            {confirmed ? "✓ Date confirmed by patient" : "Extracted from the call. Is this right?"}
+          </span>
+          <button onClick={() => { setValue(provider.earliest_date ?? ""); setEditing(true); }} className="text-cobalt underline underline-offset-2">
+            Edit
+          </button>
+        </>
+      ) : (
+        <>
+          <label className="sr-only" htmlFor={`date-${provider.id}`}>Correct appointment date</label>
+          <input id={`date-${provider.id}`} type="date" value={value} onChange={(e) => setValue(e.target.value)}
+            className="rounded border border-line bg-paper px-2 py-1 text-ink [color-scheme:dark]" />
+          <button onClick={save} disabled={saving} className="btn btn-solid px-3 py-1 text-sm">{saving ? "Saving…" : "Save"}</button>
+          <button onClick={() => setEditing(false)} className="text-ink/60 underline underline-offset-2">Cancel</button>
+          {error && <span className="text-signal">{error}</span>}
+        </>
+      )}
+    </div>
+  );
+}
+
+export function TranscriptPanel({ search, provider, confirmed = false, onCorrect }: {
+  search: Search; provider: Provider | null; confirmed?: boolean; onCorrect?: (date: string) => Promise<void>;
+}) {
   if (!provider)
     return (
       <div className="flex h-full min-h-48 items-center justify-center rounded-xl border border-dashed border-ink/25 bg-paper p-6 text-center text-base text-ink/55">
@@ -490,6 +539,9 @@ export function TranscriptPanel({ search, provider }: { search: Search; provider
             <div className="display text-2xl text-ink">{w.limit}</div>
           </div>
         </div>
+      )}
+      {provider.earliest_date && onCorrect && (
+        <DateCheck key={provider.id + (provider.earliest_date ?? "")} provider={provider} confirmed={confirmed} onCorrect={onCorrect} />
       )}
 
       <div className="scroll-dark mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">

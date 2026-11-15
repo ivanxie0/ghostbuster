@@ -82,3 +82,17 @@ def get_authorization(search_id: str):
     with connect() as c:
         row = c.execute("SELECT authorized_at FROM authorizations WHERE search_id = %s", (search_id,)).fetchone()
         return row["authorized_at"] if row else None
+
+
+def upsert_date_correction(provider_id: str, search_id: str, original, corrected) -> None:
+    with connect() as c:
+        c.execute(
+            "INSERT INTO date_corrections (provider_id, search_id, original_date, corrected_date) VALUES (%s, %s, %s, %s) "
+            "ON CONFLICT (provider_id) DO UPDATE SET corrected_date = EXCLUDED.corrected_date, corrected_at = now()",
+            (provider_id, search_id, original, corrected))
+
+
+def get_date_corrections(search_id: str) -> list[str]:
+    with connect() as c:
+        rows = c.execute("SELECT provider_id::text FROM date_corrections WHERE search_id = %s", (search_id,)).fetchall()
+        return [r["provider_id"] for r in rows]

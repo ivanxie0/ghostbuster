@@ -50,6 +50,14 @@ CREATE TABLE IF NOT EXISTS authorizations (
     provider_count integer NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS date_corrections (
+    provider_id    uuid PRIMARY KEY REFERENCES providers(id) ON DELETE CASCADE,
+    search_id      uuid NOT NULL REFERENCES searches(id) ON DELETE CASCADE,
+    original_date  date,                                  -- what extraction produced (first value kept)
+    corrected_date date NOT NULL,                         -- what the patient confirmed
+    corrected_at   timestamptz NOT NULL DEFAULT now()
+);
+
 -- Migrations for DBs created from an older version of this file (safe to re-run).
 ALTER TABLE searches ADD COLUMN IF NOT EXISTS prior_appointment_date date;
 ALTER TABLE providers DROP CONSTRAINT IF EXISTS providers_ghost_status_check;

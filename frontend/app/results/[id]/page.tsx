@@ -7,7 +7,7 @@ import {
   type LogEvent,
 } from "@/components/results";
 import { api, POLL_MS } from "@/lib/api";
-import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, isRealCallUpdate, wasCalled } from "@/lib/format";
+import { PLAN_LABEL, SPECIALTY_LABEL, clock, deadlineText, isDemoProvider, isRealCallUpdate, shortDate, wasCalled } from "@/lib/format";
 import type { SearchDetail } from "@/lib/types";
 
 const POLL_AFTER_DONE_MS = 45_000;
@@ -119,6 +119,16 @@ export default function ResultsPage() {
   const selectedId = pinned ?? focus;
   const selected = providers.find((p) => p.id === selectedId) ?? null;
 
+  // Human check: correct an extracted date, then refresh (polling may have stopped after "done").
+  async function correctDate(providerId: string, date: string) {
+    await api.correctDate(id, providerId, date);
+    const d = await api.getSearch(id);
+    const name = d.providers.find((p) => p.id === providerId)?.name ?? "Provider";
+    log([{ tone: "user", text: `You confirmed ${name}'s earliest date as ${shortDate(date)}.` }]);
+    prev.current = d;
+    setData(d);
+  }
+
   async function approve() {
     setApproving(true);
     log([{ tone: "user", text: `You approved AI calls to ${willCall.length} offices.` }]);
@@ -186,11 +196,12 @@ export default function ResultsPage() {
               ))}
             </div>
           ) : (
-            <ProviderList search={search} providers={providers} selected={selectedId} onSelect={setPinned} />
+            <ProviderList search={search} providers={providers} selected={selectedId} onSelect={setPinned} confirmedIds={data.patient_confirmed ?? []} />
           )}
         </section>
         <aside className="space-y-4 lg:sticky lg:top-14 lg:col-span-5 lg:self-start">
-          <TranscriptPanel search={search} provider={selected} />
+          <TranscriptPanel search={search} provider={selected} confirmed={!!selected && (data.patient_confirmed ?? []).includes(selected.id)}
+            onCorrect={selected ? (date) => correctDate(selected.id, date) : undefined} />
           <ActivityLog events={events} onPick={setPinned} />
         </aside>
       </div>

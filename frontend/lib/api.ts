@@ -1,5 +1,5 @@
 // Typed client for every endpoint in docs/API.md.
-import type { DemoSettings, GhostStats, SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
+import type { DemoSettings, GhostStats, Provider, SearchCreate, SearchCreated, SearchDetail, VerifyResponse } from "./types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -24,6 +24,9 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ provider_ids }),
     }),
+  /** Human check: patient corrects an extracted date (YYYY-MM-DD); the rules engine re-runs. */
+  correctDate: (id: string, providerId: string, date: string) =>
+    req<Provider>(`/api/search/${id}/providers/${providerId}/date`, { method: "POST", body: JSON.stringify({ date }) }),
   /** Ghost Map stats (real registry vs demo providers). */
   ghostStats: () => req<GhostStats>("/api/stats/ghosts"),
   /** Demo control panel (Shift+D). */

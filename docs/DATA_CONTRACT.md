@@ -198,5 +198,6 @@ IDs are UUID strings. Dates are ISO `YYYY-MM-DD`; timestamps are ISO 8601 with t
 | Table | Columns | Written by |
 |---|---|---|
 | `authorizations` | `search_id` uuid PK → searches, `authorized_at` timestamptz, `provider_count` int | `POST /api/search/{id}/verify` (the patient's consent click; first one kept) |
+| `date_corrections` | `provider_id` uuid PK → providers, `search_id` → searches, `original_date`, `corrected_date`, `corrected_at` | `POST /api/search/{id}/providers/{pid}/date` `{"date":"YYYY-MM-DD"}` (rules engine re-runs; transcript unchanged) |
 
-`GET /api/search/{id}` adds optional `authorized_at` (ISO timestamp or null). The packet shows it near the top.
+`GET /api/search/{id}` adds optional `authorized_at` (ISO timestamp or null) and `patient_confirmed` (provider ids). The packet shows both.

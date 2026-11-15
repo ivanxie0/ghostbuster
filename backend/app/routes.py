@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from app import store
 from app.config import FAKE_MODE
 from app import demo, records
-from app.models import (DemoSettings, DemoSettingsUpdate, SearchCreate, SearchCreated, SearchDetail,
+from app.models import (DateCorrection, DemoSettings, DemoSettingsUpdate, Provider, SearchCreate, SearchCreated, SearchDetail,
                         VerifyRequest, VerifyResponse)
 from packet.render import render_packet
 
@@ -68,6 +68,17 @@ def verify(search_id: str, body: VerifyRequest):
         raise HTTPException(400, str(e))
     records.record_authorization(search_id, len(ids))  # authorization record for the packet
     return VerifyResponse(started=len(ids), provider_ids=ids)
+
+
+@router.post("/search/{search_id}/providers/{provider_id}/date", response_model=Provider)
+def correct_date(search_id: str, provider_id: str, body: DateCorrection):
+    """Human check: the patient corrects an extracted date; the rules engine re-runs on it."""
+    try:
+        return records.correct_date(search_id, provider_id, body.date)
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @router.post("/webhooks/call-complete")
