@@ -15,6 +15,7 @@ from datetime import date
 from pathlib import Path
 
 from app import store
+from app.solutions import oon_candidates
 from rules.deadlines import DEADLINES, TZ, URGENT_HOURS
 
 TEMPLATES = Path(__file__).parent / "templates"
@@ -70,6 +71,12 @@ T = {
             "<b>DMHC Help Center</b> (free): 1-888-466-2219 · www.dmhc.ca.gov/FileaComplaint.aspx — attach this packet when you file.",
         ],
         "script_h": "Member services phone script", "dmhc_h": "Taking it to the DMHC", "appendix": "Appendix: call transcripts",
+        "oon_h": "Proposed solution: providers to authorize out of network",
+        "oon_intro": "Please authorize one of these providers at in-network cost:",
+        "oon_label": "Public profile says accepting new clients; network status and availability not confirmed.",
+        "oon_none": "No provider near this ZIP has a public profile saying it accepts new clients yet.",
+        "oon_cols": ["Provider", "Phone", "Public profile", "Checked", "Profile text matched"],
+        "oon_line": "- {name}, {address} (public profile: {url}, checked {date})",
         "funnel_h": "The funnel",
         "funnel": ["providers found", "profiles found online", "appear unavailable", "offices reached", "timely appointment"],
         "standard": "<b>Standard:</b> California Health and Safety Code §1367.03(a)(5) — {appt} with a {spec} within <b>{deadline}</b>{since}. Business days exclude weekends and federal/California holidays. A provider can lawfully set a longer wait if they note in the enrollee&#39;s record that it won&#39;t harm the enrollee&#39;s health. Telehealth appointments count.",
@@ -92,6 +99,12 @@ T = {
             "<b>Centro de Ayuda del DMHC</b> (gratis): 1-888-466-2219 · www.dmhc.ca.gov/FileaComplaint.aspx — adjunte este paquete al presentar la queja.",
         ],
         "script_h": "Guion telefónico para servicios para miembros", "dmhc_h": "Pasos con el DMHC", "appendix": "Anexo: transcripciones de las llamadas",
+        "oon_h": "Solución propuesta: proveedores para autorizar fuera de la red",
+        "oon_intro": "Por favor autoricen a uno de estos proveedores al costo dentro de la red:",
+        "oon_label": "El perfil público dice que acepta clientes nuevos; no se ha confirmado si está en la red ni su disponibilidad.",
+        "oon_none": "Aún no hay proveedores cerca de este código postal cuyo perfil público diga que aceptan clientes nuevos.",
+        "oon_cols": ["Proveedor", "Teléfono", "Perfil público", "Revisado", "Texto encontrado en el perfil"],
+        "oon_line": "- {name}, {address} (perfil público: {url}, revisado el {date})",
         "funnel_h": "El embudo",
         "funnel": ["proveedores encontrados", "perfiles encontrados en línea", "no parecen disponibles", "consultorios contactados", "cita a tiempo"],
         "standard": "<b>Norma:</b> Sección 1367.03(a)(5) del Código de Salud y Seguridad de California — {appt} con {spec} en un plazo de <b>{deadline}</b>{since}. Los días hábiles excluyen fines de semana y feriados federales y de California. Un proveedor puede fijar legalmente una espera más larga si anota en el expediente del miembro que no perjudicará su salud. Las citas por telesalud cuentan.",
@@ -208,6 +221,14 @@ def render_packet(search_id: str, lang: str = "en") -> str:
             "deadline_text": f"{URGENT_HOURS['no_prior_auth']} horas" if urgent else f"{deadline_days} días hábiles",
         })
 
+    # Out-of-network proposed solution (Ending B only): public profiles saying "accepting new clients".
+    ending_b = bool(called) and not any(p.ghost_status == "available" for p in called)
+    oon = oon_candidates(s, providers) if ending_b else []
+    def _d(dt):
+        return (fecha_larga(dt.astimezone(TZ)) if lang == "es" else long_date(dt.astimezone(TZ))) if dt else "—"
+    ctx["oon_request"] = ("\n".join([tr["oon_intro"]] + [tr["oon_line"].format(name=c["name"], address=c["address"] or "",
+                          url=c["source_url"], date=_d(c["checked_at"])) for c in oon] + [tr["oon_label"]]) if oon else "")
+
     def wait(p) -> str:
         if p.business_days_wait is None:
             return "—"
@@ -248,6 +269,16 @@ def render_packet(search_id: str, lang: str = "en") -> str:
     any_available = any(p.ghost_status == "available" for p in called)
     finding = tr["f_avail"] if any_available else tr["f_none"] if called else tr["f_zero"]
     called_ids = {p.id for p in called}
+    if ending_b:
+        oon_rows = "".join(
+            f"<tr><td><b>{_e(c['name'])}</b><br><span class='muted small'>{_e(c['address'])}</span></td>"
+            f"<td>{_e(mask_phone(c['phone']))}</td><td class='small'>{_e(c['source_url'])}</td><td>{_d(c['checked_at'])}</td>"
+            f"<td>&ldquo;{_e(c['matched_text'])}&rdquo;</td></tr>" for c in oon)
+        cols = "".join(f"<th>{c}</th>" for c in tr["oon_cols"])
+        oon_section = (f"<h2>{tr['oon_h']}</h2><p>{tr['oon_intro']}</p><table><tr>{cols}</tr>{oon_rows}</table>"
+                       f"<p class='small muted'>{tr['oon_label']}</p>") if oon else f"<h2>{tr['oon_h']}</h2><p class='muted'>{tr['oon_none']}</p>"
+    else:
+        oon_section = ""
     funnel_vals = [
         len(providers),
         sum(1 for p in providers if (p.ghost_reason or "").startswith("Profile checked:")
@@ -287,6 +318,7 @@ def render_packet(search_id: str, lang: str = "en") -> str:
 <h3>{tr['ghosts_h']}</h3>
 <table><tr><th>Provider</th><th>Phone on record</th><th>Why flagged</th><th>Source</th></tr>{ghost_rows}</table>
 
+{oon_section}
 <h2 class="pb">{tr['part2'].format(insurer=_e(s.insurer))}</h2><pre>{_tpl('letter.txt', ctx, lang)}</pre>
 
 <h2 class="pb">{tr['next']}</h2>

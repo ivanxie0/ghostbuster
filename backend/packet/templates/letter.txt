@@ -32,6 +32,7 @@ California Health and Safety Code Section 1367.03(a)(5) and Title 28, California
 4. WHAT I AM ASKING YOU TO DO
 a) Arrange an appointment for me within the legal timeframe, and tell me the provider's name, date, and time.
 b) If no network provider can see me in time, arrange and cover the appointment with an out-of-network provider. Under Section 1367.03(a)(7)(C), my cost may not be more than my in-network copayment, coinsurance, and deductible.
+{oon_request}
 c) Confirm in writing that you received this grievance, and send me your written decision.
 d) Tell me which providers in the attached log are in your network, and correct your directory if any of them are listed there but not available.
 

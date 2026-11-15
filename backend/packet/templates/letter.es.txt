@@ -31,6 +31,7 @@ La Sección 1367.03(a)(5) del Código de Salud y Seguridad de California y la Se
 4. LO QUE LES PIDO
 a) Que me consigan una cita dentro del plazo legal y me informen el nombre del proveedor, la fecha y la hora.
 b) Si ningún proveedor de la red puede atenderme a tiempo, que coordinen y cubran la cita con un proveedor fuera de la red. Según la Sección 1367.03(a)(7)(C), mi costo no puede ser mayor que mi copago, coaseguro y deducible dentro de la red.
+{oon_request}
 c) Que confirmen por escrito que recibieron esta queja y me envíen su decisión por escrito.
 d) Que me indiquen cuáles proveedores del registro adjunto están en su red y corrijan su directorio si alguno aparece pero no está disponible.
 
