@@ -60,6 +60,8 @@ export interface DemoSettings {
   fake_mode: boolean;
   force_fallback: boolean;
   real_calls: boolean;
+  gemini?: boolean;
+  brightdata?: boolean;
 }
 
 export interface VerifyRequest {

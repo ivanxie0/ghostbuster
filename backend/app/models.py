@@ -68,6 +68,8 @@ class DemoSettings(BaseModel):
     fake_mode: bool
     force_fallback: bool
     real_calls: bool  # ElevenLabs configured: teammate phones get real calls
+    gemini: bool = False      # GEMINI_API_KEY set (profile classifier + transcript date extraction)
+    brightdata: bool = False  # BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE set (live profile search/fetch)
 
 
 class DemoSettingsUpdate(BaseModel):

@@ -126,6 +126,10 @@ export default function DemoPanel() {
             <dd>{settings ? (settings.fake_mode ? "Fake mode (in memory)" : "Live · Neon") : "…"}</dd>
             <dt className="text-ink/55">Real phone calls</dt>
             <dd>{settings ? (settings.real_calls ? "On (teammate phones)" : "Off · simulated") : "…"}</dd>
+            <dt className="text-ink/55">Gemini</dt>
+            <dd>{settings ? (settings.gemini ? "configured" : "not configured") : "…"}</dd>
+            <dt className="text-ink/55">Bright Data</dt>
+            <dd>{settings ? (settings.brightdata ? "configured" : "not configured") : "…"}</dd>
             <dt className="text-ink/55">This search</dt>
             <dd>{stages.length ? `fell back: ${stages.join(", ")}` : "no fallbacks"}</dd>
           </dl>

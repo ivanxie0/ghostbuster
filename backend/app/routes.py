@@ -18,8 +18,12 @@ def health():
 
 
 def _demo_settings() -> DemoSettings:
+    import os
+
     from calls.agent import real_calls_enabled
-    return DemoSettings(fake_mode=FAKE_MODE, force_fallback=demo.force_fallback(), real_calls=real_calls_enabled())
+    from scraper.web import brightdata_configured
+    return DemoSettings(fake_mode=FAKE_MODE, force_fallback=demo.force_fallback(), real_calls=real_calls_enabled(),
+                        gemini=bool(os.getenv("GEMINI_API_KEY")), brightdata=brightdata_configured())
 
 
 @router.get("/demo", response_model=DemoSettings)
